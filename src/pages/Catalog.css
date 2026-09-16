@@ -1,0 +1,335 @@
+.catalog-page {
+  background-color: #FDFBF7;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Строгий контейнер на 1440px */
+.catalog-container {
+  width: 100%;
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 40px 120px 60px 120px; /* Отступ сверху 40 (Шапка - крошка) */
+  box-sizing: border-box;
+}
+
+/* --- ВЕРХНЯЯ ЧАСТЬ (Крошки, Заголовок, Выпадашка) --- */
+.catalog-header {
+  position: relative;
+  margin-bottom: 21px; /* Заголовок - Блок с фильтрами (21) */
+}
+
+.catalog-breadcrumb {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  color: #A0A0A0;
+  margin-bottom: 23px; /* Крошка - Заголовок (23) */
+}
+
+.catalog-breadcrumb a {
+  color: #A0A0A0;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.catalog-breadcrumb a:hover { color: #4F3422; }
+
+.catalog-title {
+  font-family: 'Lora', serif;
+  font-size: 32px;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+/* --- ВЫПАДАЮЩИЙ СПИСОК (Жесткие размеры 240х48) --- */
+.catalog-sort-wrapper {
+  position: absolute;
+  right: 0;
+  bottom: -4px; /* Выравниваем по базовой линии заголовка */
+  width: 240px;
+  z-index: 100;
+}
+
+.custom-dropdown {
+  width: 100%;
+  height: 48px;
+  background: #FFFFFF;
+  border: 1px solid #1A1A1A;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.dropdown-arrow {
+  transition: transform 0.3s ease;
+  font-family: monospace;
+}
+
+.custom-dropdown.open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 52px; /* Чуть ниже самой кнопки */
+  left: 0;
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #1A1A1A;
+  border-radius: 8px;
+  list-style: none;
+  padding: 8px 0;
+  margin: 0;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-menu li {
+  padding: 10px 16px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dropdown-menu li:hover, .dropdown-menu li.active {
+  background: #F8F5F2;
+  color: #4F3422;
+}
+
+/* --- ОСНОВНОЙ КОНТЕНТ (Сайдбар + Матрица товаров) --- */
+.catalog-content {
+  display: flex;
+  justify-content: space-between; /* Расталкивает сайдбар и сетку по краям 1200px */
+  align-items: flex-start;
+}
+
+/* --- САЙДБАР ФИЛЬТРОВ --- */
+.catalog-sidebar {
+  width: 280px;
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 24px 20px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Отступы между блоками фильтров */
+.toggle-box { margin-bottom: 40px; }
+.slider-box { margin-bottom: 32px; }
+.checkbox-box { margin-bottom: 32px; }
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* Растягивает ползунки на всю ширину */
+}
+
+/* Жестко задаем строку для тумблера "В наличии" */
+.filter-group.filter-group--inline {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter-title {
+  font-family: 'Lora', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.filter-group.filter-group--inline .filter-title {
+  margin-bottom: 0; /* Убираем отступ вниз, чтобы тумблер стоял ровно напротив текста */
+}
+
+/* Тумблер В Наличии */
+.toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+.toggle-switch input { display: none; }
+.toggle-slider {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #EAEAEA; border-radius: 24px; cursor: pointer; transition: 0.3s;
+}
+.toggle-slider:before {
+  content: ""; position: absolute; height: 18px; width: 18px;
+  left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: 0.3s;
+}
+.toggle-switch input:checked + .toggle-slider { background-color: #4F3422; }
+.toggle-switch input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+/* Ползунки (Range Sliders) */
+.dual-slider {
+  position: relative; width: 100%; height: 4px; background: #EAEAEA;
+  border-radius: 2px; margin-top: 16px; margin-bottom: 8px;
+}
+.slider-track {
+  position: absolute; height: 100%; background: #D3A74A; border-radius: 2px; z-index: 1;
+}
+.dual-slider input[type="range"] {
+  position: absolute; width: 100%; height: 4px; top: 0; margin: 0;
+  -webkit-appearance: none; appearance: none; background: transparent;
+  pointer-events: none; z-index: 2; outline: none; border: none;
+}
+.dual-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; height: 16px; width: 16px;
+  border-radius: 50%; background: #4F3422; cursor: pointer; pointer-events: auto;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-top: -6px;
+}
+.dual-slider input[type="range"]::-moz-range-thumb {
+  height: 16px; width: 16px; border-radius: 50%; background: #4F3422;
+  cursor: pointer; pointer-events: auto; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.dual-slider input[type="range"]::-moz-range-track {
+  background: transparent; border: none;
+}
+.range-labels {
+  display: flex; justify-content: space-between; font-family: 'Montserrat', sans-serif;
+  font-size: 14px; color: #D3A74A; margin-top: 8px;
+}
+
+/* Чекбоксы */
+.checkbox-list {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.checkbox-label {
+  display: flex; align-items: center; gap: 12px; font-family: 'Montserrat', sans-serif;
+  font-size: 14px; color: #1A1A1A; cursor: pointer;
+}
+.checkbox-label input {
+  -webkit-appearance: none; appearance: none; width: 18px; height: 18px;
+  border: 2px solid #1A1A1A; border-radius: 4px; cursor: pointer; position: relative;
+  background-color: transparent; flex-shrink: 0; margin: 0;
+}
+.checkbox-label input:checked { background-color: #1A1A1A; }
+.checkbox-label input:checked::after {
+  content: ""; position: absolute; left: 5px; top: 1px; width: 4px; height: 8px;
+  border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg);
+}
+
+/* --- МАТРИЦА ТОВАРОВ --- */
+.catalog-grid-wrapper {
+  width: 892px; /* Жестко 3 карточки по 280 + 2 отступа по 26 */
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 280px); /* Строго 3 колонки */
+  gap: 40px 26px; /* Вертикаль 40, Горизонталь 26 */
+}
+
+/* Кнопка Показать еще */
+.catalog-show-more {
+  margin-top: 40px;
+  align-self: center;
+  width: 280px;
+  height: 50px;
+  background: transparent;
+  border: 1px solid #1A1A1A;
+  border-radius: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #1A1A1A;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.catalog-show-more:hover {
+  background: #4F3422;
+  border-color: #4F3422;
+  color: #FFFFFF;
+}
+
+/* Навигация (Нижний этаж) */
+.header__bottom {
+  position: relative; /* Важно для абсолютного позиционирования линии */
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 0;
+  border-top: 1px solid #EAEAEA;
+}
+
+.nav-link {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1A1A1A;
+  text-decoration: none;
+  padding-bottom: 8px; /* Отступ от текста до линии */
+  transition: color 0.3s ease;
+}
+
+.nav-link.active, .nav-link:hover {
+  color: #4F3422; /* Темно-коричневый при наведении */
+}
+
+/* Делаем контейнер навигации относительным, чтобы полоска выравнивалась по нему */
+.header__nav {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 0;
+  border-top: 1px solid #EAEAEA;
+}
+
+.header__nav-link {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1A1A1A;
+  text-decoration: none;
+  padding-bottom: 6px; /* Задаем небольшой зазор до полоски */
+  transition: color 0.3s ease;
+}
+
+.header__nav-link.active,
+.header__nav-link:hover {
+  color: #4F3422; /* Цвет активного текста */
+}
+
+/* Стили для самой бегающей полоски */
+.header__magic-line {
+  position: absolute;
+  bottom: 16px; /* Позиционируем точно под текстом */
+  height: 2px;
+  background-color: #4F3422; /* Фирменный темно-коричневый цвет */
+  /* Плавная физика перемещения и изменения ширины */
+  transition: left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
+              width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
+              opacity 0.2s ease;
+  pointer-events: none; /* Чтобы полоса не перехватывала курсор мыши */
+}
+/* --- АДАПТИВНОСТЬ ПРИ СЖАТИИ ОКНА --- */
+@media (max-width: 1300px) {
+  .catalog-container { padding: 40px 40px 60px 40px; }
+  .catalog-content { flex-direction: column; align-items: center; }
+  .catalog-grid-wrapper { width: 100%; max-width: 892px; }
+  .catalog-sidebar { width: 100%; max-width: 892px; }
+}
+
+@media (max-width: 950px) {
+  .catalog-grid { grid-template-columns: repeat(2, 280px); justify-content: center; }
+}
+
+@media (max-width: 650px) {
+  .catalog-grid { grid-template-columns: 280px; }
+}

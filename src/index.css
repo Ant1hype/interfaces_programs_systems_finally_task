@@ -1,0 +1,23 @@
+/* Убиваем дефолтные стили браузера */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #FAFAFA; /* Легкий светлый фон для сайта */
+  color: #000000;
+  overflow-x: hidden; /* Запрещаем горизонтальный скролл навсегда */
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content {
+  flex: 1 0 auto;
+}

@@ -1,0 +1,125 @@
+.home-page {
+  background-color: #FDFBF7; /* Заданный цвет фона */
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.home-container {
+  width: 100%;
+  max-width: 1920px;
+  padding: 0 120px;
+  box-sizing: border-box;
+  padding-top: 40px;    /* Хэдэр -> Хлебная крошка (40) */
+  padding-bottom: 60px; /* Ghost-button -> Футер (60) */
+}
+
+/* Хлебные крошки */
+.breadcrumb {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  color: #A0A0A0;
+  margin-bottom: 32px; /* Крошка -> Баннер (32) */
+}
+
+/* Баннер-заглушка */
+.banner {
+  width: 100%;
+  height: 400px;
+  background-image: url('/public/images/banner.jpg');
+  background-size: cover;
+  background-position: center;
+  border-radius: 16px;
+  margin-bottom: 26px; /* Баннер -> Подзаголовок 1 (26) */
+}
+
+/* Секции с товарами */
+.product-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.section-title {
+  font-family: 'Lora', serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 38px; /* Подзаголовок -> Ряд карточек (38) */
+}
+
+.product-row {
+  display: flex; 
+  gap: 26px;
+  margin-bottom: 26px;
+  overflow-x: auto; /* Включаем горизонтальную прокрутку */
+  padding-bottom: 16px; /* Место, чтобы тень карточек не обрезалась снизу при наведении */
+  scroll-behavior: smooth;
+  
+  /* Прячем уродливый системный скроллбар */
+  scrollbar-width: none; /* Для Firefox */
+}
+
+.product-row::-webkit-scrollbar {
+  display: none; /* Для Chrome/Safari */
+}
+
+/* У последнего ряда отступ до кнопки больше */
+.product-row.last-row {
+  margin-bottom: 60px; /* Финальный ряд -> Ghost-button (60) */
+}
+
+/* Ghost Button */
+.ghost-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.ghost-btn {
+  width: 586px; /* 280 + 280 + 26 */
+  height: 50px;
+  background: transparent;
+  border: 1px solid #4F3422;
+  border-radius: 12px;
+  color: #4F3422;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.ghost-btn:hover {
+  background: #4F3422;
+  color: #FFFFFF;
+}
+
+/* --- Стилизация интерактивных ссылок на Главной --- */
+
+.home-banner-link {
+  display: block;
+  width: 100%;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.home-section-link {
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* Эффект наведения на заголовок подборки */
+.home-section-link:hover .section-title {
+  color: #4F3422;
+}
+
+.home-ghost-link {
+  text-decoration: none;
+  display: block;
+  width: 586px; /* Ширина ссылки должна быть равна ширине кнопки */
+}

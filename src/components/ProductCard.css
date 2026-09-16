@@ -1,0 +1,107 @@
+.product-card {
+  width: 280px;
+  height: 420px;
+  flex-shrink: 0; /* <--- ДОБАВЛЯЕМ ЭТО */
+  background: #FFFFFF;
+  border: 1px solid #EAEAEA;
+  border-radius: 16px; /* Внешний радиус чуть больше */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-sizing: border-box;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.product-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+}
+
+/* КАРТИНКА (240x180, отступы 20px) */
+.product-card__image-wrap {
+  width: 240px;
+  height: 180px;
+  margin: 20px 20px 16px 20px;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.product-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ИКОНКА СЕРДЕЧКА */
+.product-card__fav {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #FFFFFF; /* Белое сердечко по макету */
+  transition: transform 0.1s ease;
+  padding: 4px;
+}
+
+.product-card__fav:hover {
+  transform: scale(1.1);
+}
+
+.product-card__fav svg { 
+  width: 24px; 
+  height: 24px; 
+}
+
+/* БЛОК С ТЕКСТОМ (Отступ 20px слева) */
+.product-card__info {
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Занимает оставшееся место, чтобы кнопка прижалась вниз */
+}
+
+.product-card__title {
+  font-family: 'Lora', serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: #000000;
+  margin-bottom: 8px;
+}
+
+.product-card__weight {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: #808080;
+  margin-bottom: 12px;
+}
+
+.product-card__price {
+  font-family: 'Lora', serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: #4F3422;
+}
+
+/* КНОПКА (180x45, отступ снизу 24, по центру) */
+.product-card__btn {
+  width: 180px;
+  height: 45px;
+  background: #4F3422;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  margin: auto auto 24px auto; /* auto по бокам центрирует, auto сверху прижимает вниз, 24px снизу */
+  transition: opacity 0.2s ease;
+}
+
+.product-card__btn:hover {
+  opacity: 0.9;
+}

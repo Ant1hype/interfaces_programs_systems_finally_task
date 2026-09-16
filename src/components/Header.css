@@ -1,0 +1,104 @@
+.header {
+  background-color: #FFFFFF;
+  width: 100%;
+  border-bottom: 1px solid #F0F0F0;
+  font-family: 'Montserrat', sans-serif;
+  position: relative; /* Для позиционирования выпадающего поиска в будущем */
+}
+
+.header__inner {
+  padding: 0 120px;
+  max-width: 1920px;
+  margin: 0 auto;
+}
+
+/* Верхний этаж шапки */
+.header__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
+  border-bottom: 1px solid #F0F0F0;
+}
+
+.header__left, .header__right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Ссылки с контактами (слева) */
+.header__info-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1A1A1A;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.header__info-link:hover {
+  color: #4F3422; /* Твой фирменный коричневый */
+}
+
+.header__info-link svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Логотип */
+.header__logo {
+  font-family: 'Lora', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1A1A1A;
+  text-decoration: none;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Иконки справа */
+.header__icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #1A1A1A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.header__icon-btn:hover {
+  color: #4F3422;
+}
+
+.header__icon-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Нижний этаж (Навигация) */
+.header__nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+}
+
+.header__nav-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1A1A1A;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color 0.2s ease;
+}
+
+.header__nav-link:hover {
+  color: #4F3422;
+}

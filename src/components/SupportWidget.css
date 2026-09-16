@@ -1,0 +1,96 @@
+.support-widget {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+/* Плавающая кнопка (FAB) */
+.support-fab {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #4F3422;
+  color: #FFF;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(79, 52, 34, 0.3);
+  transition: transform 0.2s ease, background 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.support-fab:hover {
+  transform: scale(1.05);
+  background: #3A2518;
+}
+
+/* Попап */
+.support-popup {
+  position: absolute;
+  bottom: 80px;
+  right: 0;
+  width: 280px;
+  background: #FFFFFF;
+  border: 1px solid #EAEAEA;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+}
+
+.support-popup.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #A0A0A0;
+  cursor: pointer;
+}
+
+.close-btn:hover { color: #1A1A1A; }
+
+.support-title {
+  font-family: 'Lora', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 8px;
+  margin-top: 0;
+}
+
+.support-text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  color: #808080;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.support-link {
+  display: inline-block;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4F3422;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.support-link:hover { opacity: 0.7; }
