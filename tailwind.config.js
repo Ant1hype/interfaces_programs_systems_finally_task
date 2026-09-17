@@ -8,6 +8,7 @@ export default {
     extend: {
       colors: {
         // 1.1 Брендовые (коричневая палитра)
+        'brand-800': '#4F3422',
         'brand-900': '#4F3422',
         'brand-700': '#6D4C41',
         'brand-outline': '#3A3A3A',

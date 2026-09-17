@@ -11,6 +11,7 @@
 
 | Токен | HEX / RGBA | Figma var | Где встречается |
 |---|---|---|---|
+| `brand-800` | `#4F3422` | (совпадает с fill_2f3edd3b) | Фон кнопки «Найти» в панели поиска хедера |
 | `brand-900` | `#4F3422` | fill_2f3edd3b | Основной фон кнопок («В корзину», «Перейти к оформлению», «Войти», «Оплатить заказ», активные табы фасовки/тумблера, текст цены в карточке товара, текст логотипа-заголовков H2/H3) |
 | `brand-700` | `#6D4C41` | fill_d53e2265 | Hover/active-состояния кнопок и счётчиков количества, активный трек тумблера (вариант hover), выбранная кнопка фасовки (альтернативный акцент) |
 | `brand-outline` | `#3A3A3A` | fill_33e217e9 | Обводка и текст ghost-кнопок («Самовывоз» неактивный, «Или просто посмотреть каталог»), текст на светлых кнопках-компаньонах |
@@ -58,6 +59,8 @@
 
 Шрифты, применяемые в макете: **Montserrat**, **Lora**, **Inter**, **Cormorant Garamond**.
 
+Подключение: Google Fonts через `@import` в `src/index.css` (первой строкой, до `@tailwind`-директив — иначе PostCSS переносит `@import` ниже и CSS становится невалидным). Дублируется в `tailwind.config.js` → `theme.extend.fontFamily` (`font-montserrat`, `font-lora`, `font-inter`, `font-cormorant`).
+
 | Токен | Font-family | Weight/Style | Size | Line-height | Align | Где используется |
 |---|---|---|---|---|---|---|
 | `text-logo` | Lora | Bold (700) | 24px (реально 21px box) | 21px | left | Логотип «Сырная палитра» в хедере |
@@ -89,6 +92,13 @@
 | `text-value-badge` | Montserrat | Bold (700) | 20px | — | center | Значение счётчика в мобильной кнопке «В корзину» |
 | `text-adaptive-cta` | Montserrat | SemiBold (600) | 14px | — | left | «Перейти в каталог →» (адаптивная кнопка) |
 | `text-adaptive-note` | Montserrat | Bold (700) | 8px | — | left | «Ближайшая доставка: Завтра» (адаптив) |
+| `text-nutrition-value` | Inter | Bold (700) | 28px | 1 (leading-none) | left | Цифры КБЖУ в карточке «Пищевая ценность (на 100 г)» на странице товара (calories/proteins/fats/carbs) |
+| `text-nutrition-label` | Inter | Regular (400) | 12px | — | left | Подписи под цифрами КБЖУ: «ккал», «г белки», «г жиры», «г углеводы» |
+| `text-review-author` | Montserrat | Bold (700) | 16px | — | left | Имя автора в карточке отзыва (Екатерина К., Александр М.) |
+| `text-review-body` | Montserrat | Regular (400) | 14px | 1.5em | left | Текст отзыва |
+| `text-review-pairing` | Montserrat | Regular (400) | 12px | — | left | Строка «Пара: …» в карточке отзыва |
+| `text-review-rating-summary` | Montserrat | Bold (700) | 36px | 1 (leading-none) | left | Крупная средняя оценка (4.5) в колонке-сводке отзывов |
+| `text-review-rating-note` | Montserrat | Regular (400) | 12px | — | left | «На основе N-х отзывов» под средней оценкой |
 
 ---
 

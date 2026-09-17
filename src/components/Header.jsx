@@ -92,9 +92,21 @@ export default function Header() {
     () => products
       .filter((p) => p.inStock !== false)
       .sort((a, b) => (b.taste ?? 0) - (a.taste ?? 0))
-      .slice(0, 3),
+      .slice(0, 8),
     [products]
   );
+  const rowRef = useRef(null);
+  const [visibleCount, setVisibleCount] = useState(3);
+  useEffect(() => {
+    const el = rowRef.current; if (!el) return;
+    const calc = () => setVisibleCount(
+      Math.max(1, Math.min(8, Math.floor((el.clientWidth + 24) / 324)))
+    );
+    calc();
+    const ro = new ResizeObserver(calc); ro.observe(el);
+    return () => ro.disconnect();
+  }, [isSearchOpen]);
+  const visible = popularProducts.slice(0, visibleCount);
   const closeSearch = () => setIsSearchOpen(false);
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -159,7 +171,7 @@ export default function Header() {
             <div className="flex items-center gap-3 flex-1 min-w-0 h-[48px] sm:h-[50px] pl-4 pr-2 bg-surface-white border border-[#BDBDBD] rounded-md focus-within:border-brand-900 transition-colors duration-200">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 shrink-0 text-neutral-600 pointer-events-none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Поиск по каталогу..." className="flex-1 min-w-0 h-full bg-transparent border-0 outline-none text-[14px] font-normal text-neutral-900-alt placeholder:text-neutral-600" />
-              <button type="submit" className="inline-flex items-center justify-center shrink-0 h-[36px] sm:h-[38px] px-5 sm:px-8 bg-brand-900 text-surface-white text-[13px] sm:text-[14px] font-semibold border-0 rounded-md cursor-pointer transition-colors duration-200 hover:bg-brand-700">Найти</button>
+              <button type="submit" className="inline-flex items-center justify-center shrink-0 h-[36px] sm:h-[38px] ppx-5 sm:px-8 bg-brand-800 rounded-xl text-white">Найти</button>
             </div>
             <button type="button" onClick={closeSearch} aria-label="Закрыть поиск" className="shrink-0 flex items-center justify-center w-8 h-8 bg-transparent border-0 p-0 text-neutral-900-alt cursor-pointer transition-colors duration-200 hover:text-brand-900">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -179,9 +191,11 @@ export default function Header() {
             <div className="min-w-0">
               <h3 className="font-lora text-[16px] font-bold text-neutral-900-alt m-0 mb-3">Популярные товары</h3>
               {popularProducts.length > 0 ? (
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-6">
-                  {popularProducts.map((product) => (
-                    <ProductCard key={product.id} product={product} />
+                <div ref={rowRef} className="flex flex-nowrap justify-between gap-6 w-full">
+                  {visible.map((product) => (
+                    <div key={product.id} className="flex-1 basis-[300px] max-w-[420px] min-w-0">
+                      <ProductCard product={product} />
+                    </div>
                   ))}
                 </div>
               ) : (

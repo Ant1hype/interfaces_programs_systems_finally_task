@@ -1,3 +1,7 @@
+/* Шрифты проекта (Montserrat, Lora, Inter, Cormorant Garamond).
+   @import должен идти до @tailwind-директив, иначе PostCSS поднимет его ниже и CSS будет невалиден. */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Lora:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

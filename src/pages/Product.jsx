@@ -59,6 +59,9 @@ export default function Product() {
   const currentPrice=Math.round(product.price*(selectedWeight/100));
   const related=allProducts.filter(pp=>pp.category===product.category && String(pp.id)!==String(product.id)).slice(0,4);
   const reviews=product.reviews||[];
+  const avgRating=reviews.length?Math.round(reviews.reduce((s,r)=>s+(Number(r.rating)||0),0)/reviews.length*10)/10:0;
+  const reviewsWord=(n=>{const a=n%100;if(a>=11&&a<=14)return 'отзывов';const b=n%10;if(b===1)return 'отзыв';if(b>=2&&b<=4)return 'отзыва';return 'отзывов';});
+  const starsRow=(rating)=>(<span className="flex gap-1.5" aria-label={`Оценка ${rating} из 5`}>{[1,2,3,4,5].map(d=>(<span key={d} className={`w-3 h-3 rounded-full ${d<=rating?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>);
 
   const handleImgError=(src)=>{
     setBrokenImages(prev=>prev.includes(src)?prev:[...prev,src]);
@@ -130,7 +133,7 @@ export default function Product() {
         {activeTab==='info' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 font-montserrat text-sm leading-6">
             <div><h4 className="font-bold mb-2">Состав продукта</h4><p className="text-neutral-black mb-6">{product.ingredients}</p><h4 className="font-bold mb-2">Срок годности и хранение</h4><p className="text-neutral-black">{product.shelfLife}</p></div>
-            <div className="bg-surface-white border border-neutral-250-a80 rounded-radius-xl p-6"><h4 className="font-bold mb-4">Пищевая ценность (на 100 г)</h4><div className="grid grid-cols-2 gap-4"><div><p className="font-bold text-brand-900 text-lg">{product.nutrition?.calories}</p><p className="text-neutral-500 text-xs">ккал</p></div><div><p className="font-bold text-brand-900 text-lg">{product.nutrition?.proteins} г</p><p className="text-neutral-500 text-xs">белки</p></div><div><p className="font-bold text-brand-900 text-lg">{product.nutrition?.fats} г</p><p className="text-neutral-500 text-xs">жиры</p></div><div><p className="font-bold text-brand-900 text-lg">{product.nutrition?.carbs} г</p><p className="text-neutral-500 text-xs">углеводы</p></div></div></div>
+            <div className="bg-surface-white border border-neutral-300 rounded-radius-xl p-6"><h4 className="font-bold text-neutral-black mb-5">Пищевая ценность (на 100 г)</h4><div className="grid grid-cols-2 gap-x-10 gap-y-6">{[[product.nutrition?.calories,'ккал'],[product.nutrition?.proteins,'г белки'],[product.nutrition?.fats,'г жиры'],[product.nutrition?.carbs,'г углеводы']].map(([val,label])=>(<div key={label}><p className="font-inter text-[28px] font-bold leading-none text-brand-900">{val}</p><p className="font-inter text-xs text-neutral-500 mt-2">{label}</p></div>))}</div></div>
           </div>
         )}
         {activeTab==='reviews' && (
@@ -138,23 +141,27 @@ export default function Product() {
             {reviews.length===0 ? (
               <div className="bg-surface-cream border border-neutral-250-a80 rounded-radius-lg py-12 text-center text-neutral-500 font-montserrat">отзывов пока нет</div>
             ) : (
-              <div className="flex flex-col gap-4">
-                {reviews.map(r=>(
-                  <article key={r.id} className="bg-surface-white border border-neutral-300 rounded-radius-lg p-6 font-montserrat">
-                    <header className="flex flex-wrap items-start justify-between gap-4 mb-3">
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
+                <div className="flex flex-col gap-4">
+                  {reviews.map(r=>(
+                    <article key={r.id} className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 bg-surface-white border border-neutral-300 rounded-radius-lg p-6 font-montserrat">
                       <div>
                         <p className="font-bold text-neutral-black">{r.author}</p>
-                        <p className="text-xs text-neutral-350 mt-1">{r.date}</p>
+                        <div className="mt-3">{starsRow(r.rating)}</div>
+                        {r.pairing && <p className="text-xs text-neutral-600 mt-3">Пара: {r.pairing}</p>}
                       </div>
-                      <p className="text-sm font-bold text-brand-900 whitespace-nowrap" aria-label={`Оценка ${r.rating} из 5`}>
-                        <span aria-hidden="true">{"★".repeat(r.rating)+"☆".repeat(Math.max(0,5-r.rating))}</span>
-                        <span className="ml-2 text-xs font-normal text-neutral-500">{r.rating}/5</span>
-                      </p>
-                    </header>
-                    <p className="text-sm text-neutral-700 leading-6 mb-3">{r.text}</p>
-                    {r.pairing && <p className="text-xs text-neutral-600"><span className="text-neutral-500">С чем подавали: </span>{r.pairing}</p>}
-                  </article>
-                ))}
+                      <div>
+                        <p className="text-sm text-neutral-black leading-6">{r.text}</p>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+                <aside className="font-montserrat">
+                  <p className="text-4xl font-bold text-neutral-black leading-none">{avgRating}</p>
+                  <p className="text-xs text-neutral-500 mt-2">На основе {reviews.length}-х {reviewsWord(reviews.length)}</p>
+                  <div className="mt-3">{starsRow(Math.floor(avgRating))}</div>
+                  <button type="button" className="mt-6 w-full py-3 rounded-radius-md border border-brand-outline text-brand-outline bg-surface-white text-sm font-medium hover:bg-surface-cream transition-colors">Оставить отзыв</button>
+                </aside>
               </div>
             )}
           </div>
