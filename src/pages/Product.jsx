@@ -1,110 +1,165 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { products } from '../data/catalog';
-import './Product.css';
+import { getProduct, getProducts } from '../lib/api.js';
+import ProductCard from '../components/ProductCard.jsx';
+
+function trimProduct(prod) {
+  if (!prod) return prod;
+  const c = { ...prod };
+  ["name","weight","category","milk","additives","age","features","wine","image"].forEach(k=>{ if(typeof c[k]==="string") c[k]=c[k].trim(); });
+  if(c.description) c.description=Object.fromEntries(Object.entries(c.description).map(([k,v])=>[k,typeof v==="string"?v.trim():v]));
+  ["ingredients","shelfLife"].forEach(k=>{ if(typeof c[k]==="string") c[k]=c[k].trim(); });
+  if(Array.isArray(c.images)) c.images=c.images.map(s=>typeof s==="string"?s.trim():s);
+  if(Array.isArray(c.reviews)) c.reviews=c.reviews.map(r=>({ ...r, author:typeof r.author==="string"?r.author.trim():r.author, date:typeof r.date==="string"?r.date.trim():r.date, pairing:typeof r.pairing==="string"?r.pairing.trim():r.pairing, text:typeof r.text==="string"?r.text.trim():r.text }));
+  return c;
+}
 
 export default function Product() {
   const { id } = useParams();
-  const product = products.find(p => p.id === parseInt(id));
-  
-  const [activeTab, setActiveTab] = useState('desc');
-  const [selectedWeight, setSelectedWeight] = useState(100);
+  const [product,setProduct]=useState(null);
+  const [allProducts,setAllProducts]=useState([]);
+  const [activeTab,setActiveTab]=useState('desc');
+  const [mainImg,setMainImg]=useState('');
+  const [selectedWeight,setSelectedWeight]=useState(100);
+  const [brokenImages,setBrokenImages]=useState([]);
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState('');
 
-  if (!product) return <div>Сыр не найден</div>;
+  useEffect(()=>{
+    let cancelled=false;
+    setLoading(true);
+    Promise.all([getProduct(id),getProducts()])
+      .then(([pp,list])=>{
+        if(cancelled) return;
+        const tp=trimProduct(pp);
+        setProduct(tp);
+        setMainImg((tp.images&&tp.images[0])||tp.image||'');
+        setAllProducts((list||[]).map(trimProduct));
+      })
+      .catch(e=>{ if(!cancelled) setError(e.message); })
+      .finally(()=>{ if(!cancelled) setLoading(false); });
+    return()=>{ cancelled=true; };
+  },[id]);
 
-  // Рассчитываем цену исходя из выбранного веса (100г - база)
-  const currentPrice = (product.price * (selectedWeight / 100));
+  const deliveryDate=useMemo(()=>{
+    const d=new Date(Date.now()+86400000);
+    return d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
+  },[]);
+
+  if(loading) return <div className="max-w-[1200px] mx-auto px-4 py-8 font-montserrat">Загрузка...</div>;
+  if(error) return <div className="max-w-[1200px] mx-auto px-4 py-8">Ошибка: {error}</div>;
+  if(!product) return <div className="max-w-[1200px] mx-auto px-4 py-8">Сыр не найден</div>;
+
+  const stock=product.stock??(product.inStock?5:0);
+  const isOut=stock===0||product.inStock===false;
+  const mainImage=product.image||'';
+  const rawImages=(product.images&&product.images.length)?product.images:[mainImage].filter(Boolean);
+  const visibleImages=rawImages.filter(img=>!brokenImages.includes(img));
+  const images=visibleImages.length?visibleImages:[mainImage].filter(Boolean);
+  const currentPrice=Math.round(product.price*(selectedWeight/100));
+  const related=allProducts.filter(pp=>pp.category===product.category && String(pp.id)!==String(product.id)).slice(0,4);
+  const reviews=product.reviews||[];
+
+  const handleImgError=(src)=>{
+    setBrokenImages(prev=>prev.includes(src)?prev:[...prev,src]);
+    if(mainImg===src && mainImage && src!==mainImage) setMainImg(mainImage);
+    else if(mainImg===src) setMainImg('');
+  };
+
+  const tabBtn=(key,label)=>(
+    <button onClick={()=>setActiveTab(key)} className={`pb-3 border-b-2 font-montserrat text-base font-semibold transition-colors ${activeTab===key?"border-accent-gold text-brand-900":"border-transparent text-neutral-500 hover:text-neutral-900-alt"}`}>{label}</button>
+  );
 
   return (
-    <div className="product-page">
-      <div className="product-container">
-        {/* Хлебные крошки */}
-        <div className="breadcrumb">Главная / Каталог / {product.name}</div>
-
-        <div className="product-main">
-          {/* ГАЛЕРЕЯ */}
-          <div className="product-gallery">
-            <img src={product.image} alt={product.name} className="main-img" />
-            <div className="thumbnails">
-              {product.images?.map((img, i) => <img key={i} src={img} alt="thumb" />)}
+    <div className="bg-surface-cream min-h-screen">
+      <div className="max-w-[1200px] mx-auto px-4 lg:px-6 py-6">
+        <nav className="text-xs text-neutral-350 mb-5 font-montserrat">
+          <Link to="/" className="hover:text-brand-900">Главная</Link> / <Link to="/catalog" className="hover:text-brand-900">Каталог</Link> / <span className="text-neutral-700">{product.name}</span>
+        </nav>
+        <div className="grid grid-cols-1 lg:grid-cols-[500px_1fr] gap-10 lg:gap-14 mb-10">
+          <div>
+            <div className="rounded-radius-lg overflow-hidden bg-surface-white border border-neutral-300">
+              <img src={mainImg||mainImage} alt={product.name} onError={()=>handleImgError(mainImg||mainImage)} className="w-full object-cover aspect-[4/3] block" />
             </div>
-          </div>
-
-          {/* ИНФО-БЛОК */}
-          <div className="product-info">
-            <h1>{product.name}</h1>
-            <p className="price">{currentPrice} ₽ / {selectedWeight} г</p>
-            
-            {/* Визуальная шкала вкуса */}
-            <div className="taste-scale">
-              <span>Интенсивность вкуса</span>
-              <div className="dots">
-                {[1, 2, 3, 4, 5].map(d => (
-                  <div key={d} className={`dot ${d <= product.taste ? 'active' : ''}`} />
-                ))}
-              </div>
-            </div>
-
-            <div className="specs">
-              <p>Тип молока: <b>{product.milk}</b></p>
-              <p>Выдержка: <b>{product.age}</b></p>
-              <p>Добавки: <b>{product.additives}</b></p>
-            </div>
-
-            <div className="weight-selector">
-              {[100, 200, 300].map(w => (
-                <button 
-                  key={w} 
-                  className={selectedWeight === w ? 'active' : ''}
-                  onClick={() => setSelectedWeight(w)}
-                >
-                  {w} г
-                </button>
-              ))}
-            </div>
-
-            <button className="add-to-cart">В корзину</button>
-            <p className="delivery-info">Ближайшая доставка: завтра, 7 мая</p>
-          </div>
-        </div>
-
-        {/* ТАБЫ */}
-        <div className="product-tabs">
-          <div className="tab-headers">
-            <button onClick={() => setActiveTab('desc')}>О продукте</button>
-            <button onClick={() => setActiveTab('info')}>Состав и ценность</button>
-            <button onClick={() => setActiveTab('reviews')}>Отзывы ({product.reviews?.length || 0})</button>
-          </div>
-          
-          <div className="tab-content">
-            {activeTab === 'desc' && (
-              <div className="desc-grid">
-                <p>{product.description.text1}</p>
-                <p>{product.description.text2}</p>
-              </div>
-            )}
-            {activeTab === 'info' && (
-              <div className="nutrition-grid">
-                <p>{product.ingredients}</p>
-                <div className="kbfu">
-                  {Object.entries(product.nutrition).map(([k, v]) => (
-                    <div key={k}><b>{v}</b><br/>{k}</div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {activeTab === 'reviews' && (
-              <div className="reviews-list">
-                {product.reviews?.map(r => (
-                  <div key={r.id} className="review-item">
-                    <h4>{r.author}</h4>
-                    <p>{r.text}</p>
-                  </div>
+            {images.length>1 && (
+              <div className="flex gap-3 mt-4">
+                {images.map((img,i)=>(
+                  <button key={img+i} onClick={()=>setMainImg(img)} className={`w-20 h-20 rounded-radius-md overflow-hidden border-2 ${(mainImg||mainImage)===img?"border-brand-900":"border-neutral-300"}`}><img src={img} alt="thumb" onError={()=>handleImgError(img)} className="w-full h-full object-cover" /></button>
                 ))}
               </div>
             )}
           </div>
+          <div className="font-montserrat">
+            <h1 className="font-lora text-2xl lg:text-3xl font-bold text-neutral-900-alt mb-2">{product.name}</h1>
+            <p className="text-xl font-semibold text-neutral-black">{currentPrice} ₽ <span className="text-sm font-normal text-neutral-500">/ {selectedWeight} г</span></p>
+            <p className="text-xs text-neutral-350 mt-1">{isOut?"Нет в наличии":`В наличии ${stock} шт.`}</p>
+            <div className="border-t border-neutral-250 mt-4 pt-5">
+              <h3 className="font-semibold text-neutral-black mb-3">Характеристики</h3>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-sm font-semibold text-neutral-black">Интенсивность вкуса</span>
+                <span className="flex gap-1.5">{[1,2,3,4,5].map(d=>(<span key={d} className={`w-3 h-3 rounded-full ${d<=product.taste?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>
+              </div>
+              <div className="flex flex-col gap-2 text-sm">
+                <p className="text-neutral-500">Тип молока: <b className="text-neutral-black font-semibold">{product.milk}</b></p>
+                <p className="text-neutral-500">Выдержка: <b className="text-neutral-black font-semibold">{product.age}</b></p>
+                <p className="text-neutral-500">Добавки: <b className="text-neutral-black font-semibold">{product.additives}</b></p>
+                <p className="text-neutral-500">Особенности: <b className="text-neutral-black font-semibold">{product.features}</b></p>
+                <p className="text-neutral-500">Совместимость с вином: <b className="text-neutral-black font-semibold">{product.wine}</b></p>
+              </div>
+            </div>
+            <div className="mt-6">
+              <p className="text-sm font-semibold mb-2">Фасовка</p>
+              <div className="flex gap-2.5">
+                {[100,200,300].map(w=>(
+                  <button key={w} type="button" onClick={()=>setSelectedWeight(w)} className={`w-20 py-2.5 rounded-radius-md text-sm font-medium border transition-colors ${w===selectedWeight?"bg-brand-900 text-surface-white border-brand-900":"bg-surface-gray-fill text-neutral-400 border-border-toggle-off hover:bg-neutral-250"}`}>{w} г</button>
+                ))}
+              </div>
+            </div>
+            {isOut && <div className="mt-4 text-sm text-neutral-500">Нет в наличии</div>}
+            <button disabled={isOut} className={`mt-4 w-full max-w-[320px] h-12 rounded-radius-lg font-semibold text-surface-white ${isOut?"bg-neutral-300 cursor-not-allowed":"bg-brand-900 hover:bg-brand-700"}`}>В корзину</button>
+            <p className="text-xs text-neutral-500 mt-2">Ближайшая доставка: завтра, {deliveryDate}</p>
+          </div>
         </div>
+        <div className="border-b border-neutral-250 flex gap-6 mb-6">{tabBtn('desc','О продукте')}{tabBtn('info','Состав и ценность')}{tabBtn('reviews',`Отзывы (${reviews.length})`)}</div>
+        {activeTab==='desc' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 font-montserrat text-sm leading-6 text-neutral-black">
+            <div><h4 className="font-bold mb-2">{product.name}</h4><p className="mb-4">{product.description?.text1}</p><p>{product.description?.text2}</p></div>
+            <div className="bg-surface-white border border-neutral-250-a80 rounded-radius-lg p-5"><h4 className="font-bold mb-3">Гастрономические сочетания</h4><p className="mb-4">{product.description?.pairing1}</p><p>{product.description?.pairing2}</p></div>
+          </div>
+        )}
+        {activeTab==='info' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 font-montserrat text-sm leading-6">
+            <div><h4 className="font-bold mb-2">Состав продукта</h4><p className="text-neutral-black mb-6">{product.ingredients}</p><h4 className="font-bold mb-2">Срок годности и хранение</h4><p className="text-neutral-black">{product.shelfLife}</p></div>
+            <div className="bg-surface-white border border-neutral-250-a80 rounded-radius-xl p-6"><h4 className="font-bold mb-4">Пищевая ценность (на 100 г)</h4><div className="grid grid-cols-2 gap-4"><div><p className="font-bold text-brand-900 text-lg">{product.nutrition?.calories}</p><p className="text-neutral-500 text-xs">ккал</p></div><div><p className="font-bold text-brand-900 text-lg">{product.nutrition?.proteins} г</p><p className="text-neutral-500 text-xs">белки</p></div><div><p className="font-bold text-brand-900 text-lg">{product.nutrition?.fats} г</p><p className="text-neutral-500 text-xs">жиры</p></div><div><p className="font-bold text-brand-900 text-lg">{product.nutrition?.carbs} г</p><p className="text-neutral-500 text-xs">углеводы</p></div></div></div>
+          </div>
+        )}
+        {activeTab==='reviews' && (
+          <div>
+            {reviews.length===0 ? (
+              <div className="bg-surface-cream border border-neutral-250-a80 rounded-radius-lg py-12 text-center text-neutral-500 font-montserrat">отзывов пока нет</div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {reviews.map(r=>(
+                  <article key={r.id} className="bg-surface-white border border-neutral-300 rounded-radius-lg p-6 font-montserrat">
+                    <header className="flex flex-wrap items-start justify-between gap-4 mb-3">
+                      <div>
+                        <p className="font-bold text-neutral-black">{r.author}</p>
+                        <p className="text-xs text-neutral-350 mt-1">{r.date}</p>
+                      </div>
+                      <p className="text-sm font-bold text-brand-900 whitespace-nowrap" aria-label={`Оценка ${r.rating} из 5`}>
+                        <span aria-hidden="true">{"★".repeat(r.rating)+"☆".repeat(Math.max(0,5-r.rating))}</span>
+                        <span className="ml-2 text-xs font-normal text-neutral-500">{r.rating}/5</span>
+                      </p>
+                    </header>
+                    <p className="text-sm text-neutral-700 leading-6 mb-3">{r.text}</p>
+                    {r.pairing && <p className="text-xs text-neutral-600"><span className="text-neutral-500">С чем подавали: </span>{r.pairing}</p>}
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        <div className="mt-12"><h2 className="font-lora text-2xl font-bold text-neutral-900-alt mb-6">С этим сыром покупают</h2><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{related.map(pp=>(<ProductCard key={pp.id} product={pp} />))}</div></div>
       </div>
     </div>
   );
