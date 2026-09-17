@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { products } from '../data/catalog';
 import './Catalog.css';
@@ -13,7 +13,7 @@ const filterSections = [
   { id: "wine", title: "Совместимость с вином", options: ["Красное", "Розовое", "Белое", "Игристое"] }
 ];
 
-const sortOptions = ["По популярности", "Рекомендованные", "Сначала дешевые", "Сначала дорогие", "Новинки"];
+const sortOptions = ["По популярности", "Рекомендованные", "Сначала дешевле", "Сначала дороже", "Новинки"];
 
 const categoryMap = {
   'lactose-free': 'Без лактозы',
@@ -23,11 +23,39 @@ const categoryMap = {
   'vegan': '100% Vegan'
 };
 
+// Нормализация строки для сравнений: обрезаем пробелы и приводим к нижнему регистру
+const norm = (value) => String(value == null ? '' : value).trim().toLowerCase();
+
+// Текстовые поля товара, по которым идёт подстрочный поиск
+const searchableFields = (product) => [
+  product.name,
+  product.description?.text1,
+  product.description?.text2,
+  product.description?.pairing1,
+  product.description?.pairing2,
+  product.ingredients,
+  product.category
+];
+
+// Пресеты «Часто ищут»: ключ — label из панели поиска, значение — свой предикат
+const searchPresets = {
+  'Пармезан': (product) => norm(product.name).includes('пармезан'),
+  'Твердые сорта': (product) => norm(product.age).startsWith('выдержанный'),
+  'Сырная тарелка': (product) =>
+    norm(product.category) === norm('Изысканное') ||
+    [product.description?.text1, product.description?.text2, product.description?.pairing1, product.description?.pairing2]
+      .some((field) => norm(field).includes('тарелк')),
+  'К красному сухому': (product) => norm(product.category) === norm('К красному сухому вину')
+};
+
 export default function Catalog() {
   const location = useLocation();
+  const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const filterParam = queryParams.get('filter');
+  const searchParam = queryParams.get('search');
   const currentCategory = categoryMap[filterParam];
+  const searchTerm = (searchParam || '').trim();
 
   // --- СОСТОЯНИЯ ФИЛЬТРОВ ---
   const [inStockOnly, setInStockOnly] = useState(false);
@@ -48,10 +76,10 @@ export default function Catalog() {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [selectedSort, setSelectedSort] = useState(sortOptions[0]);
 
-  // Сбрасываем кнопку "Показать еще" и фильтры при переходе между глобальными подборками
+  // Сбрасываем кнопку "Показать еще" и фильтры при переходе между подборками и новом поиске
   useEffect(() => {
     setVisibleCount(9);
-  }, [filterParam]);
+  }, [filterParam, searchParam]);
 
   // Функция переключения чекбоксов
   const handleCheckboxChange = (key, option) => {
@@ -68,18 +96,29 @@ export default function Catalog() {
   // --- СИСТЕМА ФИЛЬТРАЦИИ ---
   const filteredProducts = products.filter(product => {
     // 1. Глобальная подборка (из Шапки/Баннера)
-    if (currentCategory && product.category !== currentCategory) return false;
+    if (currentCategory && norm(product.category) !== norm(currentCategory)) return false;
 
-    // 2. Тумблер "В наличии"
+    // 2. Поиск по запросу: пресет «Часто ищут» либо подстрочный поиск по текстовым полям
+    if (searchTerm) {
+      const preset = searchPresets[searchTerm];
+      if (preset) {
+        if (!preset(product)) return false;
+      } else {
+        const needle = norm(searchTerm);
+        if (!searchableFields(product).some(field => norm(field).includes(needle))) return false;
+      }
+    }
+
+    // 3. Тумблер "В наличии"
     if (inStockOnly && !product.inStock) return false;
 
-    // 3. Ползунок Цены
+    // 4. Ползунок Цены
     if (product.price < price[0] || product.price > price[1]) return false;
 
-    // 4. Ползунок Интенсивности вкуса
+    // 5. Ползунок Интенсивности вкуса
     if (product.taste < taste[0] || product.taste > taste[1]) return false;
 
-    // 5. Боковые Чекбоксы (Динамический перебор групп)
+    // 6. Боковые Чекбоксы (Динамический перебор групп)
     for (const key in selectedFilters) {
       const activeOptions = selectedFilters[key];
       if (activeOptions.length > 0) {
@@ -93,14 +132,28 @@ export default function Catalog() {
 
   // --- СИСТЕМА СОРТИРОВКИ ---
   const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (selectedSort === "Сначала дешевые") return a.price - b.price;
-    if (selectedSort === "Сначала дорогие") return b.price - a.price;
+    if (selectedSort === "По популярности") return (b.taste ?? 0) - (a.taste ?? 0) || a.id - b.id;
+    if (selectedSort === "Сначала дешевле") return a.price - b.price;
+    if (selectedSort === "Сначала дороже") return b.price - a.price;
     if (selectedSort === "Новинки") return b.id - a.id; // Сортируем по ID в обратном порядке
-    return 0; // "По популярности" и "Рекомендованные" оставляем исходный порядок БД
+    return 0; // "Рекомендованные" оставляем исходный порядок БД
   });
 
   // Срез для пагинации кнопки "Показать еще"
   const displayProducts = sortedProducts.slice(0, visibleCount);
+
+  // Активен ли поисковый запрос или глобальная подборка (для счётчика и пустого состояния)
+  const hasActiveQuery = Boolean(searchTerm || currentCategory);
+
+  // Сброс: очищаем URL-параметры и локальные фильтры, возвращаем пагинацию к началу
+  const resetFilters = () => {
+    setSelectedFilters({ milk: [], additives: [], age: [], features: [], wine: [] });
+    setInStockOnly(false);
+    setPrice([0, 5000]);
+    setTaste([1, 5]);
+    setVisibleCount(9);
+    navigate('/catalog');
+  };
 
   const pageTitle = currentCategory ? currentCategory : 'Каталог сыров';
 
@@ -205,6 +258,14 @@ export default function Catalog() {
 
           {/* СЕТКА ТОВАРОВ С ПАГИНАЦИЕЙ */}
           <div className="catalog-grid-wrapper">
+            {hasActiveQuery && (
+              <div className="catalog-counter">
+                <span>Найдено: {sortedProducts.length}</span>
+                <button type="button" className="catalog-counter__reset" onClick={resetFilters}>
+                  сбросить
+                </button>
+              </div>
+            )}
             {sortedProducts.length > 0 ? (
               <>
                 <div className="catalog-grid">
@@ -219,9 +280,12 @@ export default function Catalog() {
                 )}
               </>
             ) : (
-              <p style={{fontFamily: 'Montserrat', fontSize: '16px', color: '#808080', marginTop: '20px'}}>
-                По вашему запросу сыров не найдено. Попробуйте изменить параметры фильтрации!
-              </p>
+              <div className="catalog-empty">
+                <p className="catalog-empty__text">По вашему запросу ничего не найдено</p>
+                <button type="button" className="catalog-empty__reset" onClick={resetFilters}>
+                  Сбросить фильтры
+                </button>
+              </div>
             )}
           </div>
         </div>

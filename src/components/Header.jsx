@@ -1,5 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import ProductCard from './ProductCard';
+import { getProducts } from '../lib/api';
+
+const popularSearches = ['Пармезан', 'Твердые сорта', 'Сырная тарелка', 'К красному сухому'];
 
 const navItems = [
   { path: '/catalog', filter: null, label: 'Каталог' },
@@ -12,7 +16,10 @@ const navItems = [
 
 export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [products, setProducts] = useState([]);
   const location = useLocation();
+  const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const currentFilter = queryParams.get('filter');
   const activeIndex = navItems.findIndex(item => {
@@ -35,8 +42,69 @@ export default function Header() {
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, [activeIndex]);
+  useEffect(() => {
+    if (!isSearchOpen) return undefined;
+    const onKeyDown = (e) => { if (e.key === 'Escape') setIsSearchOpen(false); };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isSearchOpen]);
+  useEffect(() => {
+    if (!isSearchOpen) return undefined;
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const hadBodyLock = document.body.classList.contains('search-locked');
+    const hadHtmlLock = document.documentElement.classList.contains('search-locked');
+    const hadBodyOpen = document.body.classList.contains('search-open');
+    document.body.classList.add('search-locked', 'search-open');
+    document.documentElement.classList.add('search-locked');
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    window.scrollTo(0, 0);
+    return () => {
+      document.body.style.overflow = prevBodyOverflow;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      if (!hadBodyLock) document.body.classList.remove('search-locked');
+      if (!hadHtmlLock) document.documentElement.classList.remove('search-locked');
+      if (!hadBodyOpen) document.body.classList.remove('search-open');
+    };
+  }, [isSearchOpen]);
+  const [productsError, setProductsError] = useState(false);
+  const [retryToken, setRetryToken] = useState(0);
+  useEffect(() => {
+    if (!isSearchOpen || products.length > 0) return undefined;
+    let cancelled = false;
+    setProductsError(false);
+    getProducts()
+      .then((data) => {
+        if (cancelled) return;
+        const list = Array.isArray(data) ? data : [];
+        setProducts(list);
+        setProductsError(list.length === 0);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setProducts([]);
+        setProductsError(true);
+      });
+    return () => { cancelled = true; };
+  }, [isSearchOpen, products.length, retryToken]);
+  const popularProducts = useMemo(
+    () => products
+      .filter((p) => p.inStock !== false)
+      .sort((a, b) => (b.taste ?? 0) - (a.taste ?? 0))
+      .slice(0, 3),
+    [products]
+  );
+  const closeSearch = () => setIsSearchOpen(false);
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const term = searchQuery.trim();
+    setSearchQuery(term);
+    setIsSearchOpen(false);
+    navigate(term ? `/catalog?search=${encodeURIComponent(term)}` : '/catalog');
+  };
   return (
-    <header className="w-full bg-surface-white border-b border-[#F0F0F0] font-montserrat relative shadow-shadow-header">
+    <header className="w-full bg-surface-white border-b border-[#F0F0F0] font-montserrat relative z-50 shadow-shadow-header">
       <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto">
         <div className="flex items-center justify-between gap-2 sm:gap-4 min-h-[56px] md:h-[70px] py-2 md:py-0 border-b border-[#F0F0F0] relative flex-wrap sm:flex-nowrap">
           <div className="flex items-center gap-3 sm:gap-4 lg:gap-6 shrink-0 order-1">
@@ -58,8 +126,8 @@ export default function Header() {
             Сырная палитра
           </Link>
           <div className="flex items-center gap-3 sm:gap-4 lg:gap-6 shrink-0 order-3">
-            <button className="bg-transparent border-0 cursor-pointer text-neutral-900-alt flex items-center justify-center transition-colors duration-200 hover:text-brand-900 p-1" onClick={() => setIsSearchOpen(!isSearchOpen)} title="Поиск" type="button">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <button className={`bg-transparent border-0 cursor-pointer flex items-center justify-center transition-colors duration-200 p-1 ${isSearchOpen ? 'text-brand-900' : 'text-neutral-900-alt hover:text-brand-900'}`} onClick={() => setIsSearchOpen(v => !v)} title="Поиск" type="button" aria-label="Поиск" aria-expanded={isSearchOpen} aria-controls="header-search-panel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 pointer-events-none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </button>
             <Link to="/favorites" className="text-neutral-900-alt flex items-center justify-center transition-colors duration-200 hover:text-brand-900 p-1" title="Избранное">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -80,6 +148,55 @@ export default function Header() {
           ))}
           <div className="absolute bottom-2 md:bottom-4 h-0.5 bg-brand-900 pointer-events-none transition-[left,width,opacity] duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] hidden sm:block" style={lineStyle}></div>
         </nav>
+      </div>
+      <div
+        id="header-search-panel"
+        className={`absolute left-0 top-full w-full z-50 bg-surface-cream border-b border-[#F0F0F0] shadow-shadow-header transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)] ${isSearchOpen ? 'opacity-100 translate-y-0 visible' : 'opacity-0 -translate-y-1 invisible pointer-events-none'}`}
+        aria-hidden={!isSearchOpen}
+      >
+        <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto py-5 md:py-6 max-h-[70vh] overflow-hidden">
+          <form onSubmit={handleSearchSubmit} className="flex items-center gap-3 sm:gap-5" role="search">
+            <div className="flex items-center gap-3 flex-1 min-w-0 h-[48px] sm:h-[50px] pl-4 pr-2 bg-surface-white border border-[#BDBDBD] rounded-md focus-within:border-brand-900 transition-colors duration-200">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 shrink-0 text-neutral-600 pointer-events-none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Поиск по каталогу..." className="flex-1 min-w-0 h-full bg-transparent border-0 outline-none text-[14px] font-normal text-neutral-900-alt placeholder:text-neutral-600" />
+              <button type="submit" className="inline-flex items-center justify-center shrink-0 h-[36px] sm:h-[38px] px-5 sm:px-8 bg-brand-900 text-surface-white text-[13px] sm:text-[14px] font-semibold border-0 rounded-md cursor-pointer transition-colors duration-200 hover:bg-brand-700">Найти</button>
+            </div>
+            <button type="button" onClick={closeSearch} aria-label="Закрыть поиск" className="shrink-0 flex items-center justify-center w-8 h-8 bg-transparent border-0 p-0 text-neutral-900-alt cursor-pointer transition-colors duration-200 hover:text-brand-900">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </form>
+          <div className="grid grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)] gap-6 lg:gap-10 mt-6 md:mt-8">
+            <div className="min-w-0">
+              <h3 className="font-lora text-[16px] font-bold text-neutral-900-alt m-0 mb-3">Часто ищут</h3>
+              <ul className="list-none m-0 p-0 flex flex-row flex-wrap lg:flex-col gap-x-4 gap-y-2 lg:gap-y-3">
+                {popularSearches.map((term) => (
+                  <li key={term} className="min-w-0">
+                    <button type="button" onClick={() => { setSearchQuery(term); setIsSearchOpen(false); navigate(`/catalog?search=${encodeURIComponent(term)}`); }} className="bg-transparent border-0 p-0 text-left text-[14px] font-normal text-neutral-900-alt cursor-pointer transition-colors duration-200 hover:text-brand-900">{term}</button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="min-w-0">
+              <h3 className="font-lora text-[16px] font-bold text-neutral-900-alt m-0 mb-3">Популярные товары</h3>
+              {popularProducts.length > 0 ? (
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-6">
+                  {popularProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-start gap-3 min-h-[120px]">
+                  <p className="m-0 text-[14px] text-neutral-600">
+                    {productsError ? 'Не удалось загрузить товары.' : 'Загружаем товары…'}
+                  </p>
+                  {productsError && (
+                    <button type="button" onClick={() => setRetryToken((v) => v + 1)} className="bg-transparent border border-brand-outline rounded-md px-5 py-2 text-[13px] font-medium text-brand-outline cursor-pointer transition-colors duration-200 hover:border-brand-900 hover:text-brand-900">Повторить</button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </header>
   );

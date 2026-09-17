@@ -47,7 +47,7 @@
   right: 0;
   bottom: -4px; /* Выравниваем по базовой линии заголовка */
   width: 240px;
-  z-index: 100;
+  z-index: 10;
 }
 
 .custom-dropdown {
@@ -318,6 +318,95 @@
               opacity 0.2s ease;
   pointer-events: none; /* Чтобы полоса не перехватывала курсор мыши */
 }
+/* --- СЧЁТЧИК НАЙДЕННОГО --- */
+.catalog-counter {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: #808080;
+  margin-bottom: 20px;
+}
+
+.catalog-counter__reset {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: #4F3422;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.catalog-counter__reset:hover { color: #1A1A1A; }
+
+/* --- ПУСТОЕ СОСТОЯНИЕ --- */
+.catalog-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.catalog-empty__text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  color: #808080;
+  margin: 0;
+}
+
+.catalog-empty__reset {
+  width: 280px;
+  height: 50px;
+  background: transparent;
+  border: 1px solid #1A1A1A;
+  border-radius: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #1A1A1A;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.catalog-empty__reset:hover {
+  background: #4F3422;
+  border-color: #4F3422;
+  color: #FFFFFF;
+}
+
+/* --- ПОИСКОВАЯ ПАНЕЛЬ: СКРЫТИЕ СКРОЛЛБАРОВ --- */
+/* Внутренний скроллящийся контейнер панели прокручивается без видимого скроллбара */
+.header-search-panel__scroll {
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* старый Edge / IE */
+}
+
+.header-search-panel__scroll::-webkit-scrollbar {
+  display: none;              /* Chrome, Safari, новый Edge */
+  width: 0;
+  height: 0;
+}
+
+/* Пока панель поиска открыта — ни одного скроллбара на странице */
+html.search-locked,
+body.search-locked {
+  overflow: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html.search-locked::-webkit-scrollbar,
+body.search-locked::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 /* --- АДАПТИВНОСТЬ ПРИ СЖАТИИ ОКНА --- */
 @media (max-width: 1300px) {
   .catalog-container { padding: 40px 40px 60px 40px; }

@@ -80,6 +80,19 @@ body {
   overflow-x: hidden; /* Запрещаем горизонтальный скролл навсегда */
 }
 
+/* Пока панель поиска открыта (класс search-open вешает Header на body) —
+   прячем скроллбары у всех элементов страницы, включая вложенные скролл-контейнеры */
+body.search-open * {
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* старый Edge / IE */
+}
+
+body.search-open *::-webkit-scrollbar {
+  display: none;              /* Chrome, Safari, новый Edge */
+  width: 0;
+  height: 0;
+}
+
 #root {
   display: flex;
   flex-direction: column;
