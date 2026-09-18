@@ -7,27 +7,40 @@ import Catalog from './pages/Catalog';
 import SupportWidget from './components/SupportWidget';
 import Product from './pages/Product';
 import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
+import { AuthProvider } from './context/AuthContext.jsx';
 import { CartProvider } from './context/CartContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
+
+const Success = () => (
+  <div className="w-full px-4 py-16 text-center font-montserrat">
+    <h1 className="font-lora text-[32px] font-bold text-neutral-900-alt mb-4">Заказ принят!</h1>
+    <p className="text-neutral-500">Номер появится на этой странице в следующей задаче</p>
+  </div>
+);
 
 function App() {
   return (
     <BrowserRouter>
-      <CartProvider>
-        <ToastProvider>
-          <Header />
-          <main className="content">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/catalog" element={<Catalog />} />
-              <Route path="/product/:id" element={<Product />} />
-              <Route path="/cart" element={<Cart />} />
-            </Routes>
-          </main>
-          <SupportWidget />
-          <Footer />
-        </ToastProvider>
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <ToastProvider>
+            <Header />
+            <main className="content">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/catalog" element={<Catalog />} />
+                <Route path="/product/:id" element={<Product />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/success" element={<Success />} />
+              </Routes>
+            </main>
+            <SupportWidget />
+            <Footer />
+          </ToastProvider>
+        </CartProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

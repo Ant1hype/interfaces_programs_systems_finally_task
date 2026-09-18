@@ -36,10 +36,26 @@ function readStorage() {
 
 export const CartProvider = ({ children }) => {
   const [items, setItems] = useState(readStorage);
+  const [appliedPromo, setAppliedPromo] = useState('');
 
   useEffect(() => {
     saveStorage(items);
   }, [items]);
+
+  const applyPromo = useCallback((rawCode) => {
+    const code = (rawCode || '').trim().toUpperCase();
+    if (code === 'CHEESE10') {
+      setAppliedPromo('CHEESE10');
+      return { success: true };
+    } else {
+      setAppliedPromo('');
+      return { success: false, error: 'Промокод не распознан' };
+    }
+  }, []);
+
+  const clearPromo = useCallback(() => {
+    setAppliedPromo('');
+  }, []);
 
   const add = useCallback((id, pack = 100, maxStock = Infinity) => {
     const normalizedPack = Number(pack) || 100;
@@ -95,6 +111,7 @@ export const CartProvider = ({ children }) => {
   const clear = useCallback(() => {
     setItems([]);
     saveStorage([]);
+    setAppliedPromo('');
   }, []);
 
   const qtyForId = useCallback(
@@ -109,8 +126,8 @@ export const CartProvider = ({ children }) => {
   const totalQty = useMemo(() => items.reduce((sum, it) => sum + it.qty, 0), [items]);
 
   const value = useMemo(
-    () => ({ items, totalQty, add, inc, dec, remove, clear, qtyForId }),
-    [items, totalQty, add, inc, dec, remove, clear, qtyForId]
+    () => ({ items, totalQty, add, inc, dec, remove, clear, qtyForId, appliedPromo, applyPromo, clearPromo }),
+    [items, totalQty, add, inc, dec, remove, clear, qtyForId, appliedPromo, applyPromo, clearPromo]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

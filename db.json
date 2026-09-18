@@ -990,5 +990,15 @@
     "favorites": [],
     "orders": []
   },
-  "orders": []
+  "orders": [],
+  "users": [
+    {
+      "id": 1,
+      "name": "Демо",
+      "email": "demo@cheesecraft.ru",
+      "phone": "+7 (999) 123-45-67",
+      "passHash": "2a5b1094",
+      "createdAt": "2026-09-18T15:08:55.606Z"
+    }
+  ]
 }
