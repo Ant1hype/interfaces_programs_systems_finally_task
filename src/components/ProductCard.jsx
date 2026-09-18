@@ -24,6 +24,7 @@ export default function ProductCard({ product }) {
   }, []);
 
   const stock = Number(product.stock ?? (product.inStock === false ? 0 : 5));
+  const isOutOfStock = stock <= 0 || product.inStock === false;
   const qty = qtyForId ? qtyForId(product.id) : 0;
 
   const handleAddToCart = (e) => {
@@ -32,9 +33,9 @@ export default function ProductCard({ product }) {
 
     if (timerRef.current) clearTimeout(timerRef.current);
 
-    if (qty >= stock) {
-      setBtnText(`Максимум ${stock} шт`);
-      push(`Максимум ${stock} шт в наличии`);
+    if (qty >= stock || isOutOfStock) {
+      setBtnText(stock <= 0 || product.inStock === false ? 'Нет в наличии' : `Максимум ${stock} шт`);
+      push(stock <= 0 || product.inStock === false ? 'Нет в наличии' : `Максимум ${stock} шт в наличии`);
       timerRef.current = setTimeout(() => {
         setBtnText(null);
       }, 1200);
@@ -52,10 +53,10 @@ export default function ProductCard({ product }) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (qty >= stock) {
+    if (qty >= stock || isOutOfStock) {
       if (timerRef.current) clearTimeout(timerRef.current);
-      setBtnText(`Максимум ${stock} шт`);
-      push(`Максимум ${stock} шт в наличии`);
+      setBtnText(stock <= 0 || product.inStock === false ? 'Нет в наличии' : `Максимум ${stock} шт`);
+      push(stock <= 0 || product.inStock === false ? 'Нет в наличии' : `Максимум ${stock} шт в наличии`);
       timerRef.current = setTimeout(() => {
         setBtnText(null);
       }, 1200);
@@ -88,7 +89,7 @@ export default function ProductCard({ product }) {
     }
   };
 
-  const showLimit = Boolean(btnText && btnText.startsWith('Максимум'));
+  const showLimit = Boolean(btnText && (btnText.startsWith('Максимум') || btnText === 'Нет в наличии'));
 
   return (
     <Link to={`/product/${product.id}`} style={{ textDecoration: 'none' }}>
