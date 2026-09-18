@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
 
     async function restoreSession() {
       try {
-        const savedId = localStorage.getItem(SESSION_KEY);
+        const savedId = localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY);
         if (!savedId) {
           if (isMounted) {
             setUser(null);
@@ -42,6 +42,7 @@ export const AuthProvider = ({ children }) => {
             setUser(restoredUser);
           } else {
             localStorage.removeItem(SESSION_KEY);
+            sessionStorage.removeItem(SESSION_KEY);
             setUser(null);
           }
         }
@@ -49,6 +50,7 @@ export const AuthProvider = ({ children }) => {
         if (isMounted) {
           try {
             localStorage.removeItem(SESSION_KEY);
+            sessionStorage.removeItem(SESSION_KEY);
           } catch (e) {
             // ignore
           }
@@ -90,6 +92,7 @@ export const AuthProvider = ({ children }) => {
     const created = await createUser(newUser);
     try {
       localStorage.setItem(SESSION_KEY, String(created.id));
+      sessionStorage.removeItem(SESSION_KEY);
     } catch (e) {
       console.error("Failed to save session to localStorage:", e);
     }
@@ -97,12 +100,16 @@ export const AuthProvider = ({ children }) => {
     return created;
   }, []);
 
-  const login = useCallback(async (emailOrObj, maybePassword) => {
+  const login = useCallback(async (emailOrObj, maybePassword, maybeRemember = true) => {
     let email = emailOrObj;
     let password = maybePassword;
+    let remember = maybeRemember;
     if (emailOrObj && typeof emailOrObj === "object") {
       email = emailOrObj.email;
       password = emailOrObj.password;
+      if ("remember" in emailOrObj) {
+        remember = emailOrObj.remember;
+      }
     }
 
     const trimmedEmail = typeof email === "string" ? email.trim() : "";
@@ -117,9 +124,15 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      localStorage.setItem(SESSION_KEY, String(foundUser.id));
+      if (remember) {
+        localStorage.setItem(SESSION_KEY, String(foundUser.id));
+        sessionStorage.removeItem(SESSION_KEY);
+      } else {
+        sessionStorage.setItem(SESSION_KEY, String(foundUser.id));
+        localStorage.removeItem(SESSION_KEY);
+      }
     } catch (e) {
-      console.error("Failed to save session to localStorage:", e);
+      console.error("Failed to save session:", e);
     }
     setUser(foundUser);
     return foundUser;
@@ -128,8 +141,9 @@ export const AuthProvider = ({ children }) => {
   const logout = useCallback(() => {
     try {
       localStorage.removeItem(SESSION_KEY);
+      sessionStorage.removeItem(SESSION_KEY);
     } catch (e) {
-      console.error("Failed to clear session from localStorage:", e);
+      console.error("Failed to clear session:", e);
     }
     setUser(null);
   }, []);

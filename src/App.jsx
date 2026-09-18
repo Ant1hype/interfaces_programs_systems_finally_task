@@ -8,6 +8,7 @@ import SupportWidget from './components/SupportWidget';
 import Product from './pages/Product';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
+import Auth from './pages/Auth';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { CartProvider } from './context/CartContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
@@ -33,6 +34,7 @@ function App() {
                 <Route path="/product/:id" element={<Product />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
+                <Route path="/auth" element={<Auth />} />
                 <Route path="/success" element={<Success />} />
               </Routes>
             </main>
