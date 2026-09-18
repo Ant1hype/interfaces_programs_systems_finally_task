@@ -1,5 +1,5 @@
 import React from 'react'; // Вот это обязательно!
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -9,7 +9,8 @@ import Product from './pages/Product';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Auth from './pages/Auth';
-import { AuthProvider } from './context/AuthContext.jsx';
+import Profile from './pages/Profile';
+import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { CartProvider } from './context/CartContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 
@@ -19,6 +20,15 @@ const Success = () => (
     <p className="text-neutral-500">Номер появится на этой странице в следующей задаче</p>
   </div>
 );
+
+function ProtectedProfile() {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (user === null) {
+    return <Navigate to="/auth?next=/profile" replace />;
+  }
+  return <Profile />;
+}
 
 function App() {
   return (
@@ -35,6 +45,7 @@ function App() {
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/profile" element={<ProtectedProfile />} />
                 <Route path="/success" element={<Success />} />
               </Routes>
             </main>
