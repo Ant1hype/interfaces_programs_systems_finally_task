@@ -17,6 +17,14 @@ export function djb2(str) {
   return (hash >>> 0).toString(16);
 }
 
+function normalizeUser(u) {
+  if (!u) return null;
+  return {
+    ...u,
+    favorites: Array.isArray(u.favorites) ? u.favorites : [],
+  };
+}
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -39,7 +47,7 @@ export const AuthProvider = ({ children }) => {
         const restoredUser = await getUser(savedId);
         if (isMounted) {
           if (restoredUser && restoredUser.id) {
-            setUser(restoredUser);
+            setUser(normalizeUser(restoredUser));
           } else {
             localStorage.removeItem(SESSION_KEY);
             sessionStorage.removeItem(SESSION_KEY);
@@ -85,6 +93,7 @@ export const AuthProvider = ({ children }) => {
       email: trimmedEmail,
       phone,
       ...rest,
+      favorites: [],
       passHash: djb2(password),
       createdAt: new Date().toISOString(),
     };
@@ -96,7 +105,7 @@ export const AuthProvider = ({ children }) => {
     } catch (e) {
       console.error("Failed to save session to localStorage:", e);
     }
-    setUser(created);
+    setUser(normalizeUser(created));
     return created;
   }, []);
 
@@ -134,7 +143,7 @@ export const AuthProvider = ({ children }) => {
     } catch (e) {
       console.error("Failed to save session:", e);
     }
-    setUser(foundUser);
+    setUser(normalizeUser(foundUser));
     return foundUser;
   }, []);
 
@@ -185,7 +194,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       const updated = await patchUser(user.id, patchData);
-      setUser(updated);
+      setUser(normalizeUser(updated));
       return updated;
     },
     [user]
@@ -237,7 +246,33 @@ export const AuthProvider = ({ children }) => {
       const updated = await patchUser(user.id, {
         passHash: djb2(next),
       });
-      setUser(updated);
+      setUser(normalizeUser(updated));
+      return updated;
+    },
+    [user]
+  );
+
+  const isFavorite = useCallback(
+    (id) => {
+      if (!user) return false;
+      const favs = Array.isArray(user.favorites) ? user.favorites : [];
+      return favs.some((favId) => String(favId) === String(id));
+    },
+    [user]
+  );
+
+  const toggleFavorite = useCallback(
+    async (id) => {
+      if (!user) return;
+      const currentFavs = Array.isArray(user.favorites) ? user.favorites : [];
+      const idStr = String(id);
+      const exists = currentFavs.some((favId) => String(favId) === idStr);
+      const nextFavorites = exists
+        ? currentFavs.filter((favId) => String(favId) !== idStr)
+        : [...currentFavs, id];
+
+      const updated = await patchUser(user.id, { favorites: nextFavorites });
+      setUser(normalizeUser(updated));
       return updated;
     },
     [user]
@@ -253,6 +288,11 @@ export const AuthProvider = ({ children }) => {
       requestReset,
       resetPassword,
       changePassword,
+      isFavorite,
+      toggleFavorite,
+      get favorites() {
+        return user?.favorites || [];
+      },
       get user() {
         return user;
       },
@@ -270,8 +310,10 @@ export const AuthProvider = ({ children }) => {
       requestReset,
       resetPassword,
       changePassword,
+      isFavorite,
+      toggleFavorite,
     }),
-    [user, loading, login, register, logout, updateProfile, requestReset, resetPassword, changePassword]
+    [user, loading, login, register, logout, updateProfile, requestReset, resetPassword, changePassword, isFavorite, toggleFavorite]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

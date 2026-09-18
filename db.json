@@ -1005,7 +1005,12 @@
           "label": "Офис",
           "address": "г. Томск, ул. Сырная, д. 7"
         }
-      ]
+      ],
+      "favorites": [
+        1
+      ],
+      "subscribeEmail": false,
+      "subscribeSms": false
     },
     {
       "name": "Тимофей",

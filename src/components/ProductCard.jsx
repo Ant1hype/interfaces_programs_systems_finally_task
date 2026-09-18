@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'; // ЭТО ДОЛЖНО БЫТЬ ТУТ!
 import './ProductCard.css';
 import { useCart } from '../context/CartContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 
 export default function ProductCard({ product }) {
   const { add, inc, dec, remove, items = [], qtyForId } = useCart() || {};
@@ -14,8 +15,25 @@ export default function ProductCard({ product }) {
   }
   const push = toastContext?.push || (() => {});
 
+  const { user, isFavorite, toggleFavorite } = useAuth() || {};
+  const isFav = isFavorite ? isFavorite(product.id) : false;
+
   const [btnText, setBtnText] = useState(null);
   const timerRef = useRef(null);
+
+  const handleFavClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      push('Войдите, чтобы сохранять избранное', 'error');
+      return;
+    }
+
+    if (toggleFavorite) {
+      toggleFavorite(product.id);
+    }
+  };
 
   useEffect(() => {
     return () => {
@@ -96,8 +114,23 @@ export default function ProductCard({ product }) {
       <div className="product-card">
         <div className="product-card__image-wrap">
           <img src={product.image} alt={product.name} className="product-card__img" />
-          <button type="button" className="product-card__fav" aria-label="В избранное">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <button
+            type="button"
+            className={`product-card__fav ${isFav ? 'product-card__fav--active active text-danger-700' : ''}`}
+            onClick={handleFavClick}
+            aria-label={isFav ? 'Удалить из избранного' : 'В избранное'}
+            style={isFav ? { color: 'var(--danger-700, #A61A1A)' } : undefined}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill={isFav ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              strokeWidth={isFav ? '1' : '2'}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
           </button>
         </div>
         

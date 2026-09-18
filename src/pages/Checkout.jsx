@@ -28,6 +28,48 @@ function extractUserAddress(user) {
   return '';
 }
 
+function getStoredOrdersWithDemo() {
+  try {
+    const raw = localStorage.getItem('syrnaya-palitra:orders:v1');
+    let orders = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(orders)) {
+      orders = orders && typeof orders === 'object' ? [orders] : [];
+    }
+    const hasDemoOrder = orders.some(
+      (o) => (o && o.userId !== undefined && String(o.userId) === '1') ||
+             (o && o.userEmail && String(o.userEmail).toLowerCase() === 'demo@cheesecraft.ru')
+    );
+    if (!hasDemoOrder) {
+      const demoOrder = {
+        id: 1789750000000,
+        userId: 1,
+        userEmail: 'demo@cheesecraft.ru',
+        total: 300,
+        pointsSpent: 0,
+        date: '2026-09-18T12:00:00.000Z',
+        items: [],
+      };
+      orders = [demoOrder, ...orders];
+      localStorage.setItem('syrnaya-palitra:orders:v1', JSON.stringify(orders));
+    }
+    return orders;
+  } catch {
+    return [];
+  }
+}
+
+function getUserBalance(user) {
+  if (!user) return 0;
+  const orders = getStoredOrdersWithDemo();
+  const userOrders = orders.filter(
+    (o) => (o && o.userId !== undefined && String(o.userId) === String(user.id)) ||
+           (o && o.userEmail && user.email && String(o.userEmail).toLowerCase() === String(user.email).toLowerCase())
+  );
+  const earned = userOrders.reduce((s, o) => s + Number(o.total ?? o.totalPrice ?? o.finalTotal ?? 0), 0);
+  const spent = userOrders.reduce((s, o) => s + Number(o.pointsSpent ?? 0), 0);
+  return Math.max(0, Math.round(earned - spent));
+}
+
 function useProducts() {
   const [p, setP] = useState([]);
   useEffect(() => {
@@ -54,6 +96,9 @@ export default function Checkout() {
   const [delivery, setDelivery] = useState('Доставка курьером');
   const [address, setAddress] = useState(() => extractUserAddress(user));
   const [payment, setPayment] = useState('Картой онлайн');
+
+  const balance = useMemo(() => getUserBalance(user), [user]);
+  const [pointsInput, setPointsInput] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -87,7 +132,38 @@ export default function Checkout() {
 
   const it = useMemo(() => rows.reduce((s, r) => s + r.lineTotal, 0), [rows]);
   const disc = appliedPromo === PROMO_CODE ? Math.round((it * PROMO_PERCENT) / 100) : 0;
-  const gt = Math.max(0, it - disc);
+  const afterPromo = Math.max(0, it - disc);
+  const cap = Math.max(0, Math.min(balance, afterPromo));
+
+  const pointsNum = parseInt(pointsInput, 10);
+  const pointsToSpend = user && !Number.isNaN(pointsNum) && pointsNum > 0
+    ? Math.min(pointsNum, cap)
+    : 0;
+
+  const gt = Math.max(0, afterPromo - pointsToSpend);
+
+  const handlePointsChange = (e) => {
+    const rawVal = e.target.value.trim();
+    if (rawVal === '') {
+      setPointsInput('');
+      return;
+    }
+    const clean = rawVal.replace(/\s+/g, '');
+    if (!/^\d+$/.test(clean)) {
+      setPointsInput('0');
+      return;
+    }
+    const num = Number(clean);
+    if (num > cap) {
+      setPointsInput(String(cap));
+      return;
+    }
+    setPointsInput(String(num));
+  };
+
+  const handlePointsMax = () => {
+    setPointsInput(String(cap));
+  };
 
   const phoneDisplay = useMemo(() => {
     if (!phoneDigits) return '';
@@ -170,13 +246,18 @@ export default function Checkout() {
       items,
       total: gt,
       discount: disc,
+      pointsSpent: pointsToSpend,
+      userId: user?.id,
+      userEmail: user?.email,
       delivery,
       payment,
       date: new Date().toISOString(),
     };
 
     try {
-      localStorage.setItem('syrnaya-palitra:orders:v1', JSON.stringify(order));
+      const existing = getStoredOrdersWithDemo();
+      const updated = [order, ...existing];
+      localStorage.setItem('syrnaya-palitra:orders:v1', JSON.stringify(updated));
     } catch (err) {
       console.error('Failed to save order to localStorage:', err);
     }
@@ -379,10 +460,43 @@ export default function Checkout() {
             <span>Скидка</span>
             <span className="font-inter font-bold">-{disc} ₽</span>
           </div>
+          {user && pointsToSpend > 0 && (
+            <div className="flex items-center justify-between text-[15px] text-neutral-black mb-5">
+              <span>Оплата баллами</span>
+              <span className="font-inter font-bold">-{pointsToSpend} ₽</span>
+            </div>
+          )}
           <div className="border-t border-neutral-250 pt-5 mb-5 flex items-center justify-between">
             <span className="text-[24px] font-bold text-neutral-black">Итого</span>
             <span className="text-[24px] font-bold text-neutral-black">{fmt(gt)}</span>
           </div>
+
+          {user && balance > 0 && (
+            <div className="mb-4">
+              <div className="flex items-center justify-between text-[14px] mb-2">
+                <span className="text-neutral-black">Списать баллы</span>
+                <span className="text-neutral-400">Доступно: {balance}</span>
+              </div>
+              <div className="relative flex items-center">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={pointsInput}
+                  onChange={handlePointsChange}
+                  placeholder="0"
+                  className="w-full h-[44px] pl-4 pr-16 bg-surface-white border border-neutral-250-a80 rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900"
+                />
+                <button
+                  type="button"
+                  onClick={handlePointsMax}
+                  className="absolute right-3 text-[14px] text-neutral-800 hover:text-brand-900 font-normal cursor-pointer bg-transparent border-none p-0"
+                >
+                  Макс.
+                </button>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handlePromoApply} className="flex items-center gap-3 mb-4">
             <input
               type="text"
