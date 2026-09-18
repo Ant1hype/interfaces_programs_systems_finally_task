@@ -16,7 +16,7 @@ export default function ProductCard({ product }) {
 
   const handleAddToCart = (e) => {
     e.preventDefault();
-    const stock = product.stock ?? (product.inStock === false ? 0 : 5);
+    const stock = Number(product.stock ?? (product.inStock === false ? 0 : 5));
     const already = (items || [])
       .filter((it) => String(it.id) === String(product.id))
       .reduce((sum, it) => sum + it.qty, 0);
@@ -31,7 +31,7 @@ export default function ProductCard({ product }) {
       return;
     }
 
-    add(product.id, 100);
+    add(product.id, 100, stock);
     setBtnText('✓ Добавлено');
     timerRef.current = setTimeout(() => {
       setBtnText(null);

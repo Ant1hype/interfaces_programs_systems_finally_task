@@ -130,7 +130,34 @@ export default function Product() {
               </div>
             </div>
             {isOut && <div className="mt-4 text-sm text-neutral-500">Нет в наличии</div>}
-            <button type="button" disabled={isOut} onClick={() => add(product.id, pack)} className={`mt-4 w-full max-w-[320px] h-12 rounded-radius-lg font-semibold text-surface-white ${isOut?"bg-neutral-300 cursor-not-allowed":"bg-brand-900 hover:bg-brand-700"}`}>В корзину</button>
+            <button
+              type="button"
+              disabled={isOut}
+              onClick={() => {
+                const already = (items || [])
+                  .filter((it) => String(it.id) === String(product.id))
+                  .reduce((sum, it) => sum + it.qty, 0);
+
+                if (timerRef.current) clearTimeout(timerRef.current);
+
+                if (already >= stock) {
+                  setBtnText(`Максимум ${stock} шт`);
+                  timerRef.current = setTimeout(() => {
+                    setBtnText(null);
+                  }, 1200);
+                  return;
+                }
+
+                add(product.id, pack, stock);
+                setBtnText('✓ Добавлено');
+                timerRef.current = setTimeout(() => {
+                  setBtnText(null);
+                }, 1200);
+              }}
+              className={`mt-4 w-full max-w-[320px] h-12 rounded-radius-lg font-semibold text-surface-white ${isOut?"bg-neutral-300 cursor-not-allowed":"bg-brand-900 hover:bg-brand-700"}`}
+            >
+              {btnText || 'В корзину'}
+            </button>
             <p className="text-xs text-neutral-500 mt-2">Ближайшая доставка: завтра, {deliveryDate}</p>
           </div>
         </div>

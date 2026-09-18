@@ -41,9 +41,14 @@ export const CartProvider = ({ children }) => {
     saveStorage(items);
   }, [items]);
 
-  const add = useCallback((id, pack = 100) => {
+  const add = useCallback((id, pack = 100, maxStock = Infinity) => {
     const normalizedPack = Number(pack) || 100;
     setItems((prev) => {
+      const already = prev
+        .filter((it) => String(it.id) === String(id))
+        .reduce((sum, it) => sum + it.qty, 0);
+      if (already >= maxStock) return prev;
+
       const key = itemKey(id, normalizedPack);
       const found = prev.find((it) => itemKey(it.id, it.pack) === key);
       const next = found
@@ -54,9 +59,14 @@ export const CartProvider = ({ children }) => {
     });
   }, []);
 
-  const inc = useCallback((id, pack) => {
+  const inc = useCallback((id, pack, maxStock = Infinity) => {
     const key = itemKey(id, pack);
     setItems((prev) => {
+      const already = prev
+        .filter((it) => String(it.id) === String(id))
+        .reduce((sum, it) => sum + it.qty, 0);
+      if (already >= maxStock) return prev;
+
       const next = prev.map((it) => (itemKey(it.id, it.pack) === key ? { ...it, qty: it.qty + 1 } : it));
       saveStorage(next);
       return next;
