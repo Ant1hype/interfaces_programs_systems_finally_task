@@ -156,6 +156,17 @@ export const AuthProvider = ({ children }) => {
 
       const patchData = { ...patch };
 
+      if (patchData.email !== undefined) {
+        const trimmedEmail = typeof patchData.email === "string" ? patchData.email.trim() : "";
+        patchData.email = trimmedEmail;
+        if (trimmedEmail && trimmedEmail.toLowerCase() !== (user.email || "").toLowerCase()) {
+          const existing = await getUserByEmail(trimmedEmail);
+          if (existing && String(existing.id) !== String(user.id)) {
+            throw new Error("EMAIL_TAKEN");
+          }
+        }
+      }
+
       // Смена пароля только при верном текущем
       const wantsPasswordChange = "password" in patchData || "newPassword" in patchData;
       if (wantsPasswordChange) {

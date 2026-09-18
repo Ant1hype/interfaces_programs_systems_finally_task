@@ -999,6 +999,16 @@
       "phone": "+7 (999) 123-45-67",
       "passHash": "2a5b1094",
       "createdAt": "2026-09-18T15:08:55.606Z"
+    },
+    {
+      "name": "Тимофей",
+      "email": "timofey@mail.com",
+      "passHash": "72f91e96",
+      "createdAt": "2026-09-18T16:00:18.910Z",
+      "id": 2,
+      "phone": "+7 (913) 112-62-18",
+      "subscribeEmail": true,
+      "subscribeSms": true
     }
   ]
 }
