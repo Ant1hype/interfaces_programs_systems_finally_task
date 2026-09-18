@@ -3,7 +3,7 @@ import { Navigate, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Auth() {
-  const { user, login } = useAuth();
+  const { user, login, register } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -68,6 +68,66 @@ export default function Auth() {
       setIsSubmitting(false);
     }
   };
+  // Регистрация
+  const [regName, setRegName] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [regAgree, setRegAgree] = useState(false);
+  const [regShowPassword, setRegShowPassword] = useState(false);
+  const [regErrors, setRegErrors] = useState({});
+  const [isRegSubmitting, setIsRegSubmitting] = useState(false);
+
+  const handleRegisterSubmit = async (e) => {
+    e.preventDefault();
+    const newErrors = {};
+    const emailRegex = /^\S+@\S+\.\S+$/;
+
+    if (!regName.trim()) {
+      newErrors.name = 'Введите имя';
+    }
+
+    if (!regEmail.trim()) {
+      newErrors.email = 'Введите email';
+    } else if (!emailRegex.test(regEmail.trim())) {
+      newErrors.email = 'Некорректный email';
+    }
+
+    if (!regPassword) {
+      newErrors.password = 'Введите пароль';
+    } else if (regPassword.length < 6) {
+      newErrors.password = 'Пароль не короче 6 символов';
+    }
+
+    if (!regAgree) {
+      newErrors.agree = 'Нужно согласие с политикой';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setRegErrors(newErrors);
+      return;
+    }
+
+    setRegErrors({});
+    setIsRegSubmitting(true);
+
+    try {
+      await register({
+        name: regName.trim(),
+        email: regEmail.trim(),
+        password: regPassword,
+      });
+      const next = searchParams.get('next') || '/';
+      navigate(next);
+    } catch (err) {
+      if (err.message === 'EMAIL_TAKEN') {
+        setRegErrors({ email: 'Пользователь с таким email уже существует' });
+      } else {
+        setRegErrors({ form: err.message || 'Ошибка регистрации' });
+      }
+    } finally {
+      setIsRegSubmitting(false);
+    }
+  };
 
   return (
     <div className="w-full min-h-[calc(100vh-140px)] bg-[#FDFBF7] flex items-center justify-center px-4 py-12 md:py-20 font-montserrat">
@@ -98,9 +158,118 @@ export default function Auth() {
         </div>
 
         {activeTab === 'register' ? (
-          <div className="py-12 text-center text-neutral-500 font-montserrat text-sm">
-            Форма регистрации — следующая задача
-          </div>
+          <form onSubmit={handleRegisterSubmit} noValidate className="space-y-5">
+            <div>
+              <label htmlFor="reg-name" className="block text-sm text-neutral-700 mb-2">
+                Имя
+              </label>
+              <input
+                id="reg-name"
+                type="text"
+                value={regName}
+                onChange={(e) => {
+                  setRegName(e.target.value);
+                  if (regErrors.name) setRegErrors((prev) => ({ ...prev, name: '' }));
+                }}
+                placeholder="Иван"
+                className={`w-full px-4 py-3 rounded-lg border text-sm text-neutral-900 placeholder:text-[#A1A1AA] bg-white focus:outline-none transition-colors ${
+                  regErrors.name ? 'border-red-500 focus:border-red-600' : 'border-[#CCCCCC] focus:border-[#4F3422]'
+                }`}
+              />
+              {regErrors.name && <p className="text-xs text-red-600 mt-1.5">{regErrors.name}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="reg-email" className="block text-sm text-neutral-700 mb-2">
+                Email
+              </label>
+              <input
+                id="reg-email"
+                type="email"
+                value={regEmail}
+                onChange={(e) => {
+                  setRegEmail(e.target.value);
+                  if (regErrors.email) setRegErrors((prev) => ({ ...prev, email: '' }));
+                }}
+                placeholder="example@mail.ru"
+                className={`w-full px-4 py-3 rounded-lg border text-sm text-neutral-900 placeholder:text-[#A1A1AA] bg-white focus:outline-none transition-colors ${
+                  regErrors.email ? 'border-red-500 focus:border-red-600' : 'border-[#CCCCCC] focus:border-[#4F3422]'
+                }`}
+              />
+              {regErrors.email && <p className="text-xs text-red-600 mt-1.5">{regErrors.email}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="reg-password" className="block text-sm text-neutral-700 mb-2">
+                Пароль
+              </label>
+              <div className="relative">
+                <input
+                  id="reg-password"
+                  type={regShowPassword ? 'text' : 'password'}
+                  value={regPassword}
+                  onChange={(e) => {
+                    setRegPassword(e.target.value);
+                    if (regErrors.password) setRegErrors((prev) => ({ ...prev, password: '' }));
+                  }}
+                  placeholder="••••••••"
+                  className={`w-full px-4 py-3 pr-11 rounded-lg border text-sm text-neutral-900 placeholder:text-[#A1A1AA] bg-white focus:outline-none transition-colors ${
+                    regErrors.password ? 'border-red-500 focus:border-red-600' : 'border-[#CCCCCC] focus:border-[#4F3422]'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setRegShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800 p-1 transition-colors"
+                  aria-label={regShowPassword ? 'Скрыть пароль' : 'Показать пароль'}
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </button>
+              </div>
+              {regErrors.password && <p className="text-xs text-red-600 mt-1.5">{regErrors.password}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="reg-agree" className="flex items-center gap-2.5 cursor-pointer select-none">
+                <input
+                  id="reg-agree"
+                  type="checkbox"
+                  checked={regAgree}
+                  onChange={(e) => {
+                    setRegAgree(e.target.checked);
+                    if (regErrors.agree) setRegErrors((prev) => ({ ...prev, agree: '' }));
+                  }}
+                  className="sr-only"
+                />
+                <div
+                  className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-colors flex-shrink-0 ${
+                    regAgree ? 'bg-[#4F3422] border-[#4F3422]' : regErrors.agree ? 'border-red-500 bg-white' : 'border-[#CCCCCC] bg-white'
+                  }`}
+                >
+                  {regAgree && (
+                    <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="2.5 6 4.8 8.5 9.5 3.5" />
+                    </svg>
+                  )}
+                </div>
+                <span className="text-sm text-neutral-800">Я согласен с политикой конфиденциальности</span>
+              </label>
+              {regErrors.agree && <p className="text-xs text-red-600 mt-1.5">{regErrors.agree}</p>}
+            </div>
+
+            {regErrors.form && <p className="text-xs text-red-600">{regErrors.form}</p>}
+
+            <button
+              type="submit"
+              disabled={isRegSubmitting}
+              className="w-full bg-[#4F3422] hover:bg-[#6D4C41] active:bg-[#3E291B] text-white py-3.5 px-4 rounded-lg font-medium text-base transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isRegSubmitting ? 'Регистрация...' : 'Зарегистрироваться'}
+            </button>
+          </form>
         ) : (
           <form onSubmit={handleSubmit} noValidate className="space-y-5">
             <div>
