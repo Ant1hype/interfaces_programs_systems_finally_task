@@ -12,6 +12,7 @@ import Auth from './pages/Auth';
 import Profile from './pages/Profile';
 import Forgot from './pages/Forgot';
 import Reset from './pages/Reset';
+import Favorites from './pages/Favorites';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { CartProvider } from './context/CartContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
@@ -50,6 +51,7 @@ function App() {
                 <Route path="/forgot" element={<Forgot />} />
                 <Route path="/reset" element={<Reset />} />
                 <Route path="/profile" element={<ProtectedProfile />} />
+                <Route path="/favorites" element={<Favorites />} />
                 <Route path="/success" element={<Success />} />
               </Routes>
             </main>
