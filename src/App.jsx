@@ -6,20 +6,25 @@ import Home from './pages/Home';
 import Catalog from './pages/Catalog';
 import SupportWidget from './components/SupportWidget';
 import Product from './pages/Product';
+import Cart from './pages/Cart';
+import { CartProvider } from './context/CartContext.jsx';
 
 function App() {
   return (
     <BrowserRouter>
-      <Header />
-      <main className="content">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/catalog" element={<Catalog />} />
-          <Route path="/product/:id" element={<Product />} />
-        </Routes>
-      </main>
-      <SupportWidget />
-      <Footer />
+      <CartProvider>
+        <Header />
+        <main className="content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/catalog" element={<Catalog />} />
+            <Route path="/product/:id" element={<Product />} />
+            <Route path="/cart" element={<Cart />} />
+          </Routes>
+        </main>
+        <SupportWidget />
+        <Footer />
+      </CartProvider>
     </BrowserRouter>
   );
 }

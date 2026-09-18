@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getProduct, getProducts } from '../lib/api.js';
 import ProductCard from '../components/ProductCard.jsx';
+import { useCart } from '../context/CartContext.jsx';
 
 function trimProduct(prod) {
   if (!prod) return prod;
@@ -16,11 +17,13 @@ function trimProduct(prod) {
 
 export default function Product() {
   const { id } = useParams();
+  const { add } = useCart();
   const [product,setProduct]=useState(null);
   const [allProducts,setAllProducts]=useState([]);
   const [activeTab,setActiveTab]=useState('desc');
   const [mainImg,setMainImg]=useState('');
   const [selectedWeight,setSelectedWeight]=useState(100);
+  const pack = selectedWeight;
   const [brokenImages,setBrokenImages]=useState([]);
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState('');
@@ -119,7 +122,7 @@ export default function Product() {
               </div>
             </div>
             {isOut && <div className="mt-4 text-sm text-neutral-500">Нет в наличии</div>}
-            <button disabled={isOut} className={`mt-4 w-full max-w-[320px] h-12 rounded-radius-lg font-semibold text-surface-white ${isOut?"bg-neutral-300 cursor-not-allowed":"bg-brand-900 hover:bg-brand-700"}`}>В корзину</button>
+            <button type="button" disabled={isOut} onClick={() => add(product.id, pack)} className={`mt-4 w-full max-w-[320px] h-12 rounded-radius-lg font-semibold text-surface-white ${isOut?"bg-neutral-300 cursor-not-allowed":"bg-brand-900 hover:bg-brand-700"}`}>В корзину</button>
             <p className="text-xs text-neutral-500 mt-2">Ближайшая доставка: завтра, {deliveryDate}</p>
           </div>
         </div>

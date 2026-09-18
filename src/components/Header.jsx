@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { getProducts } from '../lib/api';
+import { useCart } from '../context/CartContext.jsx';
 
 const popularSearches = ['Пармезан', 'Твердые сорта', 'Сырная тарелка', 'К красному сухому'];
 
@@ -13,6 +14,20 @@ const navItems = [
   { path: '/catalog', filter: 'exquisite', label: 'Изысканное' },
   { path: '/catalog', filter: 'vegan', label: '100% Vegan' }
 ];
+
+function CartIconWithBadge() {
+  const { totalQty } = useCart();
+  return (
+    <Link to="/cart" className="text-neutral-900-alt flex items-center justify-center transition-colors duration-200 hover:text-brand-900 p-1 relative" title="Корзина">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      {totalQty > 0 && (
+        <span className="absolute -top-1 -right-1 bg-brand-900 text-surface-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center leading-none">
+          {totalQty}
+        </span>
+      )}
+    </Link>
+  );
+}
 
 export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -144,9 +159,7 @@ export default function Header() {
             <Link to="/favorites" className="text-neutral-900-alt flex items-center justify-center transition-colors duration-200 hover:text-brand-900 p-1" title="Избранное">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             </Link>
-            <Link to="/cart" className="text-neutral-900-alt flex items-center justify-center transition-colors duration-200 hover:text-brand-900 p-1" title="Корзина">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-            </Link>
+            <CartIconWithBadge />
             <Link to="/profile" className="text-neutral-900-alt flex items-center justify-center transition-colors duration-200 hover:text-brand-900 p-1" title="Профиль">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </Link>
