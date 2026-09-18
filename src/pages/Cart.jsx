@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart, itemKey } from '../context/CartContext.jsx';
 import { getProducts } from '../lib/api.js';

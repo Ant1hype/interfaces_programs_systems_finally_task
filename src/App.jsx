@@ -8,22 +8,25 @@ import SupportWidget from './components/SupportWidget';
 import Product from './pages/Product';
 import Cart from './pages/Cart';
 import { CartProvider } from './context/CartContext.jsx';
+import { ToastProvider } from './context/ToastContext.jsx';
 
 function App() {
   return (
     <BrowserRouter>
       <CartProvider>
-        <Header />
-        <main className="content">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/catalog" element={<Catalog />} />
-            <Route path="/product/:id" element={<Product />} />
-            <Route path="/cart" element={<Cart />} />
-          </Routes>
-        </main>
-        <SupportWidget />
-        <Footer />
+        <ToastProvider>
+          <Header />
+          <main className="content">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/catalog" element={<Catalog />} />
+              <Route path="/product/:id" element={<Product />} />
+              <Route path="/cart" element={<Cart />} />
+            </Routes>
+          </main>
+          <SupportWidget />
+          <Footer />
+        </ToastProvider>
       </CartProvider>
     </BrowserRouter>
   );

@@ -122,3 +122,19 @@ body.search-open *::-webkit-scrollbar {
 .cart-badge-pulse {
   animation: cartBadgePulse 300ms ease-in-out;
 }
+
+@keyframes toastEnter {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.toast-enter {
+  animation: toastEnter 200ms ease-out;
+}
+
