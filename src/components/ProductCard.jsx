@@ -2,9 +2,18 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // ЭТО ДОЛЖНО БЫТЬ ТУТ!
 import './ProductCard.css';
 import { useCart } from '../context/CartContext.jsx';
+import { useToast } from '../context/ToastContext.jsx';
 
 export default function ProductCard({ product }) {
-  const { add, items } = useCart();
+  const { add, inc, dec, remove, items = [], qtyForId } = useCart() || {};
+  let toastContext;
+  try {
+    toastContext = useToast();
+  } catch {
+    toastContext = null;
+  }
+  const push = toastContext?.push || (() => {});
+
   const [btnText, setBtnText] = useState(null);
   const timerRef = useRef(null);
 
@@ -14,17 +23,18 @@ export default function ProductCard({ product }) {
     };
   }, []);
 
+  const stock = Number(product.stock ?? (product.inStock === false ? 0 : 5));
+  const qty = qtyForId ? qtyForId(product.id) : 0;
+
   const handleAddToCart = (e) => {
     e.preventDefault();
-    const stock = Number(product.stock ?? (product.inStock === false ? 0 : 5));
-    const already = (items || [])
-      .filter((it) => String(it.id) === String(product.id))
-      .reduce((sum, it) => sum + it.qty, 0);
+    e.stopPropagation();
 
     if (timerRef.current) clearTimeout(timerRef.current);
 
-    if (already >= stock) {
+    if (qty >= stock) {
       setBtnText(`Максимум ${stock} шт`);
+      push(`Максимум ${stock} шт в наличии`);
       timerRef.current = setTimeout(() => {
         setBtnText(null);
       }, 1200);
@@ -37,6 +47,48 @@ export default function ProductCard({ product }) {
       setBtnText(null);
     }, 1200);
   };
+
+  const handleInc = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (qty >= stock) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      setBtnText(`Максимум ${stock} шт`);
+      push(`Максимум ${stock} шт в наличии`);
+      timerRef.current = setTimeout(() => {
+        setBtnText(null);
+      }, 1200);
+      return;
+    }
+
+    const matching = (items || []).filter((it) => String(it.id) === String(product.id));
+    const target = [...matching].sort((a, b) => (Number(b.pack) || 0) - (Number(a.pack) || 0))[0];
+
+    if (target) {
+      inc(target.id, target.pack, stock);
+    } else {
+      add(product.id, 100, stock);
+    }
+  };
+
+  const handleDec = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const matching = (items || []).filter((it) => String(it.id) === String(product.id));
+    const target = [...matching].sort((a, b) => (Number(b.pack) || 0) - (Number(a.pack) || 0))[0];
+
+    if (!target) return;
+
+    if (target.qty === 1) {
+      remove(target.id, target.pack);
+    } else {
+      dec(target.id, target.pack);
+    }
+  };
+
+  const showLimit = Boolean(btnText && btnText.startsWith('Максимум'));
 
   return (
     <Link to={`/product/${product.id}`} style={{ textDecoration: 'none' }}>
@@ -54,9 +106,55 @@ export default function ProductCard({ product }) {
           <p className="product-card__price">{product.price} ₽</p>
         </div>
 
-        <button type="button" className="product-card__btn bg-brand-800 hover:bg-brand-700 transition-colors" onClick={handleAddToCart}>
-          {btnText || 'В корзину'}
-        </button>
+        {qty > 0 ? (
+          showLimit ? (
+            <div
+              className="product-card__btn bg-brand-900 text-surface-white flex items-center justify-center text-center font-medium text-[14px] cursor-default select-none"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            >
+              {btnText}
+            </div>
+          ) : (
+            <div
+              className="product-card__btn bg-brand-900 text-surface-white flex items-center justify-between px-4 select-none cursor-default"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            >
+              <button
+                type="button"
+                onClick={handleDec}
+                className="bg-transparent border-0 p-0 text-surface-white text-[18px] cursor-pointer hover:opacity-75 leading-none flex items-center justify-center w-6 h-6"
+                aria-label="Уменьшить"
+              >
+                −
+              </button>
+              <span className="font-bold text-[15px] min-w-[20px] text-center select-none">
+                {qty}
+              </span>
+              <button
+                type="button"
+                onClick={handleInc}
+                className="bg-transparent border-0 p-0 text-surface-white text-[18px] cursor-pointer hover:opacity-75 leading-none flex items-center justify-center w-6 h-6"
+                aria-label="Увеличить"
+              >
+                +
+              </button>
+            </div>
+          )
+        ) : (
+          <button
+            type="button"
+            className="product-card__btn bg-brand-800 hover:bg-brand-700 transition-colors"
+            onClick={handleAddToCart}
+          >
+            {btnText || 'В корзину'}
+          </button>
+        )}
       </div>
     </Link>
   );

@@ -97,11 +97,20 @@ export const CartProvider = ({ children }) => {
     saveStorage([]);
   }, []);
 
+  const qtyForId = useCallback(
+    (id) => {
+      return items
+        .filter((it) => String(it.id) === String(id))
+        .reduce((sum, it) => sum + it.qty, 0);
+    },
+    [items]
+  );
+
   const totalQty = useMemo(() => items.reduce((sum, it) => sum + it.qty, 0), [items]);
 
   const value = useMemo(
-    () => ({ items, totalQty, add, inc, dec, remove, clear }),
-    [items, totalQty, add, inc, dec, remove, clear]
+    () => ({ items, totalQty, add, inc, dec, remove, clear, qtyForId }),
+    [items, totalQty, add, inc, dec, remove, clear, qtyForId]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
