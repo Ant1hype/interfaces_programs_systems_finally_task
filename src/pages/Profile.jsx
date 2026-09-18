@@ -53,7 +53,7 @@ function formatOrderTotal(order) {
 }
 
 export default function Profile() {
-  const { user, updateProfile, logout } = useAuth();
+  const { user, updateProfile, logout, changePassword } = useAuth();
   const { push } = useToast();
   const { add } = useCart();
   const location = useLocation();
@@ -95,11 +95,12 @@ export default function Profile() {
   const saveTimerRef = React.useRef(null);
 
   // Смена пароля
-  const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [currentPasswordError, setCurrentPasswordError] = useState('');
+  const [newPasswordError, setNewPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [passwordSaving, setPasswordSaving] = useState(false);
 
   // Мои адреса
@@ -115,6 +116,15 @@ export default function Profile() {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setCurrentPasswordError('');
+    setNewPasswordError('');
+    setConfirmPasswordError('');
+  }, [tab]);
 
   useEffect(() => {
     if (user) {
@@ -158,45 +168,45 @@ export default function Profile() {
 
   const handlePasswordSubmit = async (e) => {
     if (e) e.preventDefault();
-    setPasswordError('');
+    setCurrentPasswordError('');
+    setNewPasswordError('');
+    setConfirmPasswordError('');
 
-    if (!currentPassword) {
-      setPasswordError('Неверный текущий пароль');
-      notify('Неверный текущий пароль', 'error');
-      return;
-    }
+    let hasError = false;
 
     if (!newPassword || newPassword.length < 6) {
-      setPasswordError('Пароль должен быть не менее 6 символов');
-      notify('Пароль должен быть не менее 6 символов', 'error');
-      return;
+      setNewPasswordError('Пароль должен быть не менее 6 символов');
+      hasError = true;
     }
 
     if (newPassword !== confirmPassword) {
-      setPasswordError('Пароли не совпадают');
-      notify('Пароли не совпадают', 'error');
+      setConfirmPasswordError('Пароли не совпадают');
+      hasError = true;
+    }
+
+    if (hasError) {
       return;
     }
 
     setPasswordSaving(true);
     try {
-      await updateProfile({
-        currentPassword,
-        newPassword,
-      });
+      const res = await changePassword(currentPassword, newPassword);
+      if (res === 'WRONG_CURRENT') {
+        setCurrentPasswordError('Неверный текущий пароль');
+        return;
+      }
       notify('Пароль изменён', 'success');
-      setShowPasswordChange(false);
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-      setPasswordError('');
+      setCurrentPasswordError('');
+      setNewPasswordError('');
+      setConfirmPasswordError('');
     } catch (err) {
-      if (err?.message === 'WRONG_PASSWORD') {
-        setPasswordError('Неверный текущий пароль');
-        notify('Неверный текущий пароль', 'error');
+      if (err?.message === 'WRONG_CURRENT' || err === 'WRONG_CURRENT') {
+        setCurrentPasswordError('Неверный текущий пароль');
       } else {
-        setPasswordError(err?.message || 'Неверный текущий пароль');
-        notify(err?.message || 'Неверный текущий пароль', 'error');
+        setCurrentPasswordError(err?.message || 'Неверный текущий пароль');
       }
     } finally {
       setPasswordSaving(false);
@@ -407,7 +417,7 @@ export default function Profile() {
               <Link
                 to="/profile"
                 className={`transition-colors ${
-                  tab !== 'orders'
+                  tab !== 'orders' && tab !== 'security'
                     ? 'font-bold text-neutral-900-alt'
                     : 'text-neutral-700 hover:text-neutral-900-alt'
                 }`}
@@ -504,6 +514,114 @@ export default function Profile() {
                 </div>
               )}
             </div>
+          ) : tab === 'security' ? (
+            <div className="flex-1 w-full max-w-[480px]">
+              <h2 className="text-[22px] font-bold text-neutral-900-alt mb-2 font-montserrat">
+                Смена пароля
+              </h2>
+              <div className="mb-6">
+                <Link
+                  to="/profile"
+                  className="text-[14px] text-neutral-500 hover:text-neutral-900 transition-colors inline-flex items-center gap-1.5 font-normal no-underline"
+                >
+                  <span>←</span>
+                  <span>Назад к профилю</span>
+                </Link>
+              </div>
+
+              <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-[13px] text-neutral-500 mb-1">
+                    Текущий пароль
+                  </label>
+                  <input
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => {
+                      setCurrentPassword(e.target.value);
+                      setCurrentPasswordError('');
+                    }}
+                    className={`w-full h-[46px] px-4 rounded-lg border bg-white focus:outline-none focus:border-brand-900 text-neutral-900-alt text-[14px] transition-colors ${
+                      currentPasswordError ? 'border-danger-700' : 'border-neutral-300'
+                    }`}
+                  />
+                  {currentPasswordError && (
+                    <p className="text-danger-700 text-[13px] mt-1.5 font-montserrat" data-error="WRONG_CURRENT">
+                      {currentPasswordError}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-[13px] text-neutral-500 mb-1">
+                    Новый (≥6)
+                  </label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => {
+                      setNewPassword(e.target.value);
+                      setNewPasswordError('');
+                    }}
+                    className={`w-full h-[46px] px-4 rounded-lg border bg-white focus:outline-none focus:border-brand-900 text-neutral-900-alt text-[14px] transition-colors ${
+                      newPasswordError ? 'border-danger-700' : 'border-neutral-300'
+                    }`}
+                  />
+                  {newPasswordError && (
+                    <p className="text-danger-700 text-[13px] mt-1.5 font-montserrat">
+                      {newPasswordError}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-[13px] text-neutral-500 mb-1">
+                    Повторите новый
+                  </label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      setConfirmPasswordError('');
+                    }}
+                    className={`w-full h-[46px] px-4 rounded-lg border bg-white focus:outline-none focus:border-brand-900 text-neutral-900-alt text-[14px] transition-colors ${
+                      confirmPasswordError ? 'border-danger-700' : 'border-neutral-300'
+                    }`}
+                  />
+                  {confirmPasswordError && (
+                    <p className="text-danger-700 text-[13px] mt-1.5 font-montserrat">
+                      {confirmPasswordError}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-4 pt-2">
+                  <button
+                    type="submit"
+                    disabled={passwordSaving}
+                    className="bg-brand-900 text-white hover:bg-brand-700 transition-colors font-medium text-[15px] px-6 py-3 rounded-lg disabled:opacity-60 cursor-pointer"
+                  >
+                    {passwordSaving ? 'Сохранение...' : 'Сохранить пароль'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCurrentPassword('');
+                      setNewPassword('');
+                      setConfirmPassword('');
+                      setCurrentPasswordError('');
+                      setNewPasswordError('');
+                      setConfirmPasswordError('');
+                      navigate('/profile');
+                    }}
+                    className="text-neutral-500 hover:text-neutral-800 text-[14px] transition-colors cursor-pointer bg-transparent border-none p-0"
+                  >
+                    Отмена
+                  </button>
+                </div>
+              </form>
+            </div>
           ) : (
             <div className="flex-1 w-full flex flex-col xl:flex-row gap-10 xl:gap-16 items-start justify-between">
               {/* Блок Личные данные */}
@@ -560,106 +678,13 @@ export default function Profile() {
                   </div>
 
                   <div className="pt-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowPasswordChange(!showPasswordChange);
-                        setPasswordError('');
-                      }}
-                      className="text-[14px] text-neutral-700 hover:text-neutral-900 transition-colors flex items-center gap-1.5 cursor-pointer bg-transparent border-none p-0 font-normal"
+                    <Link
+                      to="/profile?tab=security"
+                      className="text-[14px] text-neutral-700 hover:text-neutral-900 transition-colors inline-flex items-center gap-1.5 font-normal no-underline"
                     >
                       <span>&rarr;</span>
                       <span>Изменить пароль</span>
-                    </button>
-
-                    {showPasswordChange && (
-                      <div className="mt-3 p-4 bg-neutral-50 rounded-xl border border-neutral-200 space-y-3">
-                        <div>
-                          <label className="block text-[13px] text-neutral-500 mb-1">
-                            Текущий пароль
-                          </label>
-                          <input
-                            type="password"
-                            value={currentPassword}
-                            onChange={(e) => {
-                              setCurrentPassword(e.target.value);
-                              setPasswordError('');
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                                handlePasswordSubmit();
-                              }
-                            }}
-                            className={`w-full h-[42px] px-3.5 rounded-lg border bg-white focus:outline-none focus:border-brand-900 text-neutral-900-alt text-[14px] transition-colors ${
-                              passwordError ? 'border-danger-700' : 'border-neutral-300'
-                            }`}
-                          />
-                          {passwordError && (
-                            <p className="text-danger-700 text-[13px] mt-1 font-montserrat">
-                              {passwordError}
-                            </p>
-                          )}
-                        </div>
-
-                        <div>
-                          <label className="block text-[13px] text-neutral-500 mb-1">
-                            Новый (≥6)
-                          </label>
-                          <input
-                            type="password"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                                handlePasswordSubmit();
-                              }
-                            }}
-                            className="w-full h-[42px] px-3.5 rounded-lg border border-neutral-300 bg-white focus:outline-none focus:border-brand-900 text-neutral-900-alt text-[14px] transition-colors"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-[13px] text-neutral-500 mb-1">
-                            Повторите новый
-                          </label>
-                          <input
-                            type="password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                                handlePasswordSubmit();
-                              }
-                            }}
-                            className="w-full h-[42px] px-3.5 rounded-lg border border-neutral-300 bg-white focus:outline-none focus:border-brand-900 text-neutral-900-alt text-[14px] transition-colors"
-                          />
-                        </div>
-
-                        <div className="flex items-center gap-3 pt-1">
-                          <button
-                            type="button"
-                            onClick={handlePasswordSubmit}
-                            disabled={passwordSaving}
-                            className="bg-brand-900 text-white hover:bg-brand-700 transition-colors font-medium text-[13px] px-5 py-2.5 rounded-lg disabled:opacity-60 cursor-pointer"
-                          >
-                            {passwordSaving ? 'Сохранение...' : 'Сохранить пароль'}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setShowPasswordChange(false);
-                              setPasswordError('');
-                            }}
-                            className="text-neutral-500 hover:text-neutral-800 text-[13px] transition-colors cursor-pointer bg-transparent border-none p-0"
-                          >
-                            Отмена
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                    </Link>
                   </div>
 
                   <div className="pt-2 space-y-3">

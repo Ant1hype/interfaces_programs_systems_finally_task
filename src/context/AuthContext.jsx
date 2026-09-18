@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
-import { createUser, getUserByEmail, getUser, patchUser } from "../lib/api.js";
+import { createUser, getUserByEmail, getUser, patchUser, getUsers } from "../lib/api.js";
 
 export const AuthContext = createContext();
 
@@ -191,6 +191,58 @@ export const AuthProvider = ({ children }) => {
     [user]
   );
 
+  const requestReset = useCallback(async (email) => {
+    const trimmedEmail = typeof email === "string" ? email.trim() : "";
+    const foundUser = await getUserByEmail(trimmedEmail);
+    if (!foundUser) {
+      throw new Error("USER_NOT_FOUND");
+    }
+
+    const resetToken = String(Math.floor(100000 + Math.random() * 900000));
+    await patchUser(foundUser.id, { resetToken });
+    return resetToken;
+  }, []);
+
+  const resetPassword = useCallback(async (code, newPass) => {
+    const trimmedCode = code !== undefined && code !== null ? String(code).trim() : "";
+    if (!trimmedCode) {
+      throw new Error("CODE_INVALID");
+    }
+
+    const users = await getUsers();
+    const foundUser = Array.isArray(users)
+      ? users.find((u) => u.resetToken && String(u.resetToken).trim() === trimmedCode)
+      : null;
+
+    if (!foundUser) {
+      throw new Error("CODE_INVALID");
+    }
+
+    await patchUser(foundUser.id, {
+      passHash: djb2(newPass),
+      resetToken: null,
+    });
+
+    return true;
+  }, []);
+
+  const changePassword = useCallback(
+    async (current, next) => {
+      if (!user) {
+        throw new Error("NOT_AUTHENTICATED");
+      }
+      if (djb2(current) !== user.passHash) {
+        throw new Error("WRONG_CURRENT");
+      }
+      const updated = await patchUser(user.id, {
+        passHash: djb2(next),
+      });
+      setUser(updated);
+      return updated;
+    },
+    [user]
+  );
+
   // DEV-хук для тестирования в консоли
   if (import.meta.env.DEV && typeof window !== "undefined") {
     window.__auth = {
@@ -198,6 +250,9 @@ export const AuthProvider = ({ children }) => {
       register,
       logout,
       updateProfile,
+      requestReset,
+      resetPassword,
+      changePassword,
       get user() {
         return user;
       },
@@ -212,8 +267,11 @@ export const AuthProvider = ({ children }) => {
       register,
       logout,
       updateProfile,
+      requestReset,
+      resetPassword,
+      changePassword,
     }),
-    [user, loading, login, register, logout, updateProfile]
+    [user, loading, login, register, logout, updateProfile, requestReset, resetPassword, changePassword]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

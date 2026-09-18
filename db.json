@@ -998,7 +998,14 @@
       "email": "demo@cheesecraft.ru",
       "phone": "+7 (999) 123-45-67",
       "passHash": "2a5b1094",
-      "createdAt": "2026-09-18T15:08:55.606Z"
+      "createdAt": "2026-09-18T15:08:55.606Z",
+      "addresses": [
+        {
+          "id": "1789754542828",
+          "label": "Офис",
+          "address": "г. Томск, ул. Сырная, д. 7"
+        }
+      ]
     },
     {
       "name": "Тимофей",
@@ -1016,6 +1023,14 @@
           "id": "1789749585696"
         }
       ]
+    },
+    {
+      "name": "Тимофей",
+      "email": "Timofey@mail.com",
+      "passHash": "72f91e96",
+      "createdAt": "2026-09-18T17:09:15.885Z",
+      "id": 3,
+      "resetToken": "225265"
     }
   ]
 }

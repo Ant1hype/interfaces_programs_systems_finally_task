@@ -1,10 +1,32 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 import { getProducts } from '../lib/api.js';
 
 const PROMO_CODE = 'CHEESE10', PROMO_PERCENT = 10;
 const fmt = (v) => `${Math.round(v).toLocaleString('ru-RU')} ₽`;
+
+function extractUserPhoneDigits(phone) {
+  if (!phone) return '';
+  const raw = String(phone).trim();
+  let digits = raw.replace(/\D/g, '');
+  if (digits.length === 11 && (digits.startsWith('7') || digits.startsWith('8'))) {
+    digits = digits.slice(1);
+  } else if (digits.startsWith('7') && raw.includes('+7')) {
+    digits = digits.slice(1);
+  }
+  return digits.slice(0, 10);
+}
+
+function extractUserAddress(user) {
+  if (!user || !user.addresses) return '';
+  const first = Array.isArray(user.addresses) ? user.addresses[0] : user.addresses[0];
+  if (!first) return '';
+  if (typeof first === 'string') return first.trim();
+  if (typeof first === 'object' && first.address) return String(first.address).trim();
+  return '';
+}
 
 function useProducts() {
   const [p, setP] = useState([]);
@@ -21,16 +43,26 @@ function useProducts() {
 }
 
 export default function Checkout() {
+  const { user } = useAuth();
   const { items, totalQty, clear, appliedPromo, applyPromo } = useCart();
   const products = useProducts();
   const navigate = useNavigate();
 
-  const [name, setName] = useState('');
-  const [phoneDigits, setPhoneDigits] = useState('');
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState(() => (user?.name ? String(user.name).trim() : ''));
+  const [phoneDigits, setPhoneDigits] = useState(() => (user?.phone ? extractUserPhoneDigits(user.phone) : ''));
+  const [email, setEmail] = useState(() => (user?.email ? String(user.email).trim() : ''));
   const [delivery, setDelivery] = useState('Доставка курьером');
-  const [address, setAddress] = useState('');
+  const [address, setAddress] = useState(() => extractUserAddress(user));
   const [payment, setPayment] = useState('Картой онлайн');
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name ? String(user.name).trim() : '');
+      setPhoneDigits(user.phone ? extractUserPhoneDigits(user.phone) : '');
+      setEmail(user.email ? String(user.email).trim() : '');
+      setAddress(extractUserAddress(user));
+    }
+  }, [user]);
 
   const [promoInput, setPromoInput] = useState('');
   const [promoError, setPromoError] = useState('');
@@ -186,9 +218,11 @@ export default function Checkout() {
         <div>
           <div className="flex flex-wrap items-baseline justify-between gap-4 mb-6">
             <h1 className="font-lora text-[32px] font-bold text-neutral-900-alt">Оформление заказа</h1>
-            <span className="text-[14px] text-neutral-black">
-              Уже есть аккаунт? <Link to="/auth" className="font-bold underline text-neutral-black hover:text-brand-900">Войти</Link>
-            </span>
+            {!user && (
+              <span className="text-[14px] text-neutral-black">
+                Уже есть аккаунт? <Link to="/auth" className="font-bold underline text-neutral-black hover:text-brand-900">Войти</Link>
+              </span>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} noValidate>
