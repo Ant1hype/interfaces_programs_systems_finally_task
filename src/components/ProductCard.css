@@ -99,9 +99,10 @@
   font-weight: 500;
   cursor: pointer;
   margin: auto auto 24px auto; /* auto по бокам центрирует, auto сверху прижимает вниз, 24px снизу */
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
 }
 
 .product-card__btn:hover {
+  background: #6D4C41;
   opacity: 0.9;
 }

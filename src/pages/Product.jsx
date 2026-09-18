@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getProduct, getProducts } from '../lib/api.js';
 import ProductCard from '../components/ProductCard.jsx';
@@ -17,7 +17,7 @@ function trimProduct(prod) {
 
 export default function Product() {
   const { id } = useParams();
-  const { add } = useCart();
+  const { add, items } = useCart();
   const [product,setProduct]=useState(null);
   const [allProducts,setAllProducts]=useState([]);
   const [activeTab,setActiveTab]=useState('desc');
@@ -27,6 +27,14 @@ export default function Product() {
   const [brokenImages,setBrokenImages]=useState([]);
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState('');
+  const [btnText,setBtnText]=useState(null);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   useEffect(()=>{
     let cancelled=false;

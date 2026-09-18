@@ -106,3 +106,19 @@ body.search-open *::-webkit-scrollbar {
 .content {
   flex: 1 0 auto;
 }
+
+@keyframes cartBadgePulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.cart-badge-pulse {
+  animation: cartBadgePulse 300ms ease-in-out;
+}

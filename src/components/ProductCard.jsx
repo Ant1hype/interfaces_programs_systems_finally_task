@@ -1,14 +1,41 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // ЭТО ДОЛЖНО БЫТЬ ТУТ!
 import './ProductCard.css';
 import { useCart } from '../context/CartContext.jsx';
 
 export default function ProductCard({ product }) {
-  const { add } = useCart();
+  const { add, items } = useCart();
+  const [btnText, setBtnText] = useState(null);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   const handleAddToCart = (e) => {
     e.preventDefault();
+    const stock = product.stock ?? (product.inStock === false ? 0 : 5);
+    const already = (items || [])
+      .filter((it) => String(it.id) === String(product.id))
+      .reduce((sum, it) => sum + it.qty, 0);
+
+    if (timerRef.current) clearTimeout(timerRef.current);
+
+    if (already >= stock) {
+      setBtnText(`Максимум ${stock} шт`);
+      timerRef.current = setTimeout(() => {
+        setBtnText(null);
+      }, 1200);
+      return;
+    }
+
     add(product.id, 100);
+    setBtnText('✓ Добавлено');
+    timerRef.current = setTimeout(() => {
+      setBtnText(null);
+    }, 1200);
   };
 
   return (
@@ -27,8 +54,8 @@ export default function ProductCard({ product }) {
           <p className="product-card__price">{product.price} ₽</p>
         </div>
 
-        <button type="button" className="product-card__btn" onClick={handleAddToCart}>
-          В корзину
+        <button type="button" className="product-card__btn bg-brand-800 hover:bg-brand-700 transition-colors" onClick={handleAddToCart}>
+          {btnText || 'В корзину'}
         </button>
       </div>
     </Link>

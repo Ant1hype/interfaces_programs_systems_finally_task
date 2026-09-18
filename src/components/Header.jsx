@@ -17,11 +17,23 @@ const navItems = [
 
 function CartIconWithBadge() {
   const { totalQty } = useCart();
+  const [isPulsing, setIsPulsing] = useState(false);
+  const prevQtyRef = useRef(totalQty);
+
+  useEffect(() => {
+    if (prevQtyRef.current !== totalQty) {
+      prevQtyRef.current = totalQty;
+      setIsPulsing(true);
+      const timer = setTimeout(() => setIsPulsing(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [totalQty]);
+
   return (
     <Link to="/cart" className="text-neutral-900-alt flex items-center justify-center transition-colors duration-200 hover:text-brand-900 p-1 relative" title="Корзина">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
       {totalQty > 0 && (
-        <span className="absolute -top-1 -right-1 bg-brand-900 text-surface-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center leading-none">
+        <span className={`absolute -top-1 -right-1 bg-brand-900 text-surface-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center leading-none ${isPulsing ? 'cart-badge-pulse' : ''}`}>
           {totalQty}
         </span>
       )}
@@ -184,7 +196,7 @@ export default function Header() {
             <div className="flex items-center gap-3 flex-1 min-w-0 h-[48px] sm:h-[50px] pl-4 pr-2 bg-surface-white border border-[#BDBDBD] rounded-md focus-within:border-brand-900 transition-colors duration-200">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 shrink-0 text-neutral-600 pointer-events-none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Поиск по каталогу..." className="flex-1 min-w-0 h-full bg-transparent border-0 outline-none text-[14px] font-normal text-neutral-900-alt placeholder:text-neutral-600" />
-              <button type="submit" className="inline-flex items-center justify-center shrink-0 h-[36px] sm:h-[38px] ppx-5 sm:px-8 bg-brand-800 rounded-xl text-white">Найти</button>
+              <button type="submit" className="inline-flex items-center justify-center shrink-0 h-[36px] sm:h-[38px] px-5 sm:px-8 bg-brand-800 hover:bg-brand-700 transition-colors rounded-xl text-white">Найти</button>
             </div>
             <button type="button" onClick={closeSearch} aria-label="Закрыть поиск" className="shrink-0 flex items-center justify-center w-8 h-8 bg-transparent border-0 p-0 text-neutral-900-alt cursor-pointer transition-colors duration-200 hover:text-brand-900">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
