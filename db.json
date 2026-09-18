@@ -1008,7 +1008,14 @@
       "id": 2,
       "phone": "+7 (913) 112-62-18",
       "subscribeEmail": true,
-      "subscribeSms": true
+      "subscribeSms": true,
+      "addresses": [
+        {
+          "label": "Самовывоз",
+          "address": "г. Томск, ул. Сырная, д. 7",
+          "id": "1789749585696"
+        }
+      ]
     }
   ]
 }

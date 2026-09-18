@@ -37,6 +37,22 @@ export default function Profile() {
   const [savedRecently, setSavedRecently] = useState(false);
   const saveTimerRef = React.useRef(null);
 
+  // Смена пароля
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSaving, setPasswordSaving] = useState(false);
+
+  // Мои адреса
+  const [showAddAddress, setShowAddAddress] = useState(false);
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [addressLabel, setAddressLabel] = useState('');
+  const [addressValue, setAddressValue] = useState('');
+  const [addressSaving, setAddressSaving] = useState(false);
+
   useEffect(() => {
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
@@ -83,6 +99,156 @@ export default function Profile() {
     }
   };
 
+  const handlePasswordSubmit = async (e) => {
+    if (e) e.preventDefault();
+    setPasswordError('');
+
+    if (!currentPassword) {
+      setPasswordError('Неверный текущий пароль');
+      notify('Неверный текущий пароль', 'error');
+      return;
+    }
+
+    if (!newPassword || newPassword.length < 6) {
+      setPasswordError('Пароль должен быть не менее 6 символов');
+      notify('Пароль должен быть не менее 6 символов', 'error');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Пароли не совпадают');
+      notify('Пароли не совпадают', 'error');
+      return;
+    }
+
+    setPasswordSaving(true);
+    try {
+      await updateProfile({
+        currentPassword,
+        newPassword,
+      });
+      notify('Пароль изменён', 'success');
+      setShowPasswordChange(false);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setPasswordError('');
+    } catch (err) {
+      if (err?.message === 'WRONG_PASSWORD') {
+        setPasswordError('Неверный текущий пароль');
+        notify('Неверный текущий пароль', 'error');
+      } else {
+        setPasswordError(err?.message || 'Неверный текущий пароль');
+        notify(err?.message || 'Неверный текущий пароль', 'error');
+      }
+    } finally {
+      setPasswordSaving(false);
+    }
+  };
+
+  const handleAddAddress = async (e) => {
+    if (e) e.preventDefault();
+    const label = addressLabel.trim() || 'Дом';
+    const addr = addressValue.trim();
+    if (!addr) {
+      notify('Введите адрес', 'error');
+      return;
+    }
+
+    setAddressSaving(true);
+    try {
+      const currentAddresses = Array.isArray(user?.addresses) ? user.addresses : [];
+      const newAddressItem = {
+        id: Date.now().toString(),
+        label,
+        address: addr,
+      };
+      const updatedAddresses = [...currentAddresses, newAddressItem];
+      await updateProfile({
+        addresses: updatedAddresses,
+      });
+      notify('Адрес добавлен', 'success');
+      setShowAddAddress(false);
+      setAddressLabel('');
+      setAddressValue('');
+    } catch (err) {
+      notify(err?.message || 'Ошибка добавления адреса', 'error');
+    } finally {
+      setAddressSaving(false);
+    }
+  };
+
+  const handleStartEdit = (item, idx) => {
+    setShowAddAddress(false);
+    setEditingIndex(idx);
+    setEditingId(item?.id ?? null);
+    setAddressLabel(typeof item === 'string' ? item : item.label || item.title || '');
+    setAddressValue(typeof item === 'string' ? item : item.address || item.text || '');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingIndex(null);
+    setEditingId(null);
+    setAddressLabel('');
+    setAddressValue('');
+  };
+
+  const handleSaveEdit = async (e) => {
+    if (e) e.preventDefault();
+    const label = addressLabel.trim() || 'Дом';
+    const addr = addressValue.trim();
+    if (!addr) {
+      notify('Введите адрес', 'error');
+      return;
+    }
+
+    setAddressSaving(true);
+    try {
+      const currentAddresses = Array.isArray(user?.addresses) ? user.addresses : [];
+      const updatedAddresses = currentAddresses.map((item, idx) => {
+        const isMatch = (editingId !== null && item?.id !== undefined && item.id === editingId) || idx === editingIndex;
+        if (isMatch) {
+          const id = item?.id ?? editingId ?? Date.now().toString();
+          return { ...(typeof item === 'object' ? item : {}), id, label, address: addr };
+        }
+        return item;
+      });
+      await updateProfile({
+        addresses: updatedAddresses,
+      });
+      notify('Адрес обновлён', 'success');
+      setEditingIndex(null);
+      setEditingId(null);
+      setAddressLabel('');
+      setAddressValue('');
+    } catch (err) {
+      notify(err?.message || 'Ошибка сохранения адреса', 'error');
+    } finally {
+      setAddressSaving(false);
+    }
+  };
+
+  const handleDeleteAddress = async (targetItem, targetIndex) => {
+    try {
+      const currentAddresses = Array.isArray(user?.addresses) ? user.addresses : [];
+      const updatedAddresses = currentAddresses.filter((item, idx) => {
+        if (targetItem?.id !== undefined && item?.id !== undefined) {
+          return item.id !== targetItem.id;
+        }
+        return idx !== targetIndex;
+      });
+      await updateProfile({
+        addresses: updatedAddresses,
+      });
+      notify('Адрес удалён', 'success');
+      if (editingIndex === targetIndex) {
+        handleCancelEdit();
+      }
+    } catch (err) {
+      notify(err?.message || 'Ошибка удаления адреса', 'error');
+    }
+  };
+
   const balance = useMemo(() => {
     if (!user) return 0;
     try {
@@ -98,6 +264,8 @@ export default function Profile() {
       return 0;
     }
   }, [user]);
+
+  const userAddresses = Array.isArray(user?.addresses) ? user.addresses : [];
 
   return (
     <div className="w-full bg-surface-white font-montserrat min-h-[70vh] pb-[96px]">
@@ -222,6 +390,109 @@ export default function Profile() {
                     )}
                   </div>
 
+                  <div className="pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowPasswordChange(!showPasswordChange);
+                        setPasswordError('');
+                      }}
+                      className="text-[14px] text-neutral-700 hover:text-neutral-900 transition-colors flex items-center gap-1.5 cursor-pointer bg-transparent border-none p-0 font-normal"
+                    >
+                      <span>&rarr;</span>
+                      <span>Изменить пароль</span>
+                    </button>
+
+                    {showPasswordChange && (
+                      <div className="mt-3 p-4 bg-neutral-50 rounded-xl border border-neutral-200 space-y-3">
+                        <div>
+                          <label className="block text-[13px] text-neutral-500 mb-1">
+                            Текущий пароль
+                          </label>
+                          <input
+                            type="password"
+                            value={currentPassword}
+                            onChange={(e) => {
+                              setCurrentPassword(e.target.value);
+                              setPasswordError('');
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handlePasswordSubmit();
+                              }
+                            }}
+                            className={`w-full h-[42px] px-3.5 rounded-lg border bg-white focus:outline-none focus:border-brand-900 text-neutral-900-alt text-[14px] transition-colors ${
+                              passwordError ? 'border-danger-700' : 'border-neutral-300'
+                            }`}
+                          />
+                          {passwordError && (
+                            <p className="text-danger-700 text-[13px] mt-1 font-montserrat">
+                              {passwordError}
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-[13px] text-neutral-500 mb-1">
+                            Новый (≥6)
+                          </label>
+                          <input
+                            type="password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handlePasswordSubmit();
+                              }
+                            }}
+                            className="w-full h-[42px] px-3.5 rounded-lg border border-neutral-300 bg-white focus:outline-none focus:border-brand-900 text-neutral-900-alt text-[14px] transition-colors"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[13px] text-neutral-500 mb-1">
+                            Повторите новый
+                          </label>
+                          <input
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handlePasswordSubmit();
+                              }
+                            }}
+                            className="w-full h-[42px] px-3.5 rounded-lg border border-neutral-300 bg-white focus:outline-none focus:border-brand-900 text-neutral-900-alt text-[14px] transition-colors"
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-3 pt-1">
+                          <button
+                            type="button"
+                            onClick={handlePasswordSubmit}
+                            disabled={passwordSaving}
+                            className="bg-brand-900 text-white hover:bg-brand-700 transition-colors font-medium text-[13px] px-5 py-2.5 rounded-lg disabled:opacity-60 cursor-pointer"
+                          >
+                            {passwordSaving ? 'Сохранение...' : 'Сохранить пароль'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowPasswordChange(false);
+                              setPasswordError('');
+                            }}
+                            className="text-neutral-500 hover:text-neutral-800 text-[13px] transition-colors cursor-pointer bg-transparent border-none p-0"
+                          >
+                            Отмена
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="pt-2 space-y-3">
                     <label className="flex items-center gap-3 cursor-pointer select-none">
                       <div
@@ -284,6 +555,168 @@ export default function Profile() {
                     </button>
                   </div>
                 </form>
+
+                {/* Блок Мои адреса */}
+                <div className="mt-10 sm:mt-12">
+                  <h2 className="text-[22px] font-bold text-neutral-900-alt mb-6 font-montserrat">
+                    Мои адреса
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {userAddresses.map((item, idx) => {
+                      const label = typeof item === 'string' ? item : item.label || item.title || 'Дом';
+                      const addr = typeof item === 'string' ? item : item.address || item.text || '';
+                      
+                      if (editingIndex === idx) {
+                        return (
+                          <form
+                            key={item?.id ?? idx}
+                            onSubmit={handleSaveEdit}
+                            className="border border-neutral-300 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between w-full min-h-[105px] bg-white shadow-sm gap-2"
+                          >
+                            <input
+                              type="text"
+                              placeholder="Офис"
+                              value={addressLabel}
+                              onChange={(e) => setAddressLabel(e.target.value)}
+                              className="w-full h-7 px-2.5 text-[13px] border border-neutral-300 rounded-lg focus:outline-none focus:border-brand-900 text-neutral-900-alt"
+                              autoFocus
+                            />
+                            <input
+                              type="text"
+                              placeholder="г. Томск, ул. Сырная, д. 7, кв. 7"
+                              value={addressValue}
+                              onChange={(e) => setAddressValue(e.target.value)}
+                              className="w-full h-7 px-2.5 text-[13px] border border-neutral-300 rounded-lg focus:outline-none focus:border-brand-900 text-neutral-900-alt"
+                            />
+                            <div className="flex items-center gap-2 pt-0.5">
+                              <button
+                                type="submit"
+                                disabled={addressSaving}
+                                className="px-3 py-1 bg-brand-900 hover:bg-brand-700 text-white rounded-md text-[12px] font-medium transition-colors cursor-pointer disabled:opacity-60"
+                              >
+                                {addressSaving ? '...' : 'Сохранить'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleCancelEdit}
+                                className="px-2 py-1 text-neutral-500 hover:text-neutral-800 text-[12px] transition-colors cursor-pointer bg-transparent border-none"
+                              >
+                                Отмена
+                              </button>
+                            </div>
+                          </form>
+                        );
+                      }
+
+                      return (
+                        <div
+                          key={item?.id ?? idx}
+                          className="relative rounded-2xl overflow-hidden p-4 sm:p-5 text-white flex flex-col justify-between w-full h-[105px] shadow-sm"
+                          style={{
+                            backgroundColor: '#26211E',
+                            backgroundImage: "linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.75)), url('/images/address.jpg'), linear-gradient(135deg, #3A2E2B 0%, #1E1B18 100%)",
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            backgroundRepeat: 'no-repeat',
+                          }}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="text-[16px] font-bold text-white leading-tight">
+                              {label}
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button
+                                type="button"
+                                title="Редактировать"
+                                aria-label="Редактировать"
+                                onClick={() => handleStartEdit(item, idx)}
+                                className="text-surface-white/70 hover:text-surface-white transition-colors cursor-pointer bg-transparent border-none p-0 flex items-center justify-center"
+                              >
+                                <svg className="w-4 h-4 text-surface-white/70 hover:text-surface-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                              </button>
+                              <button
+                                type="button"
+                                title="Удалить"
+                                aria-label="Удалить"
+                                onClick={() => handleDeleteAddress(item, idx)}
+                                className="text-surface-white/70 hover:text-surface-white transition-colors cursor-pointer bg-transparent border-none p-0 flex items-center justify-center"
+                              >
+                                <svg className="w-4 h-4 text-surface-white/70 hover:text-surface-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                          <div className="text-[12px] text-white/90 leading-tight">
+                            {addr}
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {editingIndex === null && (
+                      showAddAddress ? (
+                        <form
+                          onSubmit={handleAddAddress}
+                          className="border border-neutral-300 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between w-full min-h-[105px] bg-white shadow-sm gap-2"
+                        >
+                          <input
+                            type="text"
+                            placeholder="Офис"
+                            value={addressLabel}
+                            onChange={(e) => setAddressLabel(e.target.value)}
+                            className="w-full h-7 px-2.5 text-[13px] border border-neutral-300 rounded-lg focus:outline-none focus:border-brand-900 text-neutral-900-alt"
+                            autoFocus
+                          />
+                          <input
+                            type="text"
+                            placeholder="г. Томск, ул. Сырная, д. 7, кв. 7"
+                            value={addressValue}
+                            onChange={(e) => setAddressValue(e.target.value)}
+                            className="w-full h-7 px-2.5 text-[13px] border border-neutral-300 rounded-lg focus:outline-none focus:border-brand-900 text-neutral-900-alt"
+                          />
+                          <div className="flex items-center gap-2 pt-0.5">
+                            <button
+                              type="submit"
+                              disabled={addressSaving}
+                              className="px-3 py-1 bg-brand-900 hover:bg-brand-700 text-white rounded-md text-[12px] font-medium transition-colors cursor-pointer disabled:opacity-60"
+                            >
+                              {addressSaving ? '...' : 'Добавить'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowAddAddress(false);
+                                setAddressLabel('');
+                                setAddressValue('');
+                              }}
+                              className="px-2 py-1 text-neutral-500 hover:text-neutral-800 text-[12px] transition-colors cursor-pointer bg-transparent border-none"
+                            >
+                              Отмена
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowAddAddress(true);
+                            setEditingIndex(null);
+                            setEditingId(null);
+                            setAddressLabel('');
+                            setAddressValue('');
+                          }}
+                          className="border border-neutral-300 hover:border-neutral-400 transition-colors rounded-2xl p-4 sm:p-5 flex flex-col justify-between w-full h-[105px] text-left bg-white cursor-pointer group"
+                        >
+                          <span className="text-[20px] font-bold text-neutral-900-alt leading-none">+</span>
+                          <span className="text-[14px] font-semibold text-neutral-900-alt">Добавить адрес</span>
+                        </button>
+                      )
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* Правая колонка: Карта баланса */}
