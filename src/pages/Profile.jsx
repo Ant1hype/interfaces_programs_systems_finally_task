@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
+import { useCart } from '../context/CartContext.jsx';
+import { getProducts } from '../lib/api.js';
 
 function formatPhone(val) {
   if (!val) return '';
@@ -16,12 +18,67 @@ function formatPhone(val) {
   return res;
 }
 
+function formatOrderNumber(id) {
+  const digits = String(id ?? '').replace(/\D/g, '');
+  const last6 = (digits || '000000').slice(-6).padStart(6, '0');
+  return `${last6.slice(0, 4)}-${last6.slice(4)}`;
+}
+
+function formatOrderDate(rawDate) {
+  if (!rawDate) return '';
+  const d = new Date(rawDate);
+  if (isNaN(d.getTime())) return String(rawDate);
+  return d
+    .toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+    .replace(/\s*г\.?$/, '');
+}
+
+function getOrderStatus(order) {
+  const rawDate = order.date || order.createdAt || order.id;
+  const d = new Date(rawDate);
+  if (isNaN(d.getTime())) {
+    return 'В пути';
+  }
+  const isOlderThanDay = Date.now() - d.getTime() > 24 * 60 * 60 * 1000;
+  return isOlderThanDay ? 'Доставлен' : 'В пути';
+}
+
+function formatOrderTotal(order) {
+  const total = Number(order.total ?? order.totalPrice ?? order.finalTotal ?? 0);
+  return `${Math.round(total).toLocaleString('ru-RU')} ₽`;
+}
+
 export default function Profile() {
   const { user, updateProfile, logout } = useAuth();
   const { push } = useToast();
+  const { add } = useCart();
   const location = useLocation();
   const navigate = useNavigate();
   const tab = new URLSearchParams(location.search).get('tab');
+
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    let mounted = true;
+    getProducts()
+      .then((data) => {
+        if (mounted && Array.isArray(data)) setProducts(data);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const productsMap = useMemo(() => {
+    const map = new Map();
+    products.forEach((p) => map.set(String(p.id), p));
+    return map;
+  }, [products]);
 
   const notify = (msg, type = 'error') => {
     if (typeof push === 'function') push(msg, type);
@@ -267,6 +324,59 @@ export default function Profile() {
 
   const userAddresses = Array.isArray(user?.addresses) ? user.addresses : [];
 
+  const userOrders = useMemo(() => {
+    if (!user) return [];
+    try {
+      const raw = localStorage.getItem('syrnaya-palitra:orders:v1');
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      const list = Array.isArray(parsed)
+        ? parsed
+        : parsed && typeof parsed === 'object'
+        ? [parsed]
+        : [];
+      return list
+        .filter((o) => {
+          if (!o) return false;
+          if (o.userId !== undefined) {
+            return o.userId === user.id || String(o.userId) === String(user.id);
+          }
+          if (user.email && o.userEmail) {
+            return String(o.userEmail).toLowerCase() === String(user.email).toLowerCase();
+          }
+          return false;
+        })
+        .sort((a, b) => {
+          const timeA = new Date(a.date || a.createdAt || a.id).getTime() || 0;
+          const timeB = new Date(b.date || b.createdAt || b.id).getTime() || 0;
+          return timeB - timeA;
+        });
+    } catch {
+      return [];
+    }
+  }, [user, tab]);
+
+  const handleRepeatOrder = (order) => {
+    if (!order?.items || !Array.isArray(order.items)) return;
+
+    order.items.forEach((item) => {
+      const p = productsMap.get(String(item.id));
+      const stock = item.stock !== undefined
+        ? Number(item.stock)
+        : (p?.stock !== undefined
+            ? Number(p.stock)
+            : (p?.inStock === false ? 0 : Infinity));
+
+      const qty = Math.max(0, Number(item.qty) || 1);
+      for (let i = 0; i < qty; i++) {
+        add(item.id, item.pack, stock);
+      }
+    });
+
+    notify('Заказ добавлен в корзину', 'success');
+    navigate('/cart');
+  };
+
   return (
     <div className="w-full bg-surface-white font-montserrat min-h-[70vh] pb-[96px]">
       <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto py-6 sm:py-8">
@@ -332,8 +442,67 @@ export default function Profile() {
 
           {/* Контент вкладки */}
           {tab === 'orders' ? (
-            <div className="flex-1 w-full pt-1 text-[15px] text-neutral-600">
-              История заказов — следующая задача
+            <div className="flex-1 w-full max-w-[860px]">
+              <h2 className="text-[22px] font-bold text-neutral-900-alt mb-6 font-montserrat">
+                Ваши заказы
+              </h2>
+
+              {userOrders.length === 0 ? (
+                <div className="bg-white border border-neutral-200 rounded-2xl p-8 sm:p-12 text-center">
+                  <p className="text-[16px] sm:text-[18px] text-neutral-500 mb-6">
+                    У вас пока нет заказов
+                  </p>
+                  <Link
+                    to="/catalog"
+                    className="inline-flex items-center justify-center bg-brand-800 hover:bg-brand-700 text-white font-medium text-[15px] px-8 py-3.5 rounded-lg transition-colors no-underline cursor-pointer"
+                  >
+                    В каталог
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {userOrders.map((order) => {
+                    const rawDate = order.date || order.createdAt || order.id;
+                    const dateFormatted = formatOrderDate(rawDate);
+                    const orderNum = formatOrderNumber(order.id);
+                    const status = getOrderStatus(order);
+                    const totalFormatted = formatOrderTotal(order);
+
+                    return (
+                      <div
+                        key={order.id}
+                        className="bg-white border border-neutral-200 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                      >
+                        <div className="sm:w-1/3">
+                          <div className="font-bold text-[16px] text-neutral-900-alt">
+                            Заказ № {orderNum}
+                          </div>
+                          <div className="text-[14px] text-neutral-400 mt-1">
+                            {dateFormatted}
+                          </div>
+                        </div>
+
+                        <div className="text-[14px] text-neutral-400 font-medium sm:text-center sm:w-1/3">
+                          {status}
+                        </div>
+
+                        <div className="flex items-center justify-between sm:justify-end gap-6 sm:gap-8 sm:w-1/3">
+                          <span className="font-bold text-[17px] sm:text-[18px] text-neutral-900-alt whitespace-nowrap">
+                            {totalFormatted}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleRepeatOrder(order)}
+                            className="bg-brand-800 hover:bg-brand-700 text-white text-[14px] sm:text-[15px] font-medium px-6 py-2.5 sm:px-7 sm:py-3 rounded-lg transition-colors cursor-pointer border-none"
+                          >
+                            Повторить
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex-1 w-full flex flex-col xl:flex-row gap-10 xl:gap-16 items-start justify-between">
