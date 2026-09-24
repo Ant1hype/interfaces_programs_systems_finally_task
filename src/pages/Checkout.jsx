@@ -279,6 +279,9 @@ export default function Checkout() {
       return;
     }
 
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
     const order = {
       id: Date.now(),
       items,
@@ -288,7 +291,12 @@ export default function Checkout() {
       userId: user?.id,
       userEmail: user?.email,
       delivery,
-      deliveryDate: delivery === 'Доставка курьером' ? deliveryDate : null,
+      deliveryDate:
+        delivery === 'Самовывоз'
+          ? tomorrow.toISOString()
+          : delivery === 'Доставка курьером'
+          ? deliveryDate
+          : null,
       deliverySlot: delivery === 'Доставка курьером' ? deliverySlot : null,
       payment,
       date: new Date().toISOString(),
@@ -303,7 +311,7 @@ export default function Checkout() {
     }
 
     clear();
-    navigate('/success');
+    navigate(`/success?id=${order.id}`);
   };
 
   if (items.length === 0) {

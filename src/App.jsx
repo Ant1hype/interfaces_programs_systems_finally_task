@@ -13,16 +13,10 @@ import Profile from './pages/Profile';
 import Forgot from './pages/Forgot';
 import Reset from './pages/Reset';
 import Favorites from './pages/Favorites';
+import Success from './pages/Success';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { CartProvider } from './context/CartContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
-
-const Success = () => (
-  <div className="w-full px-4 py-16 text-center font-montserrat">
-    <h1 className="font-lora text-[32px] font-bold text-neutral-900-alt mb-4">Заказ принят!</h1>
-    <p className="text-neutral-500">Номер появится на этой странице в следующей задаче</p>
-  </div>
-);
 
 function ProtectedProfile() {
   const { user, loading } = useAuth();
