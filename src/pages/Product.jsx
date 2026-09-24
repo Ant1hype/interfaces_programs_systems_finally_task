@@ -478,7 +478,7 @@ export default function Product() {
 
       {isLightboxOpen && (
         <div
-          className="fixed inset-0 z-50 bg-surface-ice/95 flex items-center justify-center p-4 sm:p-8"
+          className="fixed inset-0 z-50 bg-neutral-black/20 backdrop-blur-[20px] flex items-center justify-center p-4 sm:p-8"
           onClick={() => setIsLightboxOpen(false)}
         >
           <button
