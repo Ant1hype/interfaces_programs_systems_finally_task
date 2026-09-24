@@ -1,15 +1,48 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getProduct, getProducts } from '../lib/api.js';
+import { getProduct, getProducts, patchProduct } from '../lib/api.js';
 import ProductCard from '../components/ProductCard.jsx';
 import { useCart } from '../context/CartContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import { useToast } from '../context/ToastContext.jsx';
+
+function hasUserPurchasedProduct(user, productId) {
+  if (!user) return false;
+  const pIdStr = String(productId).trim();
+  try {
+    const raw = localStorage.getItem('syrnaya-palitra:orders:v1');
+    if (raw) {
+      const orders = JSON.parse(raw);
+      if (Array.isArray(orders)) {
+        const found = orders.some((order) => {
+          if (order?.userId && user?.id && String(order.userId).trim() !== String(user.id).trim()) {
+            return false;
+          }
+          const items = Array.isArray(order?.items) ? order.items : [];
+          return items.some((item) => String(item?.id).trim() === pIdStr || String(item?.productId).trim() === pIdStr);
+        });
+        if (found) return true;
+      }
+    }
+  } catch (e) {}
+
+  if (Array.isArray(user?.orders)) {
+    const found = user.orders.some((order) => {
+      const items = Array.isArray(order?.items) ? order.items : [];
+      return items.some((item) => String(item?.id).trim() === pIdStr || String(item?.productId).trim() === pIdStr);
+    });
+    if (found) return true;
+  }
+
+  return false;
+}
 
 function trimProduct(prod) {
   if (!prod) return prod;
   const c = { ...prod };
   ["name","weight","category","milk","additives","age","features","wine","image"].forEach(k=>{ if(typeof c[k]==="string") c[k]=c[k].trim(); });
   if(c.description) c.description=Object.fromEntries(Object.entries(c.description).map(([k,v])=>[k,typeof v==="string"?v.trim():v]));
-  ["ingredients","shelfLife"].forEach(k=>{ if(typeof c[k]==="string") c[k]=c[k].trim(); });
+  [["ingredients"],["shelfLife"]].flat().forEach(k=>{ if(typeof c[k]==="string") c[k]=c[k].trim(); });
   if(Array.isArray(c.images)) c.images=c.images.map(s=>typeof s==="string"?s.trim():s);
   if(Array.isArray(c.reviews)) c.reviews=c.reviews.map(r=>({ ...r, author:typeof r.author==="string"?r.author.trim():r.author, date:typeof r.date==="string"?r.date.trim():r.date, pairing:typeof r.pairing==="string"?r.pairing.trim():r.pairing, text:typeof r.text==="string"?r.text.trim():r.text }));
   return c;
@@ -18,6 +51,8 @@ function trimProduct(prod) {
 export default function Product() {
   const { id } = useParams();
   const { add, items } = useCart();
+  const { user } = useAuth();
+  const { push } = useToast();
   const [product,setProduct]=useState(null);
   const [allProducts,setAllProducts]=useState([]);
   const [activeTab,setActiveTab]=useState('desc');
@@ -29,6 +64,97 @@ export default function Product() {
   const [error,setError]=useState('');
   const [btnText,setBtnText]=useState(null);
   const timerRef = useRef(null);
+
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewText, setReviewText] = useState('');
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewPhotos, setReviewPhotos] = useState(['', '', '']);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+  const fileInputRef0 = useRef(null);
+  const fileInputRef1 = useRef(null);
+  const fileInputRef2 = useRef(null);
+  const fileInputRefs = [fileInputRef0, fileInputRef1, fileInputRef2];
+
+  const closeReviewModal = () => {
+    setIsReviewModalOpen(false);
+    setReviewText('');
+    setReviewRating(0);
+    setReviewPhotos(['', '', '']);
+  };
+
+  useEffect(() => {
+    if (!isReviewModalOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        closeReviewModal();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isReviewModalOpen]);
+
+  const handleOpenReviewModal = () => {
+    if (!user) {
+      push('Войдите, чтобы оставить отзыв'.trim(), 'error');
+      return;
+    }
+    if (!hasUserPurchasedProduct(user, product.id)) {
+      push('Отзыв доступен после покупки товара'.trim(), 'error');
+      return;
+    }
+    setIsReviewModalOpen(true);
+  };
+
+  const handlePhotoClick = (index) => {
+    if (fileInputRefs[index]?.current) {
+      fileInputRefs[index].current.click();
+    }
+  };
+
+  const handleFileChange = (index, e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // ASSUMPTION: фото загружаются локально для предпросмотра (objectURL) и не отправляются в БД
+      const url = URL.createObjectURL(file);
+      setReviewPhotos((prev) => {
+        const next = [...prev];
+        next[index] = url;
+        return next;
+      });
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (!reviewText.trim() || reviewRating === 0 || isSubmittingReview) return;
+    setIsSubmittingReview(true);
+    try {
+      const newReview = {
+        id: (product.reviews && product.reviews.length > 0)
+          ? Math.max(...product.reviews.map((r) => Number(r.id) || 0)) + 1
+          : 1,
+        author: (user?.name || '').trim(),
+        date: new Date().toISOString().trim(),
+        rating: Number(reviewRating),
+        text: reviewText.trim(),
+      };
+      const nextReviews = [...(product.reviews || []), newReview];
+      await patchProduct(product.id, {
+        reviews: nextReviews,
+      });
+      setProduct((prev) => ({
+        ...prev,
+        reviews: nextReviews,
+      }));
+      setActiveTab('reviews');
+      push('Отзыв опубликован'.trim(), 'success');
+      closeReviewModal();
+    } catch (err) {
+      push((err?.message || 'Ошибка отправки отзыва').trim(), 'error');
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
 
   useEffect(() => {
     return () => {
@@ -85,7 +211,7 @@ export default function Product() {
   );
 
   return (
-    <div className="bg-surface-cream min-h-screen">
+    <div className="bg-surface-cream min-h-screen pb-[100px]">
       <div className="max-w-[1200px] mx-auto px-4 lg:px-6 py-6">
         <nav className="text-xs text-neutral-350 mb-5 font-montserrat">
           <Link to="/" className="hover:text-brand-900">Главная</Link> / <Link to="/catalog" className="hover:text-brand-900">Каталог</Link> / <span className="text-neutral-700">{product.name}</span>
@@ -198,7 +324,7 @@ export default function Product() {
                   <p className="text-4xl font-bold text-neutral-black leading-none">{avgRating}</p>
                   <p className="text-xs text-neutral-500 mt-2">На основе {reviews.length}-х {reviewsWord(reviews.length)}</p>
                   <div className="mt-3">{starsRow(Math.floor(avgRating))}</div>
-                  <button type="button" className="mt-6 w-full py-3 rounded-radius-md border border-brand-outline text-brand-outline bg-surface-white text-sm font-medium hover:bg-surface-cream transition-colors">Оставить отзыв</button>
+                  <button type="button" onClick={handleOpenReviewModal} className="mt-6 w-full py-3 rounded-radius-md border border-brand-outline text-brand-outline bg-surface-white text-sm font-medium hover:bg-surface-cream transition-colors">Оставить отзыв</button>
                 </aside>
               </div>
             )}
@@ -206,6 +332,96 @@ export default function Product() {
         )}
         <div className="mt-12"><h2 className="font-lora text-2xl font-bold text-neutral-900-alt mb-6">С этим сыром покупают</h2><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{related.map(pp=>(<ProductCard key={pp.id} product={pp} />))}</div></div>
       </div>
+
+      {isReviewModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-black/20 backdrop-blur-[20px]"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              closeReviewModal();
+            }
+          }}
+        >
+          <div className="relative w-full max-w-[820px] bg-surface-white rounded-[24px] shadow-2xl p-8 sm:p-12 font-montserrat">
+            <h2 className="font-lora text-[24px] sm:text-[28px] font-bold text-neutral-900-alt mb-6">
+              {'Оставьте отзыв о продукте'.trim()}
+            </h2>
+
+            <textarea
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value)}
+              placeholder={'Напишите что думаете о данном товаре . . .'.trim()}
+              className="w-full h-[150px] p-5 rounded-radius-lg border border-neutral-300 text-neutral-black placeholder:text-neutral-400 focus:outline-none focus:border-brand-900 resize-none text-[15px] leading-relaxed transition-colors"
+            />
+
+            <div className="flex gap-4 mt-6 mb-8">
+              {[0, 1, 2].map((idx) => (
+                <div
+                  key={idx}
+                  onClick={() => handlePhotoClick(idx)}
+                  className="w-[84px] h-[84px] sm:w-[92px] sm:h-[92px] rounded-radius-lg border border-neutral-300 flex items-center justify-center cursor-pointer overflow-hidden bg-surface-white hover:border-neutral-400 transition-colors"
+                >
+                  {reviewPhotos[idx] ? (
+                    <img
+                      src={reviewPhotos[idx]}
+                      alt="preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="w-8 h-8 text-neutral-350"
+                    >
+                      <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                    </svg>
+                  )}
+                  <input
+                    ref={fileInputRefs[idx]}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileChange(idx, e)}
+                    className="hidden"
+                  />
+                </div>
+              ))}
+            </div>
+
+            <h3 className="font-lora text-[20px] font-bold text-neutral-900-alt mb-4">
+              {'Поставьте оценку'.trim()}
+            </h3>
+
+            <div className="flex items-center gap-3">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setReviewRating(star)}
+                  aria-label={`Оценка ${star}`}
+                  className={`w-9 h-9 rounded-full transition-colors cursor-pointer border-none p-0 ${
+                    star <= reviewRating ? 'bg-brand-900' : 'bg-[#BDBDBD]'
+                  }`}
+                />
+              ))}
+            </div>
+
+            <div className="flex justify-end mt-8">
+              <button
+                type="button"
+                onClick={handleSubmitReview}
+                disabled={!reviewText.trim() || reviewRating === 0 || isSubmittingReview}
+                className="px-8 py-3.5 rounded-radius-md bg-brand-900 text-surface-white text-[15px] font-medium hover:bg-brand-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer border-none"
+              >
+                {'Оставить отзыв'.trim()}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -109,4 +109,19 @@ export function patchUser(id, patch) {
     body: JSON.stringify(trimmed),
   });
 }
+/**
+ * Обновить данные товара.
+ * @param {number|string} id
+ * @param {Object} patch
+ * @returns {Promise<Object>}
+ */
+export function patchProduct(id, patch) {
+  const trimmed = trimStrings(patch);
+  return request(`/products/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(trimmed),
+  });
+}
+
 
