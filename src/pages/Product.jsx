@@ -65,6 +65,9 @@ export default function Product() {
   const [btnText,setBtnText]=useState(null);
   const timerRef = useRef(null);
 
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [reviewText, setReviewText] = useState('');
   const [reviewRating, setReviewRating] = useState(0);
@@ -183,28 +186,75 @@ export default function Product() {
     return d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
   },[]);
 
-  if(loading) return <div className="max-w-[1200px] mx-auto px-4 py-8 font-montserrat">Загрузка...</div>;
-  if(error) return <div className="max-w-[1200px] mx-auto px-4 py-8">Ошибка: {error}</div>;
-  if(!product) return <div className="max-w-[1200px] mx-auto px-4 py-8">Сыр не найден</div>;
-
-  const stock=product.stock??(product.inStock?5:0);
-  const isOut=stock===0||product.inStock===false;
-  const mainImage=product.image||'';
-  const rawImages=(product.images&&product.images.length)?product.images:[mainImage].filter(Boolean);
+  const mainImage=product?.image||'';
+  const rawImages=(product?.images&&product.images.length)?product.images:[mainImage].filter(Boolean);
   const visibleImages=rawImages.filter(img=>!brokenImages.includes(img));
   const images=visibleImages.length?visibleImages:[mainImage].filter(Boolean);
-  const currentPrice=Math.round(product.price*(selectedWeight/100));
-  const related=allProducts.filter(pp=>pp.category===product.category && String(pp.id)!==String(product.id)).slice(0,4);
-  const reviews=product.reviews||[];
-  const avgRating=reviews.length?Math.round(reviews.reduce((s,r)=>s+(Number(r.rating)||0),0)/reviews.length*10)/10:0;
-  const reviewsWord=(n=>{const a=n%100;if(a>=11&&a<=14)return 'отзывов';const b=n%10;if(b===1)return 'отзыв';if(b>=2&&b<=4)return 'отзыва';return 'отзывов';});
-  const starsRow=(rating)=>(<span className="flex gap-1.5" aria-label={`Оценка ${rating} из 5`}>{[1,2,3,4,5].map(d=>(<span key={d} className={`w-3 h-3 rounded-full ${d<=rating?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>);
+  const lightboxImages=(Array.isArray(product?.images)&&product.images.length>0)?product.images:(images.length?images:[mainImg||mainImage].filter(Boolean));
+
+  const handleOpenLightbox = () => {
+    const currentSrc = mainImg || mainImage;
+    const idx = lightboxImages.indexOf(currentSrc);
+    setLightboxIndex(idx >= 0 ? idx : 0);
+    setIsLightboxOpen(true);
+  };
+
+  const handlePrevLightbox = (e) => {
+    e?.stopPropagation();
+    setLightboxIndex((prev) => (prev - 1 + lightboxImages.length) % lightboxImages.length);
+  };
+
+  const handleNextLightbox = (e) => {
+    e?.stopPropagation();
+    setLightboxIndex((prev) => (prev + 1) % lightboxImages.length);
+  };
+
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isLightboxOpen]);
+
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsLightboxOpen(false);
+      } else if (e.key === 'ArrowLeft') {
+        if (lightboxImages.length > 1) {
+          setLightboxIndex((prev) => (prev - 1 + lightboxImages.length) % lightboxImages.length);
+        }
+      } else if (e.key === 'ArrowRight') {
+        if (lightboxImages.length > 1) {
+          setLightboxIndex((prev) => (prev + 1) % lightboxImages.length);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLightboxOpen, lightboxImages.length]);
 
   const handleImgError=(src)=>{
     setBrokenImages(prev=>prev.includes(src)?prev:[...prev,src]);
     if(mainImg===src && mainImage && src!==mainImage) setMainImg(mainImage);
     else if(mainImg===src) setMainImg('');
   };
+
+  if(loading) return <div className="max-w-[1200px] mx-auto px-4 py-8 font-montserrat">Загрузка...</div>;
+  if(error) return <div className="max-w-[1200px] mx-auto px-4 py-8">Ошибка: {error}</div>;
+  if(!product) return <div className="max-w-[1200px] mx-auto px-4 py-8">Сыр не найден</div>;
+
+  const stock=product.stock??(product.inStock?5:0);
+  const isOut=stock===0||product.inStock===false;
+  const currentPrice=Math.round(product.price*(selectedWeight/100));
+  const related=allProducts.filter(pp=>pp.category===product.category && String(pp.id)!==String(product.id)).slice(0,4);
+  const reviews=product.reviews||[];
+  const avgRating=reviews.length?Math.round(reviews.reduce((s,r)=>s+(Number(r.rating)||0),0)/reviews.length*10)/10:0;
+  const reviewsWord=(n=>{const a=n%100;if(a>=11&&a<=14)return 'отзывов';const b=n%10;if(b===1)return 'отзыв';if(b>=2&&b<=4)return 'отзыва';return 'отзывов';});
+  const starsRow=(rating)=>(<span className="flex gap-1.5" aria-label={`Оценка ${rating} из 5`}>{[1,2,3,4,5].map(d=>(<span key={d} className={`w-3 h-3 rounded-full ${d<=rating?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>);
 
   const tabBtn=(key,label)=>(
     <button onClick={()=>setActiveTab(key)} className={`pb-3 border-b-2 font-montserrat text-base font-semibold transition-colors ${activeTab===key?"border-accent-gold text-brand-900":"border-transparent text-neutral-500 hover:text-neutral-900-alt"}`}>{label}</button>
@@ -218,7 +268,10 @@ export default function Product() {
         </nav>
         <div className="grid grid-cols-1 lg:grid-cols-[500px_1fr] gap-10 lg:gap-14 mb-10">
           <div>
-            <div className="rounded-radius-lg overflow-hidden bg-surface-white border border-neutral-300">
+            <div
+              onClick={handleOpenLightbox}
+              className="rounded-radius-lg overflow-hidden bg-surface-white border border-neutral-300 cursor-pointer"
+            >
               <img src={mainImg||mainImage} alt={product.name} onError={()=>handleImgError(mainImg||mainImage)} className="w-full object-cover aspect-[4/3] block" />
             </div>
             {images.length>1 && (
@@ -420,6 +473,61 @@ export default function Product() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {isLightboxOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-surface-ice/95 flex items-center justify-center p-4 sm:p-8"
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsLightboxOpen(false);
+            }}
+            aria-label="Закрыть"
+            className="absolute top-5 right-5 sm:top-6 sm:right-6 w-10 h-10 rounded-full flex items-center justify-center text-neutral-800 hover:text-black hover:bg-neutral-200/50 transition-colors cursor-pointer border-none bg-transparent z-10"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+
+          {lightboxImages.length > 1 && (
+            <button
+              type="button"
+              onClick={handlePrevLightbox}
+              aria-label="Предыдущее фото"
+              className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 bg-surface-white rounded-radius-md shadow-md flex items-center justify-center text-neutral-800 hover:bg-neutral-50 transition-colors cursor-pointer border-none z-10"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+          )}
+
+          <img
+            src={lightboxImages[lightboxIndex]}
+            alt={product.name}
+            className="max-h-[80vh] max-w-[85vw] object-contain rounded-2xl select-none"
+            onClick={(e) => e.stopPropagation()}
+          />
+
+          {lightboxImages.length > 1 && (
+            <button
+              type="button"
+              onClick={handleNextLightbox}
+              aria-label="Следующее фото"
+              className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 bg-surface-white rounded-radius-md shadow-md flex items-center justify-center text-neutral-800 hover:bg-neutral-50 transition-colors cursor-pointer border-none z-10"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          )}
         </div>
       )}
     </div>
