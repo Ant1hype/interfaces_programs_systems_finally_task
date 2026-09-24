@@ -284,7 +284,9 @@ export default function Product() {
             >
               {btnText || 'В корзину'}
             </button>
-            <p className="text-xs text-neutral-500 mt-2">Ближайшая доставка: завтра, {deliveryDate}</p>
+            {!isOut && (
+              <p className="text-xs text-neutral-500 mt-2">Ближайшая доставка: завтра, {deliveryDate}</p>
+            )}
           </div>
         </div>
         <div className="border-b border-neutral-250 flex gap-6 mb-6">{tabBtn('desc','О продукте')}{tabBtn('info','Состав и ценность')}{tabBtn('reviews',`Отзывы (${reviews.length})`)}</div>

@@ -1007,7 +1007,8 @@
         }
       ],
       "favorites": [
-        1
+        1,
+        5
       ],
       "subscribeEmail": false,
       "subscribeSms": false

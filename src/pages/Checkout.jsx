@@ -7,6 +7,33 @@ import { getProducts } from '../lib/api.js';
 const PROMO_CODE = 'CHEESE10', PROMO_PERCENT = 10;
 const fmt = (v) => `${Math.round(v).toLocaleString('ru-RU')} ₽`;
 
+const DELIVERY_SLOTS = [
+  '10:00–14:00',
+  '14:00–18:00',
+  '18:00–21:00',
+];
+
+const MONTHS_GENITIVE = [
+  'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+  'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+];
+
+const WEEKDAYS_SHORT = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
+
+function getDeliveryDateOptions() {
+  const options = [];
+  const now = new Date();
+  for (let i = 1; i <= 7; i++) {
+    const d = new Date(now);
+    d.setDate(now.getDate() + i);
+    const day = d.getDate();
+    const month = MONTHS_GENITIVE[d.getMonth()];
+    const weekday = WEEKDAYS_SHORT[d.getDay()];
+    options.push(`${day} ${month}, ${weekday}`);
+  }
+  return options;
+}
+
 function extractUserPhoneDigits(phone) {
   if (!phone) return '';
   const raw = String(phone).trim();
@@ -94,6 +121,9 @@ export default function Checkout() {
   const [phoneDigits, setPhoneDigits] = useState(() => (user?.phone ? extractUserPhoneDigits(user.phone) : ''));
   const [email, setEmail] = useState(() => (user?.email ? String(user.email).trim() : ''));
   const [delivery, setDelivery] = useState('Доставка курьером');
+  const [deliveryDate, setDeliveryDate] = useState('');
+  const [deliverySlot, setDeliverySlot] = useState('');
+  const deliveryDateOptions = useMemo(() => getDeliveryDateOptions(), []);
   const [address, setAddress] = useState(() => extractUserAddress(user));
   const [payment, setPayment] = useState('Картой онлайн');
 
@@ -232,8 +262,16 @@ export default function Checkout() {
     if (!email.trim() || !emailRegex.test(email.trim())) {
       newErrors.email = 'Введите корректный email';
     }
-    if (delivery === 'Доставка курьером' && !address.trim()) {
-      newErrors.address = 'Введите адрес доставки';
+    if (delivery === 'Доставка курьером') {
+      if (!address.trim()) {
+        newErrors.address = 'Введите адрес доставки';
+      }
+      if (!deliveryDate) {
+        newErrors.deliveryDate = 'Выберите дату доставки';
+      }
+      if (!deliverySlot) {
+        newErrors.deliverySlot = 'Выберите временной интервал';
+      }
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -250,6 +288,8 @@ export default function Checkout() {
       userId: user?.id,
       userEmail: user?.email,
       delivery,
+      deliveryDate: delivery === 'Доставка курьером' ? deliveryDate : null,
+      deliverySlot: delivery === 'Доставка курьером' ? deliverySlot : null,
       payment,
       date: new Date().toISOString(),
     };
@@ -371,6 +411,8 @@ export default function Checkout() {
                   onClick={() => {
                     setDelivery('Самовывоз');
                     if (errors.address) setErrors((prev) => ({ ...prev, address: '' }));
+                    if (errors.deliveryDate) setErrors((prev) => ({ ...prev, deliveryDate: '' }));
+                    if (errors.deliverySlot) setErrors((prev) => ({ ...prev, deliverySlot: '' }));
                   }}
                   className={`h-[48px] px-8 rounded-radius-lg font-medium text-[14px] cursor-pointer transition-colors ${
                     delivery === 'Самовывоз'
@@ -383,22 +425,74 @@ export default function Checkout() {
               </div>
 
               {delivery === 'Доставка курьером' ? (
-                <div>
-                  <label className="block text-[14px] text-neutral-black mb-2">Адрес доставки</label>
-                  <input
-                    type="text"
-                    value={address}
-                    onChange={(e) => {
-                      setAddress(e.target.value);
-                      if (errors.address) setErrors((prev) => ({ ...prev, address: '' }));
-                    }}
-                    placeholder="г. Томск, ул. Сырная, д. 7, кв. 7"
-                    className={`w-full h-[48px] px-4 bg-surface-white border ${
-                      errors.address ? 'border-danger-700' : 'border-neutral-250-a80'
-                    } rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900`}
-                  />
-                  {errors.address && <p className="text-[13px] text-danger-700 mt-1">{errors.address}</p>}
-                </div>
+                <>
+                  <div className="mb-4">
+                    <label className="block text-[14px] text-neutral-black mb-2">Адрес доставки</label>
+                    <input
+                      type="text"
+                      value={address}
+                      onChange={(e) => {
+                        setAddress(e.target.value);
+                        if (errors.address) setErrors((prev) => ({ ...prev, address: '' }));
+                      }}
+                      placeholder="г. Томск, ул. Сырная, д. 7, кв. 7"
+                      className={`w-full h-[48px] px-4 bg-surface-white border ${
+                        errors.address ? 'border-danger-700' : 'border-neutral-250-a80'
+                      } rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900`}
+                    />
+                    {errors.address && <p className="text-[13px] text-danger-700 mt-1">{errors.address}</p>}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[14px] text-neutral-black mb-2">Дата доставки</label>
+                      <select
+                        value={deliveryDate}
+                        onChange={(e) => {
+                          setDeliveryDate(e.target.value);
+                          if (errors.deliveryDate) setErrors((prev) => ({ ...prev, deliveryDate: '' }));
+                        }}
+                        className={`w-full h-[48px] px-4 bg-surface-white border ${
+                          errors.deliveryDate ? 'border-danger-700' : 'border-neutral-250-a80'
+                        } rounded-radius-md text-[14px] text-neutral-black outline-none focus:border-brand-900 cursor-pointer`}
+                      >
+                        <option value="">Выберите дату</option>
+                        {deliveryDateOptions.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.deliveryDate && (
+                        <p className="text-[13px] text-danger-700 mt-1">{errors.deliveryDate}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-[14px] text-neutral-black mb-2">Временной интервал</label>
+                      <select
+                        value={deliverySlot}
+                        onChange={(e) => {
+                          setDeliverySlot(e.target.value);
+                          if (errors.deliverySlot) setErrors((prev) => ({ ...prev, deliverySlot: '' }));
+                        }}
+                        className={`w-full h-[48px] px-4 bg-surface-white border ${
+                          errors.deliverySlot ? 'border-danger-700' : 'border-neutral-250-a80'
+                        } rounded-radius-md text-[14px] text-neutral-black outline-none focus:border-brand-900 cursor-pointer`}
+                      >
+                        <option value="">Выберите интервал</option>
+                        {DELIVERY_SLOTS.map((slot) => (
+                          <option key={slot} value={slot}>
+                            {slot}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.deliverySlot && (
+                        <p className="text-[13px] text-danger-700 mt-1">{errors.deliverySlot}</p>
+                      )}
+                    </div>
+                  </div>
+                </>
               ) : (
                 <p className="text-[14px] text-neutral-700 py-2">
                   Заберите из нашей лавки: г. Томск, ул. Сырная, д. 7
