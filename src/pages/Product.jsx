@@ -303,33 +303,31 @@ export default function Product() {
           </div>
         )}
         {activeTab==='reviews' && (
-          <div>
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
             {reviews.length===0 ? (
               <div className="bg-surface-cream border border-neutral-250-a80 rounded-radius-lg py-12 text-center text-neutral-500 font-montserrat">отзывов пока нет</div>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
-                <div className="flex flex-col gap-4">
-                  {reviews.map(r=>(
-                    <article key={r.id} className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 bg-surface-white border border-neutral-300 rounded-radius-lg p-6 font-montserrat">
-                      <div>
-                        <p className="font-bold text-neutral-black">{r.author}</p>
-                        <div className="mt-3">{starsRow(r.rating)}</div>
-                        {r.pairing && <p className="text-xs text-neutral-600 mt-3">Пара: {r.pairing}</p>}
-                      </div>
-                      <div>
-                        <p className="text-sm text-neutral-black leading-6">{r.text}</p>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-                <aside className="font-montserrat">
-                  <p className="text-4xl font-bold text-neutral-black leading-none">{avgRating}</p>
-                  <p className="text-xs text-neutral-500 mt-2">На основе {reviews.length}-х {reviewsWord(reviews.length)}</p>
-                  <div className="mt-3">{starsRow(Math.floor(avgRating))}</div>
-                  <button type="button" onClick={handleOpenReviewModal} className="mt-6 w-full py-3 rounded-radius-md border border-brand-outline text-brand-outline bg-surface-white text-sm font-medium hover:bg-surface-cream transition-colors">Оставить отзыв</button>
-                </aside>
+              <div className="flex flex-col gap-4">
+                {reviews.map(r=>(
+                  <article key={r.id} className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 bg-surface-white border border-neutral-300 rounded-radius-lg p-6 font-montserrat">
+                    <div>
+                      <p className="font-bold text-neutral-black">{r.author}</p>
+                      <div className="mt-3">{starsRow(r.rating)}</div>
+                      {r.pairing && <p className="text-xs text-neutral-600 mt-3">Пара: {r.pairing}</p>}
+                    </div>
+                    <div>
+                      <p className="text-sm text-neutral-black leading-6">{r.text}</p>
+                    </div>
+                  </article>
+                ))}
               </div>
             )}
+            <aside className="font-montserrat">
+              <p className="text-4xl font-bold text-neutral-black leading-none">{avgRating}</p>
+              <p className="text-xs text-neutral-500 mt-2">{reviews.length === 0 ? 'На основе 0 отзывов' : `На основе ${reviews.length}-х ${reviewsWord(reviews.length)}`}</p>
+              <div className="mt-3">{starsRow(Math.floor(avgRating))}</div>
+              <button type="button" onClick={handleOpenReviewModal} className="mt-6 w-full py-3 rounded-radius-md border border-brand-outline text-brand-outline bg-surface-white text-sm font-medium hover:bg-surface-cream transition-colors">Оставить отзыв</button>
+            </aside>
           </div>
         )}
         <div className="mt-12"><h2 className="font-lora text-2xl font-bold text-neutral-900-alt mb-6">С этим сыром покупают</h2><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{related.map(pp=>(<ProductCard key={pp.id} product={pp} />))}</div></div>
