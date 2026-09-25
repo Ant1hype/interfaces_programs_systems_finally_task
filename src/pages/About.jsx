@@ -52,7 +52,7 @@ function PartnerLogo({ partner }) {
 
 export default function About() {
   return (
-    <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto py-8 md:py-12 text-neutral-900-alt">
+    <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto pt-16 md:pt-24 pb-[154px] text-neutral-900-alt">
       {/* Крошки */}
       <nav aria-label="Хлебные крошки" className="flex items-center space-x-2 font-montserrat text-[16px] text-neutral-400 mb-8 md:mb-12">
         <Link to="/" className="text-neutral-400 hover:text-neutral-600 transition-colors">
