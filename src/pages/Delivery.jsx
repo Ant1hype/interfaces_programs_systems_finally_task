@@ -73,9 +73,9 @@ const SECTIONS = [
 export default function Delivery() {
   return (
     <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto pt-16 md:pt-24 pb-[154px] text-neutral-900-alt">
-      {/* Хлебные крошки */}
-      <nav className="flex items-center gap-2 font-montserrat text-[14px] text-neutral-400 mb-6">
-        <Link to="/" className="hover:text-primary-800 transition-colors">
+      {/* Крошки */}
+      <nav aria-label="Хлебные крошки" className="flex items-center space-x-2 font-montserrat text-[16px] text-neutral-400 mb-8 md:mb-12">
+        <Link to="/" className="text-neutral-400 hover:text-neutral-600 transition-colors">
           Главная
         </Link>
         <span>/</span>
@@ -93,13 +93,13 @@ export default function Delivery() {
       </p>
 
       {/* Секции */}
-      <div className="space-y-12 md:space-y-16 max-w-[800px]">
+      <div>
         {SECTIONS.map((section) => (
-          <section key={section.title} className="space-y-4">
-            <h2 className="font-lora font-semibold text-[32px] text-neutral-900-alt">
+          <section key={section.title}>
+            <h2 className="font-lora font-semibold text-[32px] text-neutral-900-alt mt-16 mb-6">
               {section.title}
             </h2>
-            <ul className="list-disc pl-5 space-y-2 font-montserrat text-[16px] text-neutral-600">
+            <ul className="list-disc pl-5 space-y-3">
               {section.items.map((item, idx) => (
                 <li key={idx} className="font-montserrat text-[16px] text-neutral-600">
                   {item}
