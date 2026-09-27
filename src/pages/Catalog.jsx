@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { products } from '../data/catalog';
@@ -14,6 +14,10 @@ const filterSections = [
 ];
 
 const sortOptions = ["По популярности", "Рекомендованные", "Сначала дешевле", "Сначала дороже", "Новинки"];
+
+// Метрики плитки: минимальная ширина колонки и зазор (совпадают с CSS .catalog-grid)
+const GRID_COL_MIN = 250;
+const GRID_GAP = 26;
 
 const categoryMap = {
   'lactose-free': 'Без лактозы',
@@ -71,15 +75,28 @@ export default function Catalog() {
     wine: []
   });
 
-  // Состояния для выпадашки и пагинации
-  const [visibleCount, setVisibleCount] = useState(9);
+  // Состояния для выпадашки и пагинации (пагинация считается целыми рядами)
+  const gridWrapperRef = useRef(null);
+  const [cols, setCols] = useState(3);
+  const [rows, setRows] = useState(3);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [selectedSort, setSelectedSort] = useState(sortOptions[0]);
 
-  // Сбрасываем кнопку "Показать еще" и фильтры при переходе между подборками и новом поиске
+  // Сбрасываем количество рядов при переходе между подборками и новом поиске
   useEffect(() => {
-    setVisibleCount(9);
+    setRows(3);
   }, [filterParam, searchParam]);
+
+  // Считаем число колонок плитки по реальной ширине обёртки сетки и пересчитываем при resize окна
+  useEffect(() => {
+    const measureCols = () => {
+      const w = gridWrapperRef.current ? gridWrapperRef.current.clientWidth : 0;
+      setCols(Math.max(1, Math.floor((w + GRID_GAP) / (GRID_COL_MIN + GRID_GAP))));
+    };
+    measureCols();
+    window.addEventListener('resize', measureCols);
+    return () => window.removeEventListener('resize', measureCols);
+  }, []);
 
   // Функция переключения чекбоксов
   const handleCheckboxChange = (key, option) => {
@@ -90,7 +107,7 @@ export default function Catalog() {
         : [...currentValues, option];                // ставим галочку
       return { ...prev, [key]: updatedValues };
     });
-    setVisibleCount(9); // Сбрасываем пагинацию при изменении фильтров
+    setRows(3); // Сбрасываем пагинацию (ряды) при изменении фильтров
   };
 
   // --- СИСТЕМА ФИЛЬТРАЦИИ ---
@@ -139,7 +156,8 @@ export default function Catalog() {
     return 0; // "Рекомендованные" оставляем исходный порядок БД
   });
 
-  // Срез для пагинации кнопки "Показать еще"
+  // Срез для пагинации кнопки "Показать еще": показываем целые ряды (rows × cols карточек)
+  const visibleCount = rows * cols;
   const displayProducts = sortedProducts.slice(0, visibleCount);
 
   // Активен ли поисковый запрос или глобальная подборка (для счётчика и пустого состояния)
@@ -151,7 +169,7 @@ export default function Catalog() {
     setInStockOnly(false);
     setPrice([0, 5000]);
     setTaste([1, 5]);
-    setVisibleCount(9);
+    setRows(3);
     navigate('/catalog');
   };
 
@@ -202,7 +220,7 @@ export default function Catalog() {
                 <input 
                   type="checkbox" 
                   checked={inStockOnly} 
-                  onChange={(e) => { setInStockOnly(e.target.checked); setVisibleCount(9); }} 
+                  onChange={(e) => { setInStockOnly(e.target.checked); setRows(3); }} 
                 />
                 <span className="toggle-slider"></span>
               </label>
@@ -212,8 +230,8 @@ export default function Catalog() {
             <div className="filter-group slider-box">
               <span className="filter-title">Цена, ₽</span>
               <div className="dual-slider">
-                <input type="range" min="0" max="5000" value={price[0]} onChange={e => { setPrice([parseInt(e.target.value), price[1]]); setVisibleCount(9); }} />
-                <input type="range" min="0" max="5000" value={price[1]} onChange={e => { setPrice([price[0], parseInt(e.target.value)]); setVisibleCount(9); }} />
+                <input type="range" min="0" max="5000" value={price[0]} onChange={e => { setPrice([parseInt(e.target.value), price[1]]); setRows(3); }} />
+                <input type="range" min="0" max="5000" value={price[1]} onChange={e => { setPrice([price[0], parseInt(e.target.value)]); setRows(3); }} />
                 <div className="slider-track" style={{ left: `${(price[0]/5000)*100}%`, right: `${100 - (price[1]/5000)*100}%` }}></div>
               </div>
               <div className="range-labels">
@@ -226,8 +244,8 @@ export default function Catalog() {
             <div className="filter-group slider-box">
               <span className="filter-title">Интенсивность вкуса</span>
               <div className="dual-slider">
-                <input type="range" min="1" max="5" value={taste[0]} onChange={e => { setTaste([parseInt(e.target.value), taste[1]]); setVisibleCount(9); }} />
-                <input type="range" min="1" max="5" value={taste[1]} onChange={e => { setTaste([taste[0], parseInt(e.target.value)]); setVisibleCount(9); }} />
+                <input type="range" min="1" max="5" value={taste[0]} onChange={e => { setTaste([parseInt(e.target.value), taste[1]]); setRows(3); }} />
+                <input type="range" min="1" max="5" value={taste[1]} onChange={e => { setTaste([taste[0], parseInt(e.target.value)]); setRows(3); }} />
                 <div className="slider-track" style={{ left: `${((taste[0]-1)/4)*100}%`, right: `${100 - ((taste[1]-1)/4)*100}%` }}></div>
               </div>
               <div className="range-labels">
@@ -257,7 +275,7 @@ export default function Catalog() {
           </aside>
 
           {/* СЕТКА ТОВАРОВ С ПАГИНАЦИЕЙ */}
-          <div className="catalog-grid-wrapper">
+          <div className="catalog-grid-wrapper" ref={gridWrapperRef}>
             {hasActiveQuery && (
               <div className="catalog-counter">
                 <span>Найдено: {sortedProducts.length}</span>
@@ -274,7 +292,7 @@ export default function Catalog() {
                   ))}
                 </div>
                 {visibleCount < sortedProducts.length && (
-                  <button className="catalog-show-more" onClick={() => setVisibleCount(prev => prev + 9)}>
+                  <button className="catalog-show-more" onClick={() => setRows(prev => prev + 1)}>
                     Показать еще
                   </button>
                 )}
