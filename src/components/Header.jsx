@@ -46,6 +46,7 @@ export default function Header() {
   const { user } = useAuth();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const searchRef = useRef(null);
   const [products, setProducts] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
@@ -77,6 +78,21 @@ export default function Header() {
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isSearchOpen]);
+  // Сворачиваем панель поиска при любом переходе на другую страницу
+  useEffect(() => {
+    setIsSearchOpen(false);
+  }, [location.pathname]);
+  // Сворачиваем панель поиска при клике вне неё
+  useEffect(() => {
+    const onMouseDown = (e) => {
+      if (!searchRef.current || searchRef.current.contains(e.target)) return;
+      // Клик по кнопке-иконке поиска в шапке закрывает панель своим onClick
+      if (e.target.closest && e.target.closest('[aria-controls="header-search-panel"]')) return;
+      setIsSearchOpen(false);
+    };
+    document.addEventListener('mousedown', onMouseDown);
+    return () => document.removeEventListener('mousedown', onMouseDown);
+  }, []);
   useEffect(() => {
     if (!isSearchOpen) return undefined;
     const prevBodyOverflow = document.body.style.overflow;
@@ -195,47 +211,52 @@ export default function Header() {
       >
         <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto py-5 md:py-6 max-h-[70vh] overflow-hidden">
           <form onSubmit={handleSearchSubmit} className="flex items-center gap-3 sm:gap-5" role="search">
-            <div className="flex items-center gap-3 flex-1 min-w-0 h-[48px] sm:h-[50px] pl-4 pr-2 backdrop-blur-xl bg-white/85 border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.12)] rounded-2xl focus-within:border-brand-900 transition-colors duration-200">
+            <div ref={searchRef} className="flex items-center gap-3 flex-1 min-w-0 h-[48px] sm:h-[50px] pl-4 pr-2 backdrop-blur-xl bg-white/85 border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.12)] rounded-2xl focus-within:border-brand-900 transition-colors duration-200" style={{ backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', background: 'rgba(255, 255, 255, 0.95)', border: '1px solid rgba(255, 255, 255, 0.5)', boxShadow: '0 20px 60px rgba(0, 0, 0, 0.2)', borderRadius: '20px', padding: '16px 24px', margin: '20px 0 0', height: 'auto' }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 shrink-0 text-neutral-600 pointer-events-none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Поиск по каталогу..." className="flex-1 min-w-0 h-full bg-transparent border-0 outline-none text-[14px] font-normal text-neutral-900-alt placeholder:text-neutral-600" />
               <button type="submit" className="inline-flex items-center justify-center shrink-0 h-[36px] sm:h-[38px] px-5 sm:px-8 bg-brand-800 hover:bg-brand-700 transition-colors rounded-xl text-white">Найти</button>
             </div>
+            {/* Визуальный разделитель под поисковой панелью */}
+            <div style={{
+              height: '1px',
+              background: 'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.15) 15%, rgba(0,0,0,0.15) 85%, transparent 100%)',
+              marginTop: '12px'
+            }} />
             <button type="button" onClick={closeSearch} aria-label="Закрыть поиск" className="shrink-0 flex items-center justify-center w-8 h-8 bg-transparent border-0 p-0 text-neutral-900-alt cursor-pointer transition-colors duration-200 hover:text-brand-900">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </form>
-          <div className="grid grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)] items-start gap-6 lg:gap-10 mt-6 md:mt-8">
-            <div className="min-w-0 self-start">
-              <h3 className="font-lora text-[20px] font-semibold text-neutral-900-alt m-0 mb-[16px]">Часто ищут</h3>
-              <ul className="list-none m-0 p-0 flex flex-row flex-wrap lg:flex-col gap-x-4 gap-y-2 lg:gap-y-3">
-                {popularSearches.map((term) => (
-                  <li key={term} className="min-w-0">
-                    <button type="button" onClick={() => { setSearchQuery(term); setIsSearchOpen(false); navigate(`/catalog?search=${encodeURIComponent(term)}`); }} className="bg-transparent border-0 p-0 text-left text-[14px] font-normal text-neutral-900-alt cursor-pointer transition-colors duration-200 hover:text-brand-900">{term}</button>
-                  </li>
+          {/* Общая сетка: на lg заголовки стоят в первой строке (сайдбар по верхней линии
+              «Популярные товары», без провала), а список и карточки — во второй, поэтому
+              «Часто ищут» начинается ровно по верхней линии карточек. */}
+          <div className="grid grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)] items-start gap-x-6 lg:gap-x-10 gap-y-0 mt-6 md:mt-8">
+            <h3 className="font-lora text-[20px] font-semibold text-neutral-900-alt m-0 mb-[16px] min-w-0 lg:col-start-1 lg:row-start-1" style={{ fontSize: '20px', fontWeight: 600, marginBottom: '16px' }}>Часто ищут</h3>
+            <ul className="list-none m-0 p-0 flex flex-row flex-wrap lg:flex-col gap-x-4 gap-y-2 lg:gap-y-3 min-w-0 lg:col-start-1 lg:row-start-2">
+              {popularSearches.map((term) => (
+                <li key={term} className="min-w-0">
+                  <button type="button" onClick={() => { setSearchQuery(term); setIsSearchOpen(false); navigate(`/catalog?search=${encodeURIComponent(term)}`); }} className="bg-transparent border-0 p-0 text-left text-[14px] font-normal text-neutral-900-alt cursor-pointer transition-colors duration-200 hover:text-brand-900">{term}</button>
+                </li>
+              ))}
+            </ul>
+            <h3 className="font-lora text-[28px] font-semibold text-neutral-900-alt m-0 mt-6 mb-[26px] min-w-0 lg:mt-0 lg:col-start-2 lg:row-start-1" style={{ fontSize: '28px', fontWeight: 600, marginBottom: '26px' }}>Популярные товары</h3>
+            {popularProducts.length > 0 ? (
+              <div ref={rowRef} className="flex flex-nowrap justify-between gap-6 w-full min-w-0 lg:col-start-2 lg:row-start-2">
+                {visible.map((product) => (
+                  <div key={product.id} className="flex-1 basis-[300px] max-w-[420px] min-w-0">
+                    <ProductCard product={product} />
+                  </div>
                 ))}
-              </ul>
-            </div>
-            <div className="min-w-0 self-start">
-              <h3 className="font-lora text-[28px] font-semibold text-neutral-900-alt m-0 mb-[26px]">Популярные товары</h3>
-              {popularProducts.length > 0 ? (
-                <div ref={rowRef} className="flex flex-nowrap justify-between gap-6 w-full">
-                  {visible.map((product) => (
-                    <div key={product.id} className="flex-1 basis-[300px] max-w-[420px] min-w-0">
-                      <ProductCard product={product} />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-start gap-3 min-h-[120px]">
-                  <p className="m-0 text-[14px] text-neutral-600">
-                    {productsError ? 'Не удалось загрузить товары.' : 'Загружаем товары…'}
-                  </p>
-                  {productsError && (
-                    <button type="button" onClick={() => setRetryToken((v) => v + 1)} className="bg-transparent border border-brand-outline rounded-md px-5 py-2 text-[13px] font-medium text-brand-outline cursor-pointer transition-colors duration-200 hover:border-brand-900 hover:text-brand-900">Повторить</button>
-                  )}
-                </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-start gap-3 min-h-[120px] min-w-0 lg:col-start-2 lg:row-start-2">
+                <p className="m-0 text-[14px] text-neutral-600">
+                  {productsError ? 'Не удалось загрузить товары.' : 'Загружаем товары…'}
+                </p>
+                {productsError && (
+                  <button type="button" onClick={() => setRetryToken((v) => v + 1)} className="bg-transparent border border-brand-outline rounded-md px-5 py-2 text-[13px] font-medium text-brand-outline cursor-pointer transition-colors duration-200 hover:border-brand-900 hover:text-brand-900">Повторить</button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
