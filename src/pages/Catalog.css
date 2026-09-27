@@ -228,22 +228,56 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
+  /* Обёртка сетки не добавляет собственных отступов:
+     зазор между сайдбаром и плиткой задаёт только gap у .catalog-content (26px) */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .catalog-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Динамическая плитка */
-  gap: 26px;
+  gap: 26px; /* Единственный источник зазоров между карточками — ровно 26px */
   width: 100%;
+  /* Никаких внешних отступов у самой сетки, иначе зазор удваивается */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Карточка товара растягивается на всю ширину своей колонки:
+/* Ячейка сетки (Link-обёртка карточки) растягивается на всю ширину своей колонки:
    !important перебивает фиксированную width/max-width из стилей самой карточки,
-   поэтому последняя карточка в ряду встаёт вровень с правым краем контейнера */
+   поэтому последняя карточка в ряду встаёт В ТОЧНОСТИ на правую грань контейнера
+   (та же вертикаль, что у правого края дропдауна сортировки) — без остаточного зазора */
 .catalog-page .catalog-grid > * {
   width: 100% !important;
   max-width: 100% !important;
   min-width: 0;
+  box-sizing: border-box;
+  /* Внешние отступы ячеек сетки обнуляем ПОЛНОСТЬЮ: зазор даёт только gap (26px),
+     иначе получаются двойные промежутки между карточками */
+  margin: 0 !important;
+}
+
+/* Карточка товара внутри сетки: внешние боковые отступы (~20px) убираем полностью.
+   width:100% — чтобы правый край карточки совпадал с правой гранью колонки.
+   Внутренние паддинги карточки (фото, текст, кнопка) при этом НЕ трогаем. */
+.catalog-page .catalog-grid .product-card,
+.catalog-page .catalog-grid .catalog-card {
+  margin: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* Обёртка-ссылка карточки: внешние отступы и поля убираем полностью */
+.catalog-page .catalog-grid .product-card__link,
+.catalog-page .catalog-card-wrapper {
+  display: block;
+  margin: 0 !important;
+  padding: 0;
+  width: 100%;
   box-sizing: border-box;
 }
 

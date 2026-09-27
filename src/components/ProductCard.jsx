@@ -110,7 +110,7 @@ export default function ProductCard({ product }) {
   const showLimit = Boolean(btnText && (btnText.startsWith('Максимум') || btnText === 'Нет в наличии'));
 
   return (
-    <Link to={`/product/${product.id}`} style={{ textDecoration: 'none' }}>
+    <Link to={`/product/${product.id}`} className="product-card__link" style={{ textDecoration: 'none', margin: 0 }}>
       <div className="product-card">
         <div className="product-card__image-wrap">
           <img src={product.image} alt={product.name} className="product-card__img" />
