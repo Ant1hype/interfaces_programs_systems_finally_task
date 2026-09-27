@@ -106,7 +106,7 @@ export default function Footer() {
           <div className="flex flex-col">
             <div className="font-lora text-[18px] font-semibold text-surface-white mb-5">В интернет-магазине</div>
             <Link to="/delivery" className="block text-[14px] text-neutral-350 no-underline mb-3 transition-colors duration-200 hover:text-surface-white">Условия доставки</Link>
-            <Link to="/returns" className="block text-[14px] text-neutral-350 no-underline mb-3 transition-colors duration-200 hover:text-surface-white">Оплата и возврат</Link>
+            <span className="block text-[14px] text-neutral-350 mb-3 cursor-default">Оплата и возврат</span>
             <Link to="/faq" className="block text-[14px] text-neutral-350 no-underline mb-3 transition-colors duration-200 hover:text-surface-white">Частые вопросы</Link>
             <Link to="/about" className="block text-[14px] text-neutral-350 no-underline mb-3 transition-colors duration-200 hover:text-surface-white">О нас</Link>
           </div>

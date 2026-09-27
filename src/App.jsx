@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Catalog from './pages/Catalog';
 import About from './pages/About';
 import Faq from './pages/Faq';
+import Delivery from './pages/Delivery';
 import SupportWidget from './components/SupportWidget';
 import Product from './pages/Product';
 import Cart from './pages/Cart';
@@ -42,6 +43,7 @@ function App() {
                 <Route path="/catalog" element={<Catalog />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/faq" element={<Faq />} />
+                <Route path="/delivery" element={<Delivery />} />
                 <Route path="/product/:id" element={<Product />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
