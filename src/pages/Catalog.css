@@ -112,7 +112,7 @@
 /* --- ОСНОВНОЙ КОНТЕНТ (Сайдбар + Матрица товаров) --- */
 .catalog-content {
   display: flex;
-  justify-content: space-between; /* Расталкивает сайдбар и сетку по краям 1200px */
+  gap: 26px; /* Ровный отступ между сайдбаром фильтров и плиткой */
   align-items: flex-start;
 }
 
@@ -224,16 +224,25 @@
 
 /* --- МАТРИЦА ТОВАРОВ --- */
 .catalog-grid-wrapper {
-  width: 892px; /* Жестко 3 карточки по 280 + 2 отступа по 26 */
+  flex: 1 1 auto; /* Занимает всю оставшуюся ширину рядом с сайдбаром */
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
 }
 
 .catalog-grid {
   display: grid;
-  grid-template-columns: repeat(3, 280px); /* Строго 3 колонки */
-  gap: 40px 26px; /* Вертикаль 40, Горизонталь 26 */
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Динамическая плитка */
+  gap: 26px;
+  width: 100%;
+}
+
+/* Карточка товара занимает всю ширину своей колонки */
+.catalog-page .catalog-grid > * {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* Кнопка Показать еще */
@@ -411,14 +420,8 @@ body.search-locked::-webkit-scrollbar {
 @media (max-width: 1300px) {
   .catalog-container { padding: 40px 40px 60px 40px; }
   .catalog-content { flex-direction: column; align-items: center; }
-  .catalog-grid-wrapper { width: 100%; max-width: 892px; }
+  .catalog-grid-wrapper { width: 100%; }
   .catalog-sidebar { width: 100%; max-width: 892px; }
 }
 
-@media (max-width: 950px) {
-  .catalog-grid { grid-template-columns: repeat(2, 280px); justify-content: center; }
-}
-
-@media (max-width: 650px) {
-  .catalog-grid { grid-template-columns: 280px; }
-}
+/* Кол-во колонок плитки на любых ширинах считает auto-fill — фиксированные брейкпоинты сетки не нужны */
