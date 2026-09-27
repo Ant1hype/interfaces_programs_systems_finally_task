@@ -195,7 +195,7 @@ export default function Header() {
       >
         <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto py-5 md:py-6 max-h-[70vh] overflow-hidden">
           <form onSubmit={handleSearchSubmit} className="flex items-center gap-3 sm:gap-5" role="search">
-            <div className="flex items-center gap-3 flex-1 min-w-0 h-[48px] sm:h-[50px] pl-4 pr-2 bg-surface-white border border-[#BDBDBD] rounded-md focus-within:border-brand-900 transition-colors duration-200">
+            <div className="flex items-center gap-3 flex-1 min-w-0 h-[48px] sm:h-[50px] pl-4 pr-2 backdrop-blur-xl bg-white/85 border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.12)] rounded-2xl focus-within:border-brand-900 transition-colors duration-200">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 shrink-0 text-neutral-600 pointer-events-none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Поиск по каталогу..." className="flex-1 min-w-0 h-full bg-transparent border-0 outline-none text-[14px] font-normal text-neutral-900-alt placeholder:text-neutral-600" />
               <button type="submit" className="inline-flex items-center justify-center shrink-0 h-[36px] sm:h-[38px] px-5 sm:px-8 bg-brand-800 hover:bg-brand-700 transition-colors rounded-xl text-white">Найти</button>
@@ -204,9 +204,9 @@ export default function Header() {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </form>
-          <div className="grid grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)] gap-6 lg:gap-10 mt-6 md:mt-8">
-            <div className="min-w-0">
-              <h3 className="font-lora text-[16px] font-bold text-neutral-900-alt m-0 mb-3">Часто ищут</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)] items-start gap-6 lg:gap-10 mt-6 md:mt-8">
+            <div className="min-w-0 self-start">
+              <h3 className="font-lora text-[20px] font-semibold text-neutral-900-alt m-0 mb-[16px]">Часто ищут</h3>
               <ul className="list-none m-0 p-0 flex flex-row flex-wrap lg:flex-col gap-x-4 gap-y-2 lg:gap-y-3">
                 {popularSearches.map((term) => (
                   <li key={term} className="min-w-0">
@@ -215,8 +215,8 @@ export default function Header() {
                 ))}
               </ul>
             </div>
-            <div className="min-w-0">
-              <h3 className="font-lora text-[16px] font-bold text-neutral-900-alt m-0 mb-3">Популярные товары</h3>
+            <div className="min-w-0 self-start">
+              <h3 className="font-lora text-[28px] font-semibold text-neutral-900-alt m-0 mb-[26px]">Популярные товары</h3>
               {popularProducts.length > 0 ? (
                 <div ref={rowRef} className="flex flex-nowrap justify-between gap-6 w-full">
                   {visible.map((product) => (
