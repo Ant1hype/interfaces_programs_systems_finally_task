@@ -82,10 +82,14 @@ export default function Dropdown({
         </button>
       </div>
 
-      {/* Панель опций выведена из потока: absolute-оверлей, единая рамка с шапкой (-mt-px) */}
+      {/* Панель опций выведена из потока: absolute-оверлей, единая рамка с шапкой (-mt-px).
+          В закрытом состоянии полностью невидима (opacity-0 + border-transparent + pointer-events-none),
+          поэтому под шапкой не появляется вторая линия. */}
       <div
-        className={`absolute left-0 right-0 top-full -mt-px z-20 bg-[#ECEEF0] border rounded-b-[12px] overflow-hidden ${
-          isOpen ? 'border-neutral-900' : 'border-transparent pointer-events-none'
+        className={`absolute left-0 right-0 top-full -mt-px z-20 bg-[#ECEEF0] border rounded-b-[12px] overflow-hidden transition-opacity duration-200 ease-out ${
+          isOpen
+            ? 'border-neutral-900 opacity-100'
+            : 'border-transparent opacity-0 pointer-events-none'
         }`}
       >
         <ul
