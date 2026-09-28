@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { getProducts } from '../lib/api.js';
+import Dropdown from '../components/Dropdown.jsx';
 
 const PROMO_CODE = 'CHEESE10', PROMO_PERCENT = 10;
 const fmt = (v) => `${Math.round(v).toLocaleString('ru-RU')} ₽`;
@@ -454,23 +455,16 @@ export default function Checkout() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[14px] text-neutral-black mb-2">Дата доставки</label>
-                      <select
+                      <Dropdown
                         value={deliveryDate}
-                        onChange={(e) => {
-                          setDeliveryDate(e.target.value);
+                        onChange={(nextValue) => {
+                          setDeliveryDate(nextValue);
                           if (errors.deliveryDate) setErrors((prev) => ({ ...prev, deliveryDate: '' }));
                         }}
-                        className={`w-full h-[48px] px-4 bg-surface-white border ${
-                          errors.deliveryDate ? 'border-danger-700' : 'border-neutral-250-a80'
-                        } rounded-radius-md text-[14px] text-neutral-black outline-none focus:border-brand-900 cursor-pointer`}
-                      >
-                        <option value="">Выберите дату</option>
-                        {deliveryDateOptions.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
+                        options={deliveryDateOptions.map((opt) => ({ value: opt, label: opt }))}
+                        placeholder="Выберите дату"
+                        ariaLabel="Дата доставки"
+                      />
                       {errors.deliveryDate && (
                         <p className="text-[13px] text-danger-700 mt-1">{errors.deliveryDate}</p>
                       )}
@@ -478,23 +472,16 @@ export default function Checkout() {
 
                     <div>
                       <label className="block text-[14px] text-neutral-black mb-2">Временной интервал</label>
-                      <select
+                      <Dropdown
                         value={deliverySlot}
-                        onChange={(e) => {
-                          setDeliverySlot(e.target.value);
+                        onChange={(nextValue) => {
+                          setDeliverySlot(nextValue);
                           if (errors.deliverySlot) setErrors((prev) => ({ ...prev, deliverySlot: '' }));
                         }}
-                        className={`w-full h-[48px] px-4 bg-surface-white border ${
-                          errors.deliverySlot ? 'border-danger-700' : 'border-neutral-250-a80'
-                        } rounded-radius-md text-[14px] text-neutral-black outline-none focus:border-brand-900 cursor-pointer`}
-                      >
-                        <option value="">Выберите интервал</option>
-                        {DELIVERY_SLOTS.map((slot) => (
-                          <option key={slot} value={slot}>
-                            {slot}
-                          </option>
-                        ))}
-                      </select>
+                        options={DELIVERY_SLOTS.map((slot) => ({ value: slot, label: slot }))}
+                        placeholder="Выберите интервал"
+                        ariaLabel="Временной интервал доставки"
+                      />
                       {errors.deliverySlot && (
                         <p className="text-[13px] text-danger-700 mt-1">{errors.deliverySlot}</p>
                       )}

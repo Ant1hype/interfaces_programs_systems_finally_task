@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
+import Dropdown from '../components/Dropdown';
 import { products } from '../data/catalog';
 import './Catalog.css';
 
@@ -13,7 +14,14 @@ const filterSections = [
   { id: "wine", title: "Совместимость с вином", options: ["Красное", "Розовое", "Белое", "Игристое"] }
 ];
 
-const sortOptions = ["По популярности", "Рекомендованные", "Сначала дешевле", "Сначала дороже", "Новинки"];
+// Ключи сортировки + человекочитаемые подписи для кастомного Dropdown
+const sortOptions = [
+  { value: "popular", label: "По популярности" },
+  { value: "recommended", label: "Рекомендованные" },
+  { value: "cheap", label: "Сначала дешевые" },
+  { value: "expensive", label: "Сначала дорогие" },
+  { value: "new", label: "Новинки" }
+];
 
 // Метрики плитки: минимальная ширина колонки и зазор (совпадают с CSS .catalog-grid)
 const GRID_COL_MIN = 250;
@@ -79,8 +87,7 @@ export default function Catalog() {
   const gridWrapperRef = useRef(null);
   const [cols, setCols] = useState(3);
   const [rows, setRows] = useState(3);
-  const [isSortOpen, setIsSortOpen] = useState(false);
-  const [selectedSort, setSelectedSort] = useState(sortOptions[0]);
+  const [selectedSort, setSelectedSort] = useState(sortOptions[0].value);
 
   // Сбрасываем количество рядов при переходе между подборками и новом поиске
   useEffect(() => {
@@ -149,11 +156,11 @@ export default function Catalog() {
 
   // --- СИСТЕМА СОРТИРОВКИ ---
   const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (selectedSort === "По популярности") return (b.taste ?? 0) - (a.taste ?? 0) || a.id - b.id;
-    if (selectedSort === "Сначала дешевле") return a.price - b.price;
-    if (selectedSort === "Сначала дороже") return b.price - a.price;
-    if (selectedSort === "Новинки") return b.id - a.id; // Сортируем по ID в обратном порядке
-    return 0; // "Рекомендованные" оставляем исходный порядок БД
+    if (selectedSort === "cheap") return a.price - b.price;
+    if (selectedSort === "expensive") return b.price - a.price;
+    if (selectedSort === "new") return b.id - a.id; // Сортируем по ID в обратном порядке
+    if (selectedSort === "popular") return (b.taste ?? 0) - (a.taste ?? 0) || a.id - b.id;
+    return 0; // "recommended" оставляем исходный порядок БД
   });
 
   // Срез для пагинации кнопки "Показать еще": показываем целые ряды (rows × cols карточек)
@@ -188,23 +195,13 @@ export default function Catalog() {
           
           {/* СОРТИРОВКА (Dropdown) */}
           <div className="catalog-sort-wrapper">
-            <div className={`custom-dropdown ${isSortOpen ? 'open' : ''}`} onClick={() => setIsSortOpen(!isSortOpen)}>
-              <span>{selectedSort}</span>
-              <span className="dropdown-arrow">v</span>
-            </div>
-            {isSortOpen && (
-              <ul className="dropdown-menu">
-                {sortOptions.map(option => (
-                  <li 
-                    key={option} 
-                    onClick={() => { setSelectedSort(option); setIsSortOpen(false); }}
-                    className={selectedSort === option ? 'active' : ''}
-                  >
-                    {option}
-                  </li>
-                ))}
-              </ul>
-            )}
+            <Dropdown
+              value={selectedSort}
+              onChange={setSelectedSort}
+              options={sortOptions}
+              placeholder="По популярности"
+              ariaLabel="Сортировка товаров"
+            />
           </div>
         </div>
 
