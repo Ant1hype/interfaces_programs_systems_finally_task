@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import Dropdown from '../components/Dropdown';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { products } from '../data/catalog';
 import './Catalog.css';
 
@@ -187,9 +188,7 @@ export default function Catalog() {
       <div className="catalog-container">
         
         <div className="catalog-header">
-          <div className="catalog-breadcrumb">
-            <Link to="/">Главная</Link> / <span>{pageTitle}</span>
-          </div>
+          <Breadcrumbs items={[{ to: '/', label: 'Главная' }]} current={pageTitle} />
           
           <h1 className="catalog-title">{pageTitle}</h1>
           

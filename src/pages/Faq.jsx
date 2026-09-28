@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { faq } from '../data/faq';
 
 function FaqAccordionItem({ item, isOpen, onToggle }) {
@@ -54,15 +54,9 @@ export default function Faq() {
   };
 
   return (
-    <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto pt-16 md:pt-24 pb-[154px] text-neutral-900-alt">
+    <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto pt-[40px] pb-[154px] text-neutral-900-alt">
       {/* Крошки */}
-      <nav aria-label="Хлебные крошки" className="flex items-center space-x-2 font-montserrat text-[16px] text-neutral-400 mb-8 md:mb-12">
-        <Link to="/" className="text-neutral-400 hover:text-neutral-600 transition-colors">
-          Главная
-        </Link>
-        <span>/</span>
-        <span className="text-neutral-600">Частые вопросы</span>
-      </nav>
+      <Breadcrumbs items={[{ to: '/', label: 'Главная' }]} current="Частые вопросы" />
 
       {/* H1 */}
       <h1 className="font-lora font-medium text-[48px] leading-[1.2] mb-4 text-neutral-900-alt">

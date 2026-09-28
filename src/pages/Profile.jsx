@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { useCart } from '../context/CartContext.jsx';
 import { getProducts } from '../lib/api.js';
+import Breadcrumbs from '../components/Breadcrumbs.jsx';
 
 function formatPhone(val) {
   if (!val) return '';
@@ -410,21 +411,12 @@ export default function Profile() {
 
   return (
     <div className="w-full bg-surface-white font-montserrat min-h-[70vh] pb-[96px]">
-      <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto py-6 sm:py-8">
+      <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto pt-[40px] pb-6 sm:pb-8">
         {/* Хлебные крошки */}
-        <nav className="flex items-center gap-2 text-[13px] text-neutral-500 mb-6 sm:mb-8" aria-label="Хлебные крошки">
-          <Link to="/" className="text-neutral-500 hover:text-neutral-800 transition-colors">
-            Главная
-          </Link>
-          <span className="text-neutral-400">/</span>
-          <Link to="/profile" className="text-neutral-500 hover:text-neutral-800 transition-colors">
-            Личный кабинет
-          </Link>
-          <span className="text-neutral-400">/</span>
-          <span className="text-neutral-700 font-medium">
-            {tab === 'orders' ? 'История заказов' : 'Мой профиль'}
-          </span>
-        </nav>
+        <Breadcrumbs
+          items={[{ to: '/', label: 'Главная' }, { to: '/profile', label: 'Личный кабинет' }]}
+          current={tab === 'orders' ? 'История заказов' : 'Мой профиль'}
+        />
 
         {/* H1 Заголовок */}
         <h1 className="font-lora text-[32px] sm:text-[36px] font-bold text-neutral-900-alt mb-8 sm:mb-10">

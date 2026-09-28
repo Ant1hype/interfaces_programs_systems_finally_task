@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { getProducts } from '../lib/api.js';
 import Dropdown from '../components/Dropdown.jsx';
+import Breadcrumbs from '../components/Breadcrumbs.jsx';
 
 const PROMO_CODE = 'CHEESE10', PROMO_PERCENT = 10;
 const fmt = (v) => `${Math.round(v).toLocaleString('ru-RU')} ₽`;
@@ -317,14 +318,8 @@ export default function Checkout() {
 
   if (items.length === 0) {
     return (
-      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] py-10 font-montserrat">
-        <nav className="text-[13px] text-neutral-350 mb-5">
-          <Link to="/" className="text-neutral-700 no-underline hover:text-brand-900">Главная</Link>
-          <span className="mx-2">/</span>
-          <Link to="/cart" className="text-neutral-700 no-underline hover:text-brand-900">Корзина</Link>
-          <span className="mx-2">/</span>
-          <span className="text-neutral-700">Оформление</span>
-        </nav>
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat">
+        <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/cart', label: 'Корзина' }]} current="Оформление" />
         <h1 className="font-lora text-[32px] font-bold text-neutral-900-alt mb-10">Оформление заказа</h1>
         <div className="bg-surface-cream border border-neutral-250-a80 rounded-radius-xl py-16 px-6 text-center">
           <p className="text-[18px] text-neutral-500 mb-6">Ваша корзина пуста</p>
@@ -335,14 +330,8 @@ export default function Checkout() {
   }
 
   return (
-    <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] py-10 font-montserrat">
-      <nav className="text-[13px] text-neutral-350 mb-5">
-        <Link to="/" className="text-neutral-700 no-underline hover:text-brand-900">Главная</Link>
-        <span className="mx-2">/</span>
-        <Link to="/cart" className="text-neutral-700 no-underline hover:text-brand-900">Корзина</Link>
-        <span className="mx-2">/</span>
-        <span className="text-neutral-700">Оформление</span>
-      </nav>
+    <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat">
+      <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/cart', label: 'Корзина' }]} current="Оформление" />
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_360px] gap-10 xl:gap-16 items-start">
         <div>

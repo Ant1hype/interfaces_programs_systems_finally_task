@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { getProducts } from '../lib/api.js';
 import ProductCard from '../components/ProductCard.jsx';
+import Breadcrumbs from '../components/Breadcrumbs.jsx';
 
 function BrokenHeartIcon() {
   return (
@@ -64,15 +65,9 @@ export default function Favorites() {
   const isEmpty = !isGuest && favoriteProducts.length === 0;
 
   return (
-    <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto py-10 font-montserrat">
+    <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto pt-[40px] pb-10 font-montserrat">
       {/* Хлебные крошки */}
-      <nav className="text-[13px] text-neutral-350 mb-5">
-        <Link to="/" className="text-neutral-700 no-underline hover:text-brand-900 transition-colors">
-          Главная
-        </Link>
-        <span className="mx-2 text-neutral-350">/</span>
-        <span className="text-neutral-700">Избранное</span>
-      </nav>
+      <Breadcrumbs items={[{ to: '/', label: 'Главная' }]} current="Избранное" />
 
       {/* Заголовок страницы */}
       <h1 className="font-lora text-[32px] font-bold text-neutral-900-alt mb-8">

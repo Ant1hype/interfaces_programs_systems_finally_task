@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom'; // Импортируем Link для навигации
 import ProductCard from '../components/ProductCard';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { products } from '../data/catalog';
 import './Home.css';
 
@@ -18,7 +19,7 @@ export default function Home() {
       <div className="home-container">
         
         {/* Хлебная крошка */}
-        <div className="breadcrumb">Главная</div>
+        <Breadcrumbs current="Главная" />
 
         {/* БАННЕР: ведет прямо на новую подборку «Изысканное» */}
         <Link to="/catalog?filter=exquisite" className="home-banner-link">

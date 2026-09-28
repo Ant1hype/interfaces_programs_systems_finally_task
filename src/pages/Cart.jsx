@@ -4,6 +4,7 @@ import { useCart, itemKey } from '../context/CartContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { getProducts } from '../lib/api.js';
 import ProductCard from '../components/ProductCard.jsx';
+import Breadcrumbs from '../components/Breadcrumbs.jsx';
 
 const PROMO_CODE = 'CHEESE10', PROMO_PERCENT = 10;
 const fmt = (v) => `${Math.round(v).toLocaleString('ru-RU')} ₽`;
@@ -42,9 +43,9 @@ export default function Cart() {
     }
   };
 
-  if (items.length === 0) return (<div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] py-10 font-montserrat"><nav className="text-[13px] text-neutral-350 mb-5"><Link to="/" className="text-neutral-700 no-underline hover:text-brand-900">Главная</Link><span className="mx-2">/</span><span>Корзина</span></nav><h1 className="font-lora text-[32px] font-bold text-neutral-900-alt mb-10">Корзина</h1><div className="bg-surface-cream border border-neutral-250-a80 rounded-radius-xl py-16 px-6 text-center"><p className="text-[18px] text-neutral-500 mb-6">Ваша корзина пуста</p><Link to="/catalog" className="inline-flex px-8 py-4 rounded-radius-lg bg-brand-900 text-surface-white font-medium no-underline hover:bg-brand-700">В каталог</Link></div></div>);
+  if (items.length === 0) return (<div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat"><Breadcrumbs items={[{ to: '/', label: 'Главная' }]} current="Корзина" /><h1 className="font-lora text-[32px] font-bold text-neutral-900-alt mb-10">Корзина</h1><div className="bg-surface-cream border border-neutral-250-a80 rounded-radius-xl py-16 px-6 text-center"><p className="text-[18px] text-neutral-500 mb-6">Ваша корзина пуста</p><Link to="/catalog" className="inline-flex px-8 py-4 rounded-radius-lg bg-brand-900 text-surface-white font-medium no-underline hover:bg-brand-700">В каталог</Link></div></div>);
 
-  return (<div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] py-10 font-montserrat"><nav className="text-[13px] text-neutral-350 mb-5"><Link to="/" className="text-neutral-700 no-underline hover:text-brand-900">Главная</Link><span className="mx-2">/</span><span>Корзина</span></nav><h1 className="font-lora text-[32px] font-bold text-neutral-900-alt mb-10">Корзина</h1><div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-10 xl:gap-16 items-start"><div>{rows.map(r => {
+  return (<div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat"><Breadcrumbs items={[{ to: '/', label: 'Главная' }]} current="Корзина" /><h1 className="font-lora text-[32px] font-bold text-neutral-900-alt mb-10">Корзина</h1><div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-10 xl:gap-16 items-start"><div>{rows.map(r => {
   const p = byId.get(String(r.id));
   const stock = (r.stock !== undefined ? r.stock : p?.stock) !== undefined ? Number(r.stock !== undefined ? r.stock : p?.stock) : undefined;
   const isMax = stock !== undefined && qtyForId(r.id) >= stock;

@@ -16,14 +16,6 @@
   padding-bottom: 60px; /* Ghost-button -> Футер (60) */
 }
 
-/* Хлебные крошки */
-.breadcrumb {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 13px;
-  color: #A0A0A0;
-  margin-bottom: 32px; /* Крошка -> Баннер (32) */
-}
-
 /* Баннер-заглушка */
 .banner-wrapper {
   width: 100%;

@@ -19,21 +19,6 @@
   margin-bottom: 21px; /* Заголовок - Блок с фильтрами (21) */
 }
 
-.catalog-breadcrumb {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 13px;
-  color: #A0A0A0;
-  margin-bottom: 23px; /* Крошка - Заголовок (23) */
-}
-
-.catalog-breadcrumb a {
-  color: #A0A0A0;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.catalog-breadcrumb a:hover { color: #4F3422; }
-
 .catalog-title {
   font-family: 'Lora', serif;
   font-size: 32px;
