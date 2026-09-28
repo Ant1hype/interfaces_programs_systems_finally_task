@@ -254,45 +254,45 @@ export default function Product() {
   const reviews=product.reviews||[];
   const avgRating=reviews.length?Math.round(reviews.reduce((s,r)=>s+(Number(r.rating)||0),0)/reviews.length*10)/10:0;
   const reviewsWord=(n=>{const a=n%100;if(a>=11&&a<=14)return 'отзывов';const b=n%10;if(b===1)return 'отзыв';if(b>=2&&b<=4)return 'отзыва';return 'отзывов';});
-  const starsRow=(rating)=>(<span className="flex gap-1.5" aria-label={`Оценка ${rating} из 5`}>{[1,2,3,4,5].map(d=>(<span key={d} className={`w-3 h-3 rounded-full ${d<=rating?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>);
+  const starsRow=(rating)=>(<span className="flex gap-1.5" aria-label={`Оценка ${rating} из 5`}>{[1,2,3,4,5].map(d=>(<span key={d} className={`w-3 h-3 2xl:w-4 2xl:h-4 rounded-full ${d<=rating?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>);
 
   const tabBtn=(key,label)=>(
-    <button onClick={()=>setActiveTab(key)} className={`pb-3 border-b-2 font-montserrat text-base font-semibold transition-colors ${activeTab===key?"border-accent-gold text-brand-900":"border-transparent text-neutral-500 hover:text-neutral-900-alt"}`}>{label}</button>
+    <button onClick={()=>setActiveTab(key)} className={`pb-3 border-b-2 font-montserrat text-base font-semibold px-6 first:pl-0 2xl:text-[20px] 2xl:pb-4 transition-colors ${activeTab===key?"border-accent-gold text-brand-900":"border-transparent text-neutral-500 hover:text-neutral-900-alt"}`}>{label}</button>
   );
 
   return (
     <div className="bg-surface-cream min-h-screen pb-[100px]">
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] py-6">
-        <nav className="text-xs text-neutral-350 mb-5 font-montserrat">
+        <nav className="text-xs 2xl:text-sm text-neutral-350 mb-5 font-montserrat">
           <Link to="/" className="hover:text-brand-900">Главная</Link> / <Link to="/catalog" className="hover:text-brand-900">Каталог</Link> / <span className="text-neutral-700">{product.name}</span>
         </nav>
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-10 lg:gap-16 mb-10">
           <div>
             <div
               onClick={handleOpenLightbox}
-              className="rounded-radius-lg overflow-hidden bg-surface-white border border-neutral-300 cursor-pointer"
+              className="rounded-radius-lg overflow-hidden bg-surface-white border border-neutral-300 cursor-pointer 2xl:max-w-[760px]"
             >
               <img src={mainImg||mainImage} alt={product.name} onError={()=>handleImgError(mainImg||mainImage)} className="w-full object-cover aspect-[4/3] block" />
             </div>
             {images.length>1 && (
-              <div className="flex gap-3 mt-4">
+              <div className="grid grid-cols-4 gap-4 mt-4">
                 {images.map((img,i)=>(
-                  <button key={img+i} onClick={()=>setMainImg(img)} className={`w-20 h-20 rounded-radius-md overflow-hidden border-2 ${(mainImg||mainImage)===img?"border-brand-900":"border-neutral-300"}`}><img src={img} alt="thumb" onError={()=>handleImgError(img)} className="w-full h-full object-cover" /></button>
+                  <button key={img+i} onClick={()=>setMainImg(img)} className={`aspect-square w-full rounded-radius-md overflow-hidden border-2 ${(mainImg||mainImage)===img?"border-brand-900":"border-neutral-300"}`}><img src={img} alt="thumb" onError={()=>handleImgError(img)} className="w-full h-full object-cover" /></button>
                 ))}
               </div>
             )}
           </div>
-          <div className="font-montserrat">
-            <h1 className="font-lora text-2xl lg:text-3xl font-bold text-neutral-900-alt mb-2">{product.name}</h1>
-            <p className="text-xl font-semibold text-neutral-black">{currentPrice} ₽ <span className="text-sm font-normal text-neutral-500">/ {selectedWeight} г</span></p>
-            <p className="text-xs text-neutral-350 mt-1">{isOut?"Нет в наличии":`В наличии ${stock} шт.`}</p>
+          <div className="font-montserrat 2xl:max-w-[560px]">
+            <h1 className="font-lora text-2xl lg:text-3xl 2xl:text-[40px] font-bold text-neutral-900-alt mb-2">{product.name}</h1>
+            <p className="text-xl 2xl:text-[32px] font-semibold text-neutral-black">{currentPrice} ₽ <span className="text-sm 2xl:text-base font-normal text-neutral-500">/ {selectedWeight} г</span></p>
+            <p className="text-xs 2xl:text-sm text-neutral-350 mt-1">{isOut?"Нет в наличии":`В наличии ${stock} шт.`}</p>
             <div className="border-t border-neutral-250 mt-4 pt-5">
-              <h3 className="font-semibold text-neutral-black mb-3">Характеристики</h3>
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-sm font-semibold text-neutral-black">Интенсивность вкуса</span>
-                <span className="flex gap-1.5">{[1,2,3,4,5].map(d=>(<span key={d} className={`w-3 h-3 rounded-full ${d<=product.taste?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>
+              <h3 className="font-semibold text-base 2xl:text-[22px] text-neutral-black mb-3">Характеристики</h3>
+              <div className="flex flex-col items-start gap-2 mb-3">
+                <span className="text-sm 2xl:text-base font-semibold text-neutral-black">Интенсивность вкуса</span>
+                <span className="flex gap-1.5">{[1,2,3,4,5].map(d=>(<span key={d} className={`w-3 h-3 2xl:w-4 2xl:h-4 rounded-full ${d<=product.taste?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>
               </div>
-              <div className="flex flex-col gap-2 text-sm">
+              <div className="flex flex-col gap-2 2xl:gap-2.5 text-sm 2xl:text-base">
                 <p className="text-neutral-500">Тип молока: <b className="text-neutral-black font-semibold">{product.milk}</b></p>
                 <p className="text-neutral-500">Выдержка: <b className="text-neutral-black font-semibold">{product.age}</b></p>
                 <p className="text-neutral-500">Добавки: <b className="text-neutral-black font-semibold">{product.additives}</b></p>
@@ -301,10 +301,10 @@ export default function Product() {
               </div>
             </div>
             <div className="mt-6">
-              <p className="text-sm font-semibold mb-2">Фасовка</p>
+              <p className="text-sm 2xl:text-base font-semibold mb-2">Фасовка</p>
               <div className="flex gap-2.5">
                 {[100,200,300].map(w=>(
-                  <button key={w} type="button" onClick={()=>setSelectedWeight(w)} className={`w-20 py-2.5 rounded-radius-md text-sm font-medium border transition-colors ${w===selectedWeight?"bg-brand-900 text-surface-white border-brand-900":"bg-surface-gray-fill text-neutral-400 border-border-toggle-off hover:bg-neutral-250"}`}>{w} г</button>
+                  <button key={w} type="button" onClick={()=>setSelectedWeight(w)} className={`w-20 2xl:w-24 py-2.5 2xl:py-3 rounded-radius-md text-sm 2xl:text-base font-medium border transition-colors ${w===selectedWeight?"bg-brand-900 text-surface-white border-brand-900":"bg-surface-gray-fill text-neutral-400 border-border-toggle-off hover:bg-neutral-250"}`}>{w} г</button>
                 ))}
               </div>
             </div>
@@ -333,26 +333,26 @@ export default function Product() {
                   setBtnText(null);
                 }, 1200);
               }}
-              className={`mt-4 w-full max-w-[320px] h-12 rounded-radius-lg font-semibold text-surface-white ${isOut?"bg-neutral-300 cursor-not-allowed":"bg-brand-900 hover:bg-brand-700"}`}
+              className={`mt-4 w-full max-w-[320px] 2xl:max-w-[420px] h-12 2xl:h-14 2xl:text-lg rounded-radius-lg font-semibold text-surface-white ${isOut?"bg-neutral-300 cursor-not-allowed":"bg-brand-900 hover:bg-brand-700"}`}
             >
               {btnText || 'В корзину'}
             </button>
             {!isOut && (
-              <p className="text-xs text-neutral-500 mt-2">Ближайшая доставка: завтра, {deliveryDate}</p>
+              <p className="text-xs 2xl:text-sm text-neutral-500 mt-2">Ближайшая доставка: завтра, {deliveryDate}</p>
             )}
           </div>
         </div>
-        <div className="border-b border-neutral-250 flex gap-6 mb-6">{tabBtn('desc','О продукте')}{tabBtn('info','Состав и ценность')}{tabBtn('reviews',`Отзывы (${reviews.length})`)}</div>
+        <div className="flex items-center divide-x divide-neutral-300 mb-6">{tabBtn('desc','О продукте')}{tabBtn('info','Состав и ценность')}{tabBtn('reviews',`Отзывы (${reviews.length})`)}</div>
         {activeTab==='desc' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 lg:max-w-[1280px] gap-8 font-montserrat text-sm leading-6 text-neutral-black">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:max-w-[1280px] gap-8 font-montserrat text-sm 2xl:text-base leading-6 2xl:leading-7 text-neutral-black">
             <div><h4 className="font-bold mb-2">{product.name}</h4><p className="mb-4">{product.description?.text1}</p><p>{product.description?.text2}</p></div>
-            <div className="bg-surface-white border border-neutral-250-a80 rounded-radius-lg p-5"><h4 className="font-bold mb-3">Гастрономические сочетания</h4><p className="mb-4">{product.description?.pairing1}</p><p>{product.description?.pairing2}</p></div>
+            <div><h4 className="font-bold mb-3">Гастрономические сочетания</h4><p className="mb-4">{product.description?.pairing1}</p><p>{product.description?.pairing2}</p></div>
           </div>
         )}
         {activeTab==='info' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 lg:max-w-[1280px] gap-8 font-montserrat text-sm leading-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:max-w-[1280px] gap-8 font-montserrat text-sm 2xl:text-base leading-6 2xl:leading-7">
             <div><h4 className="font-bold mb-2">Состав продукта</h4><p className="text-neutral-black mb-6">{product.ingredients}</p><h4 className="font-bold mb-2">Срок годности и хранение</h4><p className="text-neutral-black">{product.shelfLife}</p></div>
-            <div className="bg-surface-white border border-neutral-300 rounded-radius-xl p-6"><h4 className="font-bold text-neutral-black mb-5">Пищевая ценность (на 100 г)</h4><div className="grid grid-cols-2 gap-x-10 gap-y-6">{[[product.nutrition?.calories,'ккал'],[product.nutrition?.proteins,'г белки'],[product.nutrition?.fats,'г жиры'],[product.nutrition?.carbs,'г углеводы']].map(([val,label])=>(<div key={label}><p className="font-inter text-[28px] font-bold leading-none text-brand-900">{val}</p><p className="font-inter text-xs text-neutral-500 mt-2">{label}</p></div>))}</div></div>
+            <div className="bg-surface-white border border-neutral-300 rounded-radius-xl p-6"><h4 className="font-bold text-neutral-black mb-5">Пищевая ценность (на 100 г)</h4><div className="grid grid-cols-2 gap-x-10 gap-y-6">{[[product.nutrition?.calories,'ккал'],[product.nutrition?.proteins,'г белки'],[product.nutrition?.fats,'г жиры'],[product.nutrition?.carbs,'г углеводы']].map(([val,label])=>(<div key={label}><p className="font-inter text-[28px] 2xl:text-[36px] font-bold leading-none text-brand-900">{val}</p><p className="font-inter text-xs 2xl:text-sm text-neutral-500 mt-2">{label}</p></div>))}</div></div>
           </div>
         )}
         {activeTab==='reviews' && (
@@ -369,21 +369,21 @@ export default function Product() {
                       {r.pairing && <p className="text-xs text-neutral-600 mt-3">Пара: {r.pairing}</p>}
                     </div>
                     <div>
-                      <p className="text-sm text-neutral-black leading-6">{r.text}</p>
+                      <p className="text-sm 2xl:text-base text-neutral-black leading-6 2xl:leading-7">{r.text}</p>
                     </div>
                   </article>
                 ))}
               </div>
             )}
             <aside className="font-montserrat">
-              <p className="text-4xl font-bold text-neutral-black leading-none">{avgRating}</p>
+              <p className="text-4xl 2xl:text-5xl font-bold text-neutral-black leading-none">{avgRating}</p>
               <p className="text-xs text-neutral-500 mt-2">{reviews.length === 0 ? 'На основе 0 отзывов' : `На основе ${reviews.length}-х ${reviewsWord(reviews.length)}`}</p>
               <div className="mt-3">{starsRow(Math.floor(avgRating))}</div>
               <button type="button" onClick={handleOpenReviewModal} className="mt-6 w-full py-3 rounded-radius-md border border-brand-outline text-brand-outline bg-surface-white text-sm font-medium hover:bg-surface-cream transition-colors">Оставить отзыв</button>
             </aside>
           </div>
         )}
-        <div className="mt-12"><h2 className="font-lora text-2xl font-bold text-neutral-900-alt mb-6">С этим сыром покупают</h2><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{related.map(pp=>(<ProductCard key={pp.id} product={pp} />))}</div></div>
+        <div className="mt-12"><h2 className="font-lora text-2xl 2xl:text-[32px] font-bold text-neutral-900-alt mb-6">С этим сыром покупают</h2><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{related.map(pp=>(<ProductCard key={pp.id} product={pp} />))}</div></div>
       </div>
 
       {isReviewModalOpen && (
