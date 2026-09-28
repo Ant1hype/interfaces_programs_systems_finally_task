@@ -410,7 +410,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="w-full bg-surface-white font-montserrat min-h-[70vh] pb-[96px]">
+    <div className="w-full font-montserrat min-h-[70vh] pb-[96px]">
       <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto pt-[40px] pb-6 sm:pb-8">
         {/* Хлебные крошки */}
         <Breadcrumbs
@@ -636,9 +636,10 @@ export default function Profile() {
               </form>
             </div>
           ) : (
-            <div className="flex-1 w-full flex flex-col xl:flex-row gap-10 xl:gap-16 items-start justify-between">
+            <div className="flex-1 w-full flex flex-col xl:flex-row gap-10 xl:gap-16 items-start">
               {/* Блок Личные данные */}
-              <div className="w-full max-w-[480px]">
+              <div className="flex-1 min-w-0 flex justify-center">
+              <div className="w-full max-w-[640px]">
                 <h2 className="text-[22px] font-bold text-neutral-900-alt mb-6 font-montserrat">
                   Личные данные
                 </h2>
@@ -925,9 +926,10 @@ export default function Profile() {
                   </div>
                 </div>
               </div>
+              </div>
 
               {/* Правая колонка: Карта баланса */}
-              <div className="w-full xl:w-auto shrink-0 mt-6 xl:mt-0">
+              <div className="w-full sm:w-[400px] shrink-0 mt-6 xl:mt-0">
                 <div
                   className="relative rounded-2xl overflow-hidden p-6 text-white shadow-md flex flex-col justify-between w-full sm:w-[360px] min-h-[160px]"
                   style={{
