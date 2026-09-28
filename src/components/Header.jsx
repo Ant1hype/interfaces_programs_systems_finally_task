@@ -198,20 +198,16 @@ export default function Header() {
         aria-hidden={!isSearchOpen}
       >
         <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] max-w-[1920px] mx-auto py-6 md:py-8">
-          <form onSubmit={handleSearchSubmit} className="flex items-center gap-3 sm:gap-5" role="search">
-            <div className="flex items-center gap-3 flex-1 min-w-0 h-[48px] sm:h-[50px] pl-4 pr-2 backdrop-blur-xl bg-white/85 border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.12)] rounded-2xl focus-within:border-brand-900 transition-colors duration-200" style={{ backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', background: 'rgba(255, 255, 255, 0.95)', border: '1px solid rgba(255, 255, 255, 0.5)', boxShadow: '0 20px 60px rgba(0, 0, 0, 0.2)', borderRadius: '20px', padding: '16px 24px', margin: '20px 0 0', height: 'auto' }}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 shrink-0 text-neutral-600 pointer-events-none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Поиск по каталогу..." className="flex-1 min-w-0 h-full bg-transparent border-0 outline-none text-[14px] font-normal text-neutral-900-alt placeholder:text-neutral-600" />
-              <button type="submit" className="inline-flex items-center justify-center shrink-0 h-[36px] sm:h-[38px] px-5 sm:px-8 bg-brand-800 hover:bg-brand-700 transition-colors rounded-xl text-white">Найти</button>
+          <form onSubmit={handleSearchSubmit} className="flex items-center gap-4" role="search">
+            <div className="flex items-center flex-1 min-w-0 h-[52px] px-4 bg-white border border-[#E5E2DB] rounded-[12px] shadow-[0_2px_8px_rgba(0,0,0,0.06)] focus-within:border-brand-900 transition-colors duration-200">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 text-neutral-500 shrink-0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Поиск по каталогу..." className="flex-1 min-w-0 bg-transparent border-0 outline-none text-[16px] font-montserrat placeholder:text-neutral-500" />
             </div>
-            {/* Визуальный разделитель под поисковой панелью */}
-            <div style={{
-              height: '1px',
-              background: 'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.15) 15%, rgba(0,0,0,0.15) 85%, transparent 100%)',
-              marginTop: '12px'
-            }} />
-            <button type="button" onClick={closeSearch} aria-label="Закрыть поиск" className="shrink-0 flex items-center justify-center w-8 h-8 bg-transparent border-0 p-0 text-neutral-900-alt cursor-pointer transition-colors duration-200 hover:text-brand-900">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <button type="submit" className="h-[52px] px-8 rounded-[12px] bg-brand-900 text-surface-white font-montserrat font-medium text-[16px] hover:bg-brand-700 transition-colors duration-200 cursor-pointer border-0 shrink-0">
+              Найти
+            </button>
+            <button type="button" onClick={closeSearch} aria-label="Закрыть поиск" className="ml-2 bg-transparent border-0 p-0 font-montserrat font-medium text-[16px] text-neutral-900 hover:text-brand-900 transition-colors duration-200 cursor-pointer shrink-0">
+              Закрыть
             </button>
           </form>
           <div className="grid md:grid-cols-[260px_1fr] gap-8 lg:gap-12 mt-6 md:mt-8">
