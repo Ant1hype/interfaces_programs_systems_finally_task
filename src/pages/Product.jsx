@@ -52,7 +52,7 @@ function trimProduct(prod) {
 export default function Product() {
   const { id } = useParams();
   const { add, items } = useCart();
-  const { user } = useAuth();
+  const { user, isFavorite, toggleFavorite } = useAuth() || {};
   const { push } = useToast();
   const [product,setProduct]=useState(null);
   const [allProducts,setAllProducts]=useState([]);
@@ -248,6 +248,22 @@ export default function Product() {
   if(error) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-8">Ошибка: {error}</div>;
   if(!product) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-8">Сыр не найден</div>;
 
+  const isFav = isFavorite ? isFavorite(product.id) : false;
+
+  const handleFavClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      push('Войдите, чтобы сохранять избранное', 'error');
+      return;
+    }
+
+    if (toggleFavorite) {
+      toggleFavorite(product.id);
+    }
+  };
+
   const stock=product.stock??(product.inStock?5:0);
   const isOut=stock===0||product.inStock===false;
   const currentPrice=Math.round(product.price*(selectedWeight/100));
@@ -262,7 +278,7 @@ export default function Product() {
   );
 
   return (
-    <div className="bg-surface-cream min-h-screen pb-[100px]">
+    <div className="min-h-screen pb-[100px]">
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-6">
         <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/catalog', label: 'Каталог' }]} current={product.name} />
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-10 lg:gap-16 mb-14">
@@ -282,7 +298,28 @@ export default function Product() {
             )}
           </div>
           <div className="font-montserrat lg:max-w-[640px]">
-            <h1 className="font-lora text-2xl lg:text-3xl font-bold text-neutral-900-alt mb-2">{product.name}</h1>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="font-lora text-2xl lg:text-3xl font-bold text-neutral-900-alt mb-2">{product.name}</h1>
+              <button
+                type="button"
+                onClick={handleFavClick}
+                aria-label={isFav ? 'Убрать из избранного' : 'Добавить в избранное'}
+                className={`w-10 h-10 shrink-0 flex items-center justify-center bg-transparent border-0 cursor-pointer transition-colors${isFav ? ' text-danger-700' : ''}`}
+                style={isFav ? { color: 'var(--danger-700, #A61A1A)' } : undefined}
+              >
+                <svg
+                  className="w-6 h-6"
+                  viewBox="0 0 24 24"
+                  fill={isFav ? 'currentColor' : 'none'}
+                  stroke="currentColor"
+                  strokeWidth={isFav ? '1' : '2'}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+              </button>
+            </div>
             <p className="font-lora text-2xl lg:text-3xl font-bold text-neutral-black">{currentPrice} ₽ <span className="text-sm font-normal text-neutral-500">/ {selectedWeight} г</span></p>
             <p className="text-xs text-neutral-350 mt-1">{isOut?"Нет в наличии":`В наличии ${stock} шт.`}</p>
             <div className="border-t border-neutral-250 mt-4 pt-5">
