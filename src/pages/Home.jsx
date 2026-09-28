@@ -22,7 +22,9 @@ export default function Home() {
 
         {/* БАННЕР: ведет прямо на новую подборку «Изысканное» */}
         <Link to="/catalog?filter=exquisite" className="home-banner-link">
-          <div className="banner"></div>
+          <div className="banner-wrapper">
+            <img src="/images/banner.jpg" alt="Изысканная подборка" className="banner-img" />
+          </div>
         </Link>
 
         {/* Генерация рядов с товарами */}

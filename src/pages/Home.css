@@ -25,14 +25,18 @@
 }
 
 /* Баннер-заглушка */
-.banner {
+.banner-wrapper {
   width: 100%;
-  height: 400px;
-  background-image: url('/public/images/banner.jpg');
-  background-size: cover;
-  background-position: center;
+  aspect-ratio: 3/1;
+  overflow: hidden;
   border-radius: 16px;
-  margin-bottom: 26px; /* Баннер -> Подзаголовок 1 (26) */
+  margin-bottom: 26px;
+}
+.banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 /* Секции с товарами */
