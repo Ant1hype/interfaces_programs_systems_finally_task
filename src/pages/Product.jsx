@@ -244,9 +244,9 @@ export default function Product() {
     else if(mainImg===src) setMainImg('');
   };
 
-  if(loading) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] py-8 font-montserrat">Загрузка...</div>;
-  if(error) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] py-8">Ошибка: {error}</div>;
-  if(!product) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] py-8">Сыр не найден</div>;
+  if(loading) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-8 font-montserrat">Загрузка...</div>;
+  if(error) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-8">Ошибка: {error}</div>;
+  if(!product) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-8">Сыр не найден</div>;
 
   const stock=product.stock??(product.inStock?5:0);
   const isOut=stock===0||product.inStock===false;
