@@ -6,7 +6,7 @@ export default function SupportWidget() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="support-widget">
+    <div className="support-widget" style={{ zIndex: 40 }}>
       {/* Сам Попап */}
       <div className={`support-popup ${isOpen ? 'open' : ''}`}>
         <button className="close-btn" onClick={() => setIsOpen(false)}>×</button>
