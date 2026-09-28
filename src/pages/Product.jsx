@@ -266,7 +266,7 @@ export default function Product() {
         <nav className="text-xs text-neutral-350 mb-5 font-montserrat">
           <Link to="/" className="hover:text-brand-900">Главная</Link> / <Link to="/catalog" className="hover:text-brand-900">Каталог</Link> / <span className="text-neutral-700">{product.name}</span>
         </nav>
-        <div className="grid grid-cols-1 lg:grid-cols-[500px_1fr] gap-10 lg:gap-14 mb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-10 lg:gap-16 mb-10">
           <div>
             <div
               onClick={handleOpenLightbox}
@@ -344,19 +344,19 @@ export default function Product() {
         </div>
         <div className="border-b border-neutral-250 flex gap-6 mb-6">{tabBtn('desc','О продукте')}{tabBtn('info','Состав и ценность')}{tabBtn('reviews',`Отзывы (${reviews.length})`)}</div>
         {activeTab==='desc' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 font-montserrat text-sm leading-6 text-neutral-black">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:max-w-[1280px] gap-8 font-montserrat text-sm leading-6 text-neutral-black">
             <div><h4 className="font-bold mb-2">{product.name}</h4><p className="mb-4">{product.description?.text1}</p><p>{product.description?.text2}</p></div>
             <div className="bg-surface-white border border-neutral-250-a80 rounded-radius-lg p-5"><h4 className="font-bold mb-3">Гастрономические сочетания</h4><p className="mb-4">{product.description?.pairing1}</p><p>{product.description?.pairing2}</p></div>
           </div>
         )}
         {activeTab==='info' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 font-montserrat text-sm leading-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:max-w-[1280px] gap-8 font-montserrat text-sm leading-6">
             <div><h4 className="font-bold mb-2">Состав продукта</h4><p className="text-neutral-black mb-6">{product.ingredients}</p><h4 className="font-bold mb-2">Срок годности и хранение</h4><p className="text-neutral-black">{product.shelfLife}</p></div>
             <div className="bg-surface-white border border-neutral-300 rounded-radius-xl p-6"><h4 className="font-bold text-neutral-black mb-5">Пищевая ценность (на 100 г)</h4><div className="grid grid-cols-2 gap-x-10 gap-y-6">{[[product.nutrition?.calories,'ккал'],[product.nutrition?.proteins,'г белки'],[product.nutrition?.fats,'г жиры'],[product.nutrition?.carbs,'г углеводы']].map(([val,label])=>(<div key={label}><p className="font-inter text-[28px] font-bold leading-none text-brand-900">{val}</p><p className="font-inter text-xs text-neutral-500 mt-2">{label}</p></div>))}</div></div>
           </div>
         )}
         {activeTab==='reviews' && (
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] lg:max-w-[1100px] gap-8 items-start">
             {reviews.length===0 ? (
               <div className="bg-surface-cream border border-neutral-250-a80 rounded-radius-lg py-12 text-center text-neutral-500 font-montserrat">отзывов пока нет</div>
             ) : (
