@@ -243,9 +243,9 @@ export default function Product() {
     else if(mainImg===src) setMainImg('');
   };
 
-  if(loading) return <div className="max-w-[1200px] mx-auto px-4 py-8 font-montserrat">Загрузка...</div>;
-  if(error) return <div className="max-w-[1200px] mx-auto px-4 py-8">Ошибка: {error}</div>;
-  if(!product) return <div className="max-w-[1200px] mx-auto px-4 py-8">Сыр не найден</div>;
+  if(loading) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] py-8 font-montserrat">Загрузка...</div>;
+  if(error) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] py-8">Ошибка: {error}</div>;
+  if(!product) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] py-8">Сыр не найден</div>;
 
   const stock=product.stock??(product.inStock?5:0);
   const isOut=stock===0||product.inStock===false;
@@ -262,7 +262,7 @@ export default function Product() {
 
   return (
     <div className="bg-surface-cream min-h-screen pb-[100px]">
-      <div className="max-w-[1200px] mx-auto px-4 lg:px-6 py-6">
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] py-6">
         <nav className="text-xs text-neutral-350 mb-5 font-montserrat">
           <Link to="/" className="hover:text-brand-900">Главная</Link> / <Link to="/catalog" className="hover:text-brand-900">Каталог</Link> / <span className="text-neutral-700">{product.name}</span>
         </nav>
