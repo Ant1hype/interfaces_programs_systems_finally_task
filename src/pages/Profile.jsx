@@ -112,6 +112,9 @@ export default function Profile() {
   const [addressValue, setAddressValue] = useState('');
   const [addressSaving, setAddressSaving] = useState(false);
 
+  // Модальное окно просмотра заказа
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
   useEffect(() => {
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
@@ -136,6 +139,24 @@ export default function Profile() {
       setSubscribeSms(Boolean(user.subscribeSms));
     }
   }, [user]);
+
+  useEffect(() => {
+    document.body.style.overflow = selectedOrder ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [selectedOrder]);
+
+  useEffect(() => {
+    if (!selectedOrder) return undefined;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setSelectedOrder(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedOrder]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -494,7 +515,8 @@ export default function Profile() {
                     return (
                       <div
                         key={order.id}
-                        className="bg-white border border-neutral-200 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                        onClick={() => setSelectedOrder(order)}
+                        className="bg-white border border-neutral-200 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer"
                       >
                         <div className="sm:w-1/3">
                           <div className="font-bold text-[16px] text-neutral-900-alt">
@@ -515,7 +537,10 @@ export default function Profile() {
                           </span>
                           <button
                             type="button"
-                            onClick={() => handleRepeatOrder(order)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRepeatOrder(order);
+                            }}
                             className="bg-brand-800 hover:bg-brand-700 text-white text-[14px] sm:text-[15px] font-medium px-6 py-2.5 sm:px-7 sm:py-3 rounded-lg transition-colors cursor-pointer border-none"
                           >
                             Повторить
@@ -965,6 +990,168 @@ export default function Profile() {
           )}
         </div>
       </div>
+
+      {/* Модалка просмотра заказа */}
+      {selectedOrder ? (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md"
+          onClick={(e) => e.target === e.currentTarget && setSelectedOrder(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-[90vw] sm:max-w-[1080px] max-h-[85vh] overflow-y-auto p-6 sm:p-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              aria-label="Закрыть"
+              onClick={() => setSelectedOrder(null)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition-colors cursor-pointer border-none text-neutral-900-alt"
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path
+                  d="M1 1L13 13M13 1L1 13"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+
+            <h2 className="font-lora text-[24px] font-bold text-neutral-900-alt mb-6 pr-8">
+              Заказ № {formatOrderNumber(selectedOrder.id)}
+            </h2>
+
+            {(() => {
+              const addr = selectedOrder.address;
+              const addrText =
+                typeof addr === 'string'
+                  ? addr.trim()
+                  : addr && typeof addr === 'object'
+                  ? (addr.address || addr.text || addr.full || '').trim()
+                  : '';
+              const totalQty = Array.isArray(selectedOrder.items)
+                ? selectedOrder.items.reduce((sum, it) => sum + (Number(it?.qty) || 1), 0)
+                : 0;
+              return (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                  <div>
+                    <div className="text-[13px] text-neutral-500 mb-1">Статус</div>
+                    <div className="text-[15px] font-semibold text-neutral-900-alt">
+                      {getOrderStatus(selectedOrder)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[13px] text-neutral-500 mb-1">Дата заказа</div>
+                    <div className="text-[15px] font-semibold text-neutral-900-alt">
+                      {formatOrderDate(
+                        selectedOrder.date || selectedOrder.createdAt || selectedOrder.id
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[13px] text-neutral-500 mb-1">Адрес</div>
+                    <div className="text-[15px] font-semibold text-neutral-900-alt">
+                      {addrText || 'Самовывоз'}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[13px] text-neutral-500 mb-1">Всего товаров</div>
+                    <div className="text-[15px] font-semibold text-neutral-900-alt">
+                      {totalQty} шт.
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            <h3 className="font-semibold text-[18px] text-neutral-900-alt mb-4">Позиции</h3>
+            {Array.isArray(selectedOrder.items) && selectedOrder.items.length > 0 ? (
+              <div>
+                {selectedOrder.items.map((item, idx) => {
+                  const p = productsMap.get(String(item.id));
+                  const unitPrice = Math.round(
+                    (p?.price ?? item.price ?? 0) * ((item.pack || 100) / 100)
+                  );
+                  const lineSum = unitPrice * (item.qty || 1);
+                  return (
+                    <div
+                      key={item.id ?? idx}
+                      className="flex items-center gap-5 py-4 border-b border-neutral-200"
+                    >
+                      <img
+                        src={p?.images?.[0] || p?.image || item.image || ''}
+                        alt=""
+                        className="w-20 h-20 rounded-lg object-cover bg-neutral-100 shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-lora font-bold text-[18px] text-neutral-900-alt">
+                          {p?.name || item.name || 'Позиция'}
+                        </p>
+                        <p className="text-[14px] text-neutral-400 mt-1">
+                          Фасовка: {item.pack || 100} г
+                        </p>
+                      </div>
+                      <span
+                        aria-hidden="true"
+                        className="shrink-0 w-[88px] text-center border border-neutral-300 rounded-lg bg-white px-3 py-2 text-[15px] font-semibold text-neutral-900-alt"
+                      >
+                        {item.qty || 1} шт.
+                      </span>
+                      <span className="font-bold text-[17px] text-neutral-900-alt w-40 text-right shrink-0">
+                        {lineSum} ₽
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-[14px] text-neutral-500 py-3">
+                Список позиций для этого заказа недоступен.
+              </p>
+            )}
+
+            {(() => {
+              const addr = selectedOrder.address;
+              const text =
+                typeof addr === 'string'
+                  ? addr
+                  : addr && typeof addr === 'object'
+                  ? addr.address || addr.text || addr.full || ''
+                  : '';
+              if (!text) return null;
+              return (
+                <div>
+                  <h3 className="font-semibold text-[18px] text-neutral-900-alt mt-6 mb-2">
+                    Адрес доставки
+                  </h3>
+                  <p className="text-neutral-700 text-[15px]">{text}</p>
+                </div>
+              );
+            })()}
+
+            <div className="mt-6 pt-4 border-t border-neutral-300 flex justify-between items-center">
+              <span className="font-bold text-[18px] text-neutral-900-alt">Итого</span>
+              <span className="font-bold text-[18px] text-neutral-900-alt whitespace-nowrap">
+                {formatOrderTotal(selectedOrder)}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                handleRepeatOrder(selectedOrder);
+                setSelectedOrder(null);
+                navigate('/cart');
+              }}
+              className="mt-6 w-full bg-brand-800 hover:bg-brand-700 text-white py-3 rounded-lg font-medium transition-colors cursor-pointer border-none"
+            >
+              Повторить заказ
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
