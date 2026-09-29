@@ -1099,7 +1099,7 @@ export default function Profile() {
                       >
                         {item.qty || 1} шт.
                       </span>
-                      <span className="font-bold text-[17px] text-neutral-900-alt w-40 text-right shrink-0">
+                      <span className="font-bold text-[17px] text-neutral-900-alt w-32 text-right shrink-0">
                         {lineSum} ₽
                       </span>
                     </div>
