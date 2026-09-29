@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Navigate, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -14,6 +14,23 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // «Магическая линия» под табами (механизм перенесён из Header.jsx)
+  const [lineStyle, setLineStyle] = useState({ left: 0, width: 0, opacity: 0 });
+  const tabRefs = useRef([]);
+  const moveLine = (index) => {
+    const el = tabRefs.current[index];
+    if (el) setLineStyle({ left: el.offsetLeft, width: el.offsetWidth, opacity: 1 });
+  };
+  const activeIndex = activeTab === 'login' ? 0 : 1;
+  useEffect(() => {
+    moveLine(activeIndex);
+  }, [activeTab]);
+  useEffect(() => {
+    const onResize = () => moveLine(activeIndex);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [activeIndex]);
 
   if (user) {
     return <Navigate to="/" replace />;
@@ -130,16 +147,18 @@ export default function Auth() {
   };
 
   return (
-    <div className="w-full min-h-[calc(100vh-140px)] bg-[#FDFBF7] flex items-center justify-center px-4 py-12 md:py-20 font-montserrat">
+    <div className="w-full min-h-[calc(100vh-140px)] flex items-center justify-center px-4 py-12 md:py-20 font-montserrat">
       <div className="w-full max-w-[450px] bg-white rounded-[20px] shadow-[0_4px_24px_rgba(0,0,0,0.06)] p-8 md:p-10">
-        <div className="flex items-center gap-7 mb-8">
+        <div className="relative flex items-center gap-7 mb-8" onMouseLeave={() => moveLine(activeIndex)}>
           <button
             type="button"
             onClick={() => setActiveTab('login')}
-            className={`font-lora text-[26px] md:text-[28px] leading-tight pb-1 border-b-2 transition-colors ${
-              activeTab === 'login'
-                ? 'text-[#1A1A1A] border-[#1A1A1A]'
-                : 'text-[#C4C4C4] border-transparent hover:text-neutral-600'
+            ref={(el) => {
+              tabRefs.current[0] = el;
+            }}
+            onMouseEnter={() => moveLine(0)}
+            className={`font-lora text-[26px] md:text-[28px] leading-tight pb-1 transition-colors ${
+              activeTab === 'login' ? 'text-[#1A1A1A]' : 'text-[#C4C4C4] hover:text-neutral-600'
             }`}
           >
             Вход
@@ -147,14 +166,20 @@ export default function Auth() {
           <button
             type="button"
             onClick={() => setActiveTab('register')}
-            className={`font-lora text-[26px] md:text-[28px] leading-tight pb-1 border-b-2 transition-colors ${
-              activeTab === 'register'
-                ? 'text-[#1A1A1A] border-[#1A1A1A]'
-                : 'text-[#C4C4C4] border-transparent hover:text-neutral-600'
+            ref={(el) => {
+              tabRefs.current[1] = el;
+            }}
+            onMouseEnter={() => moveLine(1)}
+            className={`font-lora text-[26px] md:text-[28px] leading-tight pb-1 transition-colors ${
+              activeTab === 'register' ? 'text-[#1A1A1A]' : 'text-[#C4C4C4] hover:text-neutral-600'
             }`}
           >
             Регистрация
           </button>
+          <div
+            className="absolute bottom-0 h-0.5 bg-[#1A1A1A] pointer-events-none transition-[left,width,opacity] duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
+            style={lineStyle}
+          ></div>
         </div>
 
         {activeTab === 'register' ? (
