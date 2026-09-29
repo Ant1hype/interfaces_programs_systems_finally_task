@@ -2,6 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Footer() {
+  // Явная прокрутка вверх при клике на навигационные ссылки футера.
+  // Работает дополнительно к глобальному ScrollToTop (по location.pathname) — страховка от
+  // случая, когда переход выполняется на тот же самый маршрут и scroll не сбрасывается.
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <footer className="w-full bg-footer-bg font-montserrat">
       <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto pt-10 md:pt-[60px] pb-6 md:pb-[30px]">
@@ -105,16 +112,16 @@ export default function Footer() {
           </div>
           <div className="flex flex-col">
             <div className="font-lora text-[18px] font-semibold text-surface-white mb-5">В интернет-магазине</div>
-            <Link to="/delivery" className="block text-[14px] text-neutral-350 no-underline mb-3 transition-colors duration-200 hover:text-surface-white">Условия доставки</Link>
-            <Link to="/payment" className="block text-[14px] text-neutral-350 no-underline mb-3 transition-colors duration-200 hover:text-surface-white">Оплата и возврат</Link>
-            <Link to="/faq" className="block text-[14px] text-neutral-350 no-underline mb-3 transition-colors duration-200 hover:text-surface-white">Частые вопросы</Link>
-            <Link to="/about" className="block text-[14px] text-neutral-350 no-underline mb-3 transition-colors duration-200 hover:text-surface-white">О нас</Link>
+            <Link to="/delivery" onClick={scrollToTop} className="block text-[14px] text-neutral-350 no-underline mb-3 transition-colors duration-200 hover:text-surface-white">Условия доставки</Link>
+            <Link to="/payment" onClick={scrollToTop} className="block text-[14px] text-neutral-350 no-underline mb-3 transition-colors duration-200 hover:text-surface-white">Оплата и возврат</Link>
+            <Link to="/faq" onClick={scrollToTop} className="block text-[14px] text-neutral-350 no-underline mb-3 transition-colors duration-200 hover:text-surface-white">Частые вопросы</Link>
+            <Link to="/about" onClick={scrollToTop} className="block text-[14px] text-neutral-350 no-underline mb-3 transition-colors duration-200 hover:text-surface-white">О нас</Link>
           </div>
         </div>
         <div className="h-px bg-footer-divider mb-6 md:mb-[30px]"></div>
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
           <span className="text-[12px] text-neutral-350 text-center sm:text-left">© 2026 Сырная палитра. Все права защищены.</span>
-          <Link to="/terms" className="text-[12px] text-neutral-350 no-underline transition-colors duration-200 hover:text-surface-white text-center sm:text-right">
+          <Link to="/terms" onClick={scrollToTop} className="text-[12px] text-neutral-350 no-underline transition-colors duration-200 hover:text-surface-white text-center sm:text-right">
             Пользовательское соглашение
           </Link>
         </div>
