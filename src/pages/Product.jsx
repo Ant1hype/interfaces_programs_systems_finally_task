@@ -322,27 +322,27 @@ export default function Product() {
                 </svg>
               </button>
             </div>
-            <p className="font-lora text-2xl lg:text-3xl font-bold text-neutral-black">{currentPrice} ₽ <span className="text-sm font-normal text-neutral-700">/ {selectedWeight} г</span></p>
-            <p className="text-[15px] text-neutral-600 mt-1">{isOut?"Нет в наличии":`В наличии ${stock} шт.`}</p>
+            <p className="font-lora text-2xl lg:text-3xl font-bold text-neutral-black">{currentPrice} ₽ <span className="text-[18px] font-normal text-neutral-600">/ {selectedWeight} г</span></p>
+            <p className="text-[17px] text-neutral-600 mt-1">{isOut?"Нет в наличии":`В наличии ${stock} шт.`}</p>
             <div className="border-t border-neutral-250 mt-4 pt-5">
-              <h3 className="font-semibold text-base text-neutral-900 mb-3">Характеристики</h3>
+              <h3 className="font-bold text-[22px] text-neutral-900 mb-3">Характеристики</h3>
               <div className="flex flex-col items-start gap-2 mb-3">
-                <span className="text-[15px] font-semibold text-neutral-800">Интенсивность вкуса</span>
-                <span className="flex gap-1.5">{[1,2,3,4,5].map(d=>(<span key={d} className={`w-3 h-3 rounded-full ${d<=product.taste?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>
+                <span className="text-[18px] font-semibold text-neutral-800">Интенсивность вкуса</span>
+                <span className="flex gap-2">{[1,2,3,4,5].map(d=>(<span key={d} className={`w-6 h-6 rounded-full ${d<=product.taste?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>
               </div>
-              <div className="flex flex-col gap-2 text-[15px]">
-                <p className="text-neutral-800">Тип молока: <b className="text-neutral-black font-semibold">{product.milk}</b></p>
-                <p className="text-neutral-800">Выдержка: <b className="text-neutral-black font-semibold">{product.age}</b></p>
-                <p className="text-neutral-800">Добавки: <b className="text-neutral-black font-semibold">{product.additives}</b></p>
-                <p className="text-neutral-800">Особенности: <b className="text-neutral-black font-semibold">{product.features}</b></p>
-                <p className="text-neutral-800">Совместимость с вином: <b className="text-neutral-black font-semibold">{product.wine}</b></p>
+              <div className="flex flex-col space-y-3 text-[18px]">
+                <p className="text-neutral-600">Тип молока: <b className="text-neutral-900 font-semibold">{product.milk}</b></p>
+                <p className="text-neutral-600">Выдержка: <b className="text-neutral-900 font-semibold">{product.age}</b></p>
+                <p className="text-neutral-600">Добавки: <b className="text-neutral-900 font-semibold">{product.additives}</b></p>
+                <p className="text-neutral-600">Особенности: <b className="text-neutral-900 font-semibold">{product.features}</b></p>
+                <p className="text-neutral-600">Совместимость с вином: <b className="text-neutral-900 font-semibold">{product.wine}</b></p>
               </div>
             </div>
             <div className="mt-6">
-              <p className="text-sm font-semibold text-neutral-900 mb-2">Фасовка</p>
+              <p className="text-[18px] font-semibold text-neutral-800 mb-2">Фасовка</p>
               <div className="flex gap-2.5">
                 {[100,200,300].map(w=>(
-                  <button key={w} type="button" onClick={()=>setSelectedWeight(w)} className={`w-20 py-2.5 rounded-radius-md text-sm font-medium border transition-colors disabled:bg-[#f5f5f5] disabled:text-[#737373] disabled:border-[#e5e5e5] ${w===selectedWeight?"bg-brand-900 text-surface-white border-brand-900":"bg-white text-[#262626] border-[#a3a3a3] hover:bg-neutral-250"}`}>{w} г</button>
+                  <button key={w} type="button" onClick={()=>setSelectedWeight(w)} className={`h-12 px-6 rounded-radius-md text-[17px] font-medium border transition-colors disabled:bg-[#f5f5f5] disabled:text-[#737373] disabled:border-[#e5e5e5] ${w===selectedWeight?"bg-brand-900 text-surface-white border-brand-900":"bg-white text-[#262626] border-[#a3a3a3] hover:bg-neutral-250"}`}>{w} г</button>
                 ))}
               </div>
             </div>
@@ -371,12 +371,12 @@ export default function Product() {
                   setBtnText(null);
                 }, 1200);
               }}
-              className={`mt-4 w-full max-w-[320px] h-12 rounded-radius-lg font-semibold text-surface-white ${isOut?"bg-neutral-300 cursor-not-allowed":"bg-brand-900 hover:bg-brand-700"}`}
+              className={`mt-4 w-full max-w-[320px] h-14 rounded-radius-lg text-[18px] font-semibold text-surface-white ${isOut?"bg-neutral-300 cursor-not-allowed":"bg-brand-900 hover:bg-brand-700"}`}
             >
               {btnText || 'В корзину'}
             </button>
             {!isOut && (
-              <p className="text-[15px] text-neutral-800 mt-2">Ближайшая доставка: завтра, {deliveryDate}</p>
+              <p className="text-[17px] text-neutral-700 mt-2">Ближайшая доставка: завтра, {deliveryDate}</p>
             )}
           </div>
         </div>
