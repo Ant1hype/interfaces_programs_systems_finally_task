@@ -318,11 +318,13 @@ export default function Checkout() {
 
   if (items.length === 0) {
     return (
-      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat">
-        <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/cart', label: 'Корзина' }]} current="Оформление" />
+      <div className="w-full bg-[#ECEEF0] px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat">
+        <div className="[&_.breadcrumb]:text-neutral-900 [&_.breadcrumb__link]:text-neutral-900 [&_.breadcrumb__separator]:text-neutral-900 [&_.breadcrumb__current]:text-neutral-900 [&_.breadcrumb__current]:underline">
+          <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/cart', label: 'Корзина' }]} current="Оформление" />
+        </div>
         <h1 className="font-lora text-[32px] font-bold text-neutral-900-alt mb-10">Оформление заказа</h1>
         <div className="bg-surface-cream border border-neutral-250-a80 rounded-radius-xl py-16 px-6 text-center">
-          <p className="text-[18px] text-neutral-500 mb-6">Ваша корзина пуста</p>
+          <p className="text-[18px] text-neutral-700 mb-6">Ваша корзина пуста</p>
           <Link to="/catalog" className="inline-flex px-8 py-4 rounded-radius-lg bg-brand-900 text-surface-white font-medium no-underline hover:bg-brand-700">В каталог</Link>
         </div>
       </div>
@@ -330,8 +332,10 @@ export default function Checkout() {
   }
 
   return (
-    <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat">
-      <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/cart', label: 'Корзина' }]} current="Оформление" />
+    <div className="w-full bg-[#ECEEF0] px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat">
+      <div className="[&_.breadcrumb]:text-neutral-900 [&_.breadcrumb__link]:text-neutral-900 [&_.breadcrumb__separator]:text-neutral-900 [&_.breadcrumb__current]:text-neutral-900 [&_.breadcrumb__current]:underline">
+        <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/cart', label: 'Корзина' }]} current="Оформление" />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_360px] gap-10 xl:gap-16 items-start">
         <div>
@@ -356,7 +360,7 @@ export default function Checkout() {
                     if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
                   }}
                   placeholder="Иван"
-                  className={`w-full h-[48px] px-4 bg-surface-white border ${errors.name ? 'border-danger-700' : 'border-neutral-250-a80'} rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900`}
+                  className={`w-full h-[48px] px-4 bg-[#ECEEF0] border ${errors.name ? 'border-danger-700' : 'border-neutral-250-a80'} rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-500 outline-none focus:border-brand-900`}
                 />
                 {errors.name && <p className="text-[13px] text-danger-700 mt-1">{errors.name}</p>}
               </div>
@@ -369,7 +373,7 @@ export default function Checkout() {
                   onChange={handlePhoneChange}
                   onKeyDown={handlePhoneKeyDown}
                   placeholder="+7 (___) ___-__-__"
-                  className={`w-full h-[48px] px-4 bg-surface-white border ${errors.phone ? 'border-danger-700' : 'border-neutral-250-a80'} rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900`}
+                  className={`w-full h-[48px] px-4 bg-[#ECEEF0] border ${errors.phone ? 'border-danger-700' : 'border-neutral-250-a80'} rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-500 outline-none focus:border-brand-900`}
                 />
                 {errors.phone && <p className="text-[13px] text-danger-700 mt-1">{errors.phone}</p>}
               </div>
@@ -385,7 +389,7 @@ export default function Checkout() {
                   if (errors.email) setErrors((prev) => ({ ...prev, email: '' }));
                 }}
                 placeholder="example@mail.ru"
-                className={`w-full h-[48px] px-4 bg-surface-white border ${errors.email ? 'border-danger-700' : 'border-neutral-250-a80'} rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900`}
+                className={`w-full h-[48px] px-4 bg-[#ECEEF0] border ${errors.email ? 'border-danger-700' : 'border-neutral-250-a80'} rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-500 outline-none focus:border-brand-900`}
               />
               {errors.email && <p className="text-[13px] text-danger-700 mt-1">{errors.email}</p>}
             </div>
@@ -434,9 +438,9 @@ export default function Checkout() {
                         if (errors.address) setErrors((prev) => ({ ...prev, address: '' }));
                       }}
                       placeholder="г. Томск, ул. Сырная, д. 7, кв. 7"
-                      className={`w-full h-[48px] px-4 bg-surface-white border ${
+                      className={`w-full h-[48px] px-4 bg-[#ECEEF0] border ${
                         errors.address ? 'border-danger-700' : 'border-neutral-250-a80'
-                      } rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900`}
+                      } rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-500 outline-none focus:border-brand-900`}
                     />
                     {errors.address && <p className="text-[13px] text-danger-700 mt-1">{errors.address}</p>}
                   </div>
@@ -478,7 +482,7 @@ export default function Checkout() {
                   </div>
                 </>
               ) : (
-                <p className="text-[14px] text-neutral-700 py-2">
+                <p className="text-[14px] text-neutral-800 py-2">
                   Заберите из нашей лавки: г. Томск, ул. Сырная, д. 7
                 </p>
               )}
@@ -553,7 +557,7 @@ export default function Checkout() {
             <div className="mb-4">
               <div className="flex items-center justify-between text-[14px] mb-2">
                 <span className="text-neutral-black">Списать баллы</span>
-                <span className="text-neutral-400">Доступно: {balance}</span>
+                <span className="text-neutral-600">Доступно: {balance}</span>
               </div>
               <div className="relative flex items-center">
                 <input
@@ -562,7 +566,7 @@ export default function Checkout() {
                   value={pointsInput}
                   onChange={handlePointsChange}
                   placeholder="0"
-                  className="w-full h-[44px] pl-4 pr-16 bg-surface-white border border-neutral-250-a80 rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900"
+                  className="w-full h-[44px] pl-4 pr-16 bg-[#ECEEF0] border border-neutral-250-a80 rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-500 outline-none focus:border-brand-900"
                 />
                 <button
                   type="button"
@@ -581,7 +585,7 @@ export default function Checkout() {
               value={promoInput}
               onChange={(e) => setPromoInput(e.target.value)}
               placeholder="Введите промокод..."
-              className="flex-1 min-w-0 h-[44px] px-4 bg-surface-white border border-neutral-250-a80 rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900"
+              className="flex-1 min-w-0 h-[44px] px-4 bg-[#ECEEF0] border border-neutral-250-a80 rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-500 outline-none focus:border-brand-900"
             />
             <button
               type="submit"
