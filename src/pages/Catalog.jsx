@@ -36,29 +36,60 @@ const categoryMap = {
   'vegan': '100% Vegan'
 };
 
-// Нормализация строки для сравнений: обрезаем пробелы и приводим к нижнему регистру
-const norm = (value) => String(value == null ? '' : value).trim().toLowerCase();
+// Нормализация строки для сравнений: нижний регистр, «ё» приводим к «е», любая пунктуация
+// (в том числе кавычки-«ёлочки» и скобки) заменяется пробелом, повторные пробелы схлопываются
+const norm = (value) =>
+  String(value == null ? '' : value)
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim()
+    .replace(/\s+/g, ' ');
 
-// Текстовые поля товара, по которым идёт подстрочный поиск
-const searchableFields = (product) => [
+// Разбиваем нормализованную строку на значимые слова-токены
+const tokenize = (value) => norm(value).split(' ').filter(Boolean);
+
+// Поля «ядра» карточки — название и структурированные атрибуты товара.
+// Поиск начинается с них и не смотрит в маркетинговые тексты: именно поэтому
+// запрос «пармезан» выдавал «Пекорино» (в pairing1 лежит «Оригинальная замена пармезану…»).
+const coreSearchFields = (product) => [
   product.name,
+  product.category,
+  product.milk,
+  product.additives,
+  product.age,
+  product.features,
+  product.wine
+];
+
+// Запасные поля — описание и состав. Подключаются только когда по ядру ничего не нашлось,
+// чтобы не терять выдачу на редких запросах («плесень», «трюфель», названия из текста).
+const extendedSearchFields = (product) => [
+  ...coreSearchFields(product),
   product.description?.text1,
   product.description?.text2,
   product.description?.pairing1,
   product.description?.pairing2,
-  product.ingredients,
-  product.category
+  product.ingredients
 ];
 
-// Пресеты «Часто ищут»: ключ — label из панели поиска, значение — свой предикат
+// Совпадение запроса товару: каждый токен запроса должен встретиться хотя бы в одном из полей
+const matchesQuery = (product, tokens, fields) => {
+  const values = fields(product).map(norm);
+  return tokens.every((token) => values.some((field) => field.includes(token)));
+};
+
+// Пресеты «Часто ищут»: ключ — нормализованный label из панели поиска, значение — свой предикат.
+// Ключи нормализованы намеренно: запрос, набранный руками («пармезан», «  ТВЕРДЫЕ  сорта »,
+// «твёрдые сорта»), должен получать тот же сценарий, что и клик по готовой подсказке.
 const searchPresets = {
-  'Пармезан': (product) => norm(product.name).includes('пармезан'),
-  'Твердые сорта': (product) => norm(product.age).startsWith('выдержанный'),
-  'Сырная тарелка': (product) =>
+  [norm('Пармезан')]: (product) => norm(product.name).includes('пармезан'),
+  [norm('Твердые сорта')]: (product) => norm(product.age).startsWith('выдержанный'),
+  [norm('Сырная тарелка')]: (product) =>
     norm(product.category) === norm('Изысканное') ||
     [product.description?.text1, product.description?.text2, product.description?.pairing1, product.description?.pairing2]
       .some((field) => norm(field).includes('тарелк')),
-  'К красному сухому': (product) => norm(product.category) === norm('К красному сухому вину')
+  [norm('К красному сухому')]: (product) => norm(product.category) === norm('К красному сухому вину')
 };
 
 export default function Catalog() {
@@ -118,19 +149,35 @@ export default function Catalog() {
     setRows(3); // Сбрасываем пагинацию (ряды) при изменении фильтров
   };
 
+  // --- ПОИСКОВЫЙ КОНТЕКСТ ЗАПРОСА ---
+  // Пресет «Часто ищут» подбираем по нормализованному запросу: регистр, лишние пробелы и «ё»
+  // больше не ломают подмену готовой подсказки на слепой подстрочный поиск.
+  const searchPreset = searchTerm ? searchPresets[norm(searchTerm)] : undefined;
+
+  // Множество id товаров, подходящих под свободный запрос. Двухуровневое совпадение:
+  // сначала название и атрибуты товара, и лишь если прямых совпадений нет — описания и состав.
+  const searchMatchIds = useMemo(() => {
+    if (!searchTerm || searchPreset) return null;
+    const tokens = tokenize(searchTerm);
+    if (tokens.length === 0) return null;
+    const strict = products.filter((product) => matchesQuery(product, tokens, coreSearchFields));
+    const pool = strict.length > 0
+      ? strict
+      : products.filter((product) => matchesQuery(product, tokens, extendedSearchFields));
+    return new Set(pool.map((product) => product.id));
+  }, [searchTerm, searchPreset]);
+
   // --- СИСТЕМА ФИЛЬТРАЦИИ ---
   const filteredProducts = products.filter(product => {
     // 1. Глобальная подборка (из Шапки/Баннера)
     if (currentCategory && norm(product.category) !== norm(currentCategory)) return false;
 
-    // 2. Поиск по запросу: пресет «Часто ищут» либо подстрочный поиск по текстовым полям
+    // 2. Поиск по запросу: пресет «Часто ищут» либо подстрочный поиск по полям товара
     if (searchTerm) {
-      const preset = searchPresets[searchTerm];
-      if (preset) {
-        if (!preset(product)) return false;
-      } else {
-        const needle = norm(searchTerm);
-        if (!searchableFields(product).some(field => norm(field).includes(needle))) return false;
+      if (searchPreset) {
+        if (!searchPreset(product)) return false;
+      } else if (!searchMatchIds || !searchMatchIds.has(product.id)) {
+        return false;
       }
     }
 
@@ -191,24 +238,26 @@ export default function Catalog() {
           <Breadcrumbs items={[{ to: '/', label: 'Главная' }]} current={pageTitle} />
           
           <h1 className="catalog-title">{pageTitle}</h1>
-          
-          {/* СОРТИРОВКА (Dropdown) */}
-          <div className="catalog-sort-wrapper">
-            <Dropdown
-              value={selectedSort}
-              onChange={setSelectedSort}
-              options={sortOptions}
-              placeholder="По популярности"
-              ariaLabel="Сортировка товаров"
-            />
-          </div>
         </div>
 
         <div className="catalog-content">
           
           {/* САЙДБАР С ФИЛЬТРАМИ */}
           <aside className="catalog-sidebar">
-            
+
+            {/* СОРТИРОВКА (Dropdown) — переехал из шапки в панель фильтров:
+                стоит слева и наследует ширину сайдбара (280px - 2*20px = 240px) */}
+            <div className="filter-group" style={{ marginBottom: 32 }}>
+              <span className="filter-title">Сортировка</span>
+              <Dropdown
+                value={selectedSort}
+                onChange={setSelectedSort}
+                options={sortOptions}
+                placeholder="По популярности"
+                ariaLabel="Сортировка товаров"
+              />
+            </div>
+
             {/* Тумблер */}
             <div className="filter-group filter-group--inline toggle-box">
               <span className="filter-title">В наличии</span>

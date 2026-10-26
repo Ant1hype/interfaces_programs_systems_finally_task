@@ -2,6 +2,17 @@
    @import должен идти до @tailwind-директив, иначе PostCSS поднимет его ниже и CSS будет невалиден. */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Lora:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
 
+/* Самый нижний слой фона всех страниц — кремовый. Объявлено до @tailwind-директив,
+   чтобы локальные bg-* у секций/карточек перекрывали его только там, где нужно. */
+body {
+  background-color: #fdfbf7;
+  margin: 0;
+}
+
+html {
+  font-size: clamp(14px, 12.7px + 0.23vw, 19px);
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -79,7 +90,7 @@
 
 body {
   font-family: 'Montserrat', sans-serif;
-  background-color: #FAFAFA; /* Легкий светлый фон для сайта */
+  /* background-color у body задан единственным местом выше (до @tailwind-директив): #fdfbf7 */
   color: #000000;
   overflow-x: hidden; /* Запрещаем горизонтальный скролл навсегда */
 }

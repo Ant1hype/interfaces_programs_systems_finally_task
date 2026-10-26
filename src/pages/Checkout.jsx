@@ -319,10 +319,12 @@ export default function Checkout() {
   if (items.length === 0) {
     return (
       <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat">
-        <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/cart', label: 'Корзина' }]} current="Оформление" />
+        <div className="[&_.breadcrumb__link]:text-neutral-700 [&_.breadcrumb__link:hover]:text-brand-900 [&_.breadcrumb__current]:text-neutral-900 [&_.breadcrumb__current]:underline">
+          <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/cart', label: 'Корзина' }]} current="Оформление" />
+        </div>
         <h1 className="font-lora text-[32px] font-bold text-neutral-900-alt mb-10">Оформление заказа</h1>
         <div className="bg-surface-cream border border-neutral-250-a80 rounded-radius-xl py-16 px-6 text-center">
-          <p className="text-[18px] text-neutral-500 mb-6">Ваша корзина пуста</p>
+          <p className="text-[18px] text-neutral-800 mb-6">Ваша корзина пуста</p>
           <Link to="/catalog" className="inline-flex px-8 py-4 rounded-radius-lg bg-brand-900 text-surface-white font-medium no-underline hover:bg-brand-700">В каталог</Link>
         </div>
       </div>
@@ -331,14 +333,16 @@ export default function Checkout() {
 
   return (
     <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat">
-      <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/cart', label: 'Корзина' }]} current="Оформление" />
+      <div className="[&_.breadcrumb__link]:text-neutral-700 [&_.breadcrumb__link:hover]:text-brand-900 [&_.breadcrumb__current]:text-neutral-900 [&_.breadcrumb__current]:underline">
+        <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/cart', label: 'Корзина' }]} current="Оформление" />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_360px] gap-10 xl:gap-16 items-start">
         <div>
           <div className="flex flex-wrap items-baseline justify-between gap-4 mb-6">
             <h1 className="font-lora text-[32px] font-bold text-neutral-900-alt">Оформление заказа</h1>
             {!user && (
-              <span className="text-[14px] text-neutral-black">
+              <span className="text-[15px] text-neutral-black">
                 Уже есть аккаунт? <Link to="/auth" className="font-bold underline text-neutral-black hover:text-brand-900">Войти</Link>
               </span>
             )}
@@ -347,7 +351,7 @@ export default function Checkout() {
           <form onSubmit={handleSubmit} noValidate>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-[14px] text-neutral-black mb-2">Ваше имя</label>
+                <label className="block text-[15px] text-neutral-800 mb-2">Ваше имя</label>
                 <input
                   type="text"
                   value={name}
@@ -356,27 +360,27 @@ export default function Checkout() {
                     if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
                   }}
                   placeholder="Иван"
-                  className={`w-full h-[48px] px-4 bg-surface-white border ${errors.name ? 'border-danger-700' : 'border-neutral-250-a80'} rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900`}
+                  className={`w-full h-[48px] px-4 bg-surface-white border ${errors.name ? 'border-danger-700' : 'border-neutral-300'} rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900`}
                 />
-                {errors.name && <p className="text-[13px] text-danger-700 mt-1">{errors.name}</p>}
+                {errors.name && <p className="text-[15px] text-danger-700 mt-1">{errors.name}</p>}
               </div>
 
               <div>
-                <label className="block text-[14px] text-neutral-black mb-2">Номер телефона</label>
+                <label className="block text-[15px] text-neutral-800 mb-2">Номер телефона</label>
                 <input
                   type="tel"
                   value={phoneDisplay}
                   onChange={handlePhoneChange}
                   onKeyDown={handlePhoneKeyDown}
                   placeholder="+7 (___) ___-__-__"
-                  className={`w-full h-[48px] px-4 bg-surface-white border ${errors.phone ? 'border-danger-700' : 'border-neutral-250-a80'} rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900`}
+                  className={`w-full h-[48px] px-4 bg-surface-white border ${errors.phone ? 'border-danger-700' : 'border-neutral-300'} rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900`}
                 />
-                {errors.phone && <p className="text-[13px] text-danger-700 mt-1">{errors.phone}</p>}
+                {errors.phone && <p className="text-[15px] text-danger-700 mt-1">{errors.phone}</p>}
               </div>
             </div>
 
             <div className="mb-6">
-              <label className="block text-[14px] text-neutral-black mb-2">Email</label>
+              <label className="block text-[15px] text-neutral-800 mb-2">Email</label>
               <input
                 type="email"
                 value={email}
@@ -385,13 +389,13 @@ export default function Checkout() {
                   if (errors.email) setErrors((prev) => ({ ...prev, email: '' }));
                 }}
                 placeholder="example@mail.ru"
-                className={`w-full h-[48px] px-4 bg-surface-white border ${errors.email ? 'border-danger-700' : 'border-neutral-250-a80'} rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900`}
+                className={`w-full h-[48px] px-4 bg-surface-white border ${errors.email ? 'border-danger-700' : 'border-neutral-300'} rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900`}
               />
-              {errors.email && <p className="text-[13px] text-danger-700 mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-[15px] text-danger-700 mt-1">{errors.email}</p>}
             </div>
 
             <div className="mb-6">
-              <h2 className="font-montserrat text-[18px] font-bold text-neutral-black mb-3">Способ получения</h2>
+              <h2 className="font-montserrat text-[18px] font-bold text-neutral-900 mb-3">Способ получения</h2>
               <div className="flex flex-wrap gap-3 mb-4">
                 <button
                   type="button"
@@ -425,7 +429,7 @@ export default function Checkout() {
               {delivery === 'Доставка курьером' ? (
                 <>
                   <div className="mb-4">
-                    <label className="block text-[14px] text-neutral-black mb-2">Адрес доставки</label>
+                    <label className="block text-[15px] text-neutral-800 mb-2">Адрес доставки</label>
                     <input
                       type="text"
                       value={address}
@@ -435,15 +439,15 @@ export default function Checkout() {
                       }}
                       placeholder="г. Томск, ул. Сырная, д. 7, кв. 7"
                       className={`w-full h-[48px] px-4 bg-surface-white border ${
-                        errors.address ? 'border-danger-700' : 'border-neutral-250-a80'
-                      } rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900`}
+                        errors.address ? 'border-danger-700' : 'border-neutral-300'
+                      } rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900`}
                     />
-                    {errors.address && <p className="text-[13px] text-danger-700 mt-1">{errors.address}</p>}
+                    {errors.address && <p className="text-[15px] text-danger-700 mt-1">{errors.address}</p>}
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[14px] text-neutral-black mb-2">Дата доставки</label>
+                      <label className="block text-[15px] text-neutral-800 mb-2">Дата доставки</label>
                       <Dropdown
                         value={deliveryDate}
                         onChange={(nextValue) => {
@@ -455,12 +459,12 @@ export default function Checkout() {
                         ariaLabel="Дата доставки"
                       />
                       {errors.deliveryDate && (
-                        <p className="text-[13px] text-danger-700 mt-1">{errors.deliveryDate}</p>
+                        <p className="text-[15px] text-danger-700 mt-1">{errors.deliveryDate}</p>
                       )}
                     </div>
 
                     <div>
-                      <label className="block text-[14px] text-neutral-black mb-2">Временной интервал</label>
+                      <label className="block text-[15px] text-neutral-800 mb-2">Временной интервал</label>
                       <Dropdown
                         value={deliverySlot}
                         onChange={(nextValue) => {
@@ -472,20 +476,20 @@ export default function Checkout() {
                         ariaLabel="Временной интервал доставки"
                       />
                       {errors.deliverySlot && (
-                        <p className="text-[13px] text-danger-700 mt-1">{errors.deliverySlot}</p>
+                        <p className="text-[15px] text-danger-700 mt-1">{errors.deliverySlot}</p>
                       )}
                     </div>
                   </div>
                 </>
               ) : (
-                <p className="text-[14px] text-neutral-700 py-2">
+                <p className="text-[15px] text-neutral-800 py-2">
                   Заберите из нашей лавки: г. Томск, ул. Сырная, д. 7
                 </p>
               )}
             </div>
 
             <div className="mb-8">
-              <h2 className="font-montserrat text-[18px] font-bold text-neutral-black mb-3">Способ оплаты</h2>
+              <h2 className="font-montserrat text-[18px] font-bold text-neutral-900 mb-3">Способ оплаты</h2>
               <div className="space-y-3">
                 <label className="flex items-center gap-3 cursor-pointer select-none">
                   <span
@@ -551,9 +555,9 @@ export default function Checkout() {
 
           {user && balance > 0 && (
             <div className="mb-4">
-              <div className="flex items-center justify-between text-[14px] mb-2">
-                <span className="text-neutral-black">Списать баллы</span>
-                <span className="text-neutral-400">Доступно: {balance}</span>
+              <div className="flex items-center justify-between text-[15px] mb-2">
+                <span className="text-neutral-800">Списать баллы</span>
+                <span className="text-neutral-600">Доступно: {balance}</span>
               </div>
               <div className="relative flex items-center">
                 <input
@@ -562,7 +566,7 @@ export default function Checkout() {
                   value={pointsInput}
                   onChange={handlePointsChange}
                   placeholder="0"
-                  className="w-full h-[44px] pl-4 pr-16 bg-surface-white border border-neutral-250-a80 rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900"
+                  className="w-full h-[44px] pl-4 pr-16 bg-surface-white border border-neutral-300 rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900"
                 />
                 <button
                   type="button"
@@ -581,7 +585,7 @@ export default function Checkout() {
               value={promoInput}
               onChange={(e) => setPromoInput(e.target.value)}
               placeholder="Введите промокод..."
-              className="flex-1 min-w-0 h-[44px] px-4 bg-surface-white border border-neutral-250-a80 rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900"
+              className="flex-1 min-w-0 h-[44px] px-4 bg-surface-white border border-neutral-300 rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900"
             />
             <button
               type="submit"
@@ -593,9 +597,9 @@ export default function Checkout() {
               </svg>
             </button>
           </form>
-          {promoError && <p className="text-[13px] text-danger-700 mb-4">{promoError}</p>}
+          {promoError && <p className="text-[15px] text-danger-700 mb-4">{promoError}</p>}
           {appliedPromo && !promoError && (
-            <p className="text-[13px] text-brand-700 mb-4">Промокод {appliedPromo} применён</p>
+            <p className="text-[15px] text-brand-700 mb-4">Промокод {appliedPromo} применён</p>
           )}
           <button
             type="button"

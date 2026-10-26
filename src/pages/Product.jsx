@@ -274,13 +274,15 @@ export default function Product() {
   const starsRow=(rating)=>(<span className="flex gap-1.5" aria-label={`Оценка ${rating} из 5`}>{[1,2,3,4,5].map(d=>(<span key={d} className={`w-3 h-3 rounded-full ${d<=rating?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>);
 
   const tabBtn=(key,label)=>(
-    <button onClick={()=>setActiveTab(key)} className={`pb-3 font-montserrat text-base font-semibold px-6 first:pl-0 transition-colors ${activeTab===key?"text-brand-900":"text-neutral-500 hover:text-neutral-900-alt"}`}>{label}</button>
+    <button onClick={()=>setActiveTab(key)} className={`py-4 font-montserrat text-[17px] font-semibold px-6 first:pl-0 transition-colors border-b-2 ${activeTab===key?"text-neutral-900 !border-b-brand-900":"text-neutral-600 !border-b-transparent hover:text-neutral-900"}`}>{label}</button>
   );
 
   return (
     <div className="min-h-screen pb-[100px]">
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-6">
-        <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/catalog', label: 'Каталог' }]} current={product.name} />
+        <div className="[&_.breadcrumb__link]:text-neutral-700 [&_.breadcrumb__link:hover]:text-brand-900 [&_.breadcrumb__current]:text-neutral-900 [&_.breadcrumb__current]:underline">
+          <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/catalog', label: 'Каталог' }]} current={product.name} />
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-10 lg:gap-16 mb-14">
           <div>
             <div
@@ -320,31 +322,31 @@ export default function Product() {
                 </svg>
               </button>
             </div>
-            <p className="font-lora text-2xl lg:text-3xl font-bold text-neutral-black">{currentPrice} ₽ <span className="text-sm font-normal text-neutral-500">/ {selectedWeight} г</span></p>
-            <p className="text-xs text-neutral-350 mt-1">{isOut?"Нет в наличии":`В наличии ${stock} шт.`}</p>
+            <p className="font-lora text-2xl lg:text-3xl font-bold text-neutral-black">{currentPrice} ₽ <span className="text-sm font-normal text-neutral-700">/ {selectedWeight} г</span></p>
+            <p className="text-[15px] text-neutral-600 mt-1">{isOut?"Нет в наличии":`В наличии ${stock} шт.`}</p>
             <div className="border-t border-neutral-250 mt-4 pt-5">
-              <h3 className="font-semibold text-base text-neutral-black mb-3">Характеристики</h3>
+              <h3 className="font-semibold text-base text-neutral-900 mb-3">Характеристики</h3>
               <div className="flex flex-col items-start gap-2 mb-3">
-                <span className="text-sm font-semibold text-neutral-black">Интенсивность вкуса</span>
+                <span className="text-[15px] font-semibold text-neutral-800">Интенсивность вкуса</span>
                 <span className="flex gap-1.5">{[1,2,3,4,5].map(d=>(<span key={d} className={`w-3 h-3 rounded-full ${d<=product.taste?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>
               </div>
-              <div className="flex flex-col gap-2 text-sm">
-                <p className="text-neutral-500">Тип молока: <b className="text-neutral-black font-semibold">{product.milk}</b></p>
-                <p className="text-neutral-500">Выдержка: <b className="text-neutral-black font-semibold">{product.age}</b></p>
-                <p className="text-neutral-500">Добавки: <b className="text-neutral-black font-semibold">{product.additives}</b></p>
-                <p className="text-neutral-500">Особенности: <b className="text-neutral-black font-semibold">{product.features}</b></p>
-                <p className="text-neutral-500">Совместимость с вином: <b className="text-neutral-black font-semibold">{product.wine}</b></p>
+              <div className="flex flex-col gap-2 text-[15px]">
+                <p className="text-neutral-800">Тип молока: <b className="text-neutral-black font-semibold">{product.milk}</b></p>
+                <p className="text-neutral-800">Выдержка: <b className="text-neutral-black font-semibold">{product.age}</b></p>
+                <p className="text-neutral-800">Добавки: <b className="text-neutral-black font-semibold">{product.additives}</b></p>
+                <p className="text-neutral-800">Особенности: <b className="text-neutral-black font-semibold">{product.features}</b></p>
+                <p className="text-neutral-800">Совместимость с вином: <b className="text-neutral-black font-semibold">{product.wine}</b></p>
               </div>
             </div>
             <div className="mt-6">
-              <p className="text-sm font-semibold mb-2">Фасовка</p>
+              <p className="text-sm font-semibold text-neutral-900 mb-2">Фасовка</p>
               <div className="flex gap-2.5">
                 {[100,200,300].map(w=>(
-                  <button key={w} type="button" onClick={()=>setSelectedWeight(w)} className={`w-20 py-2.5 rounded-radius-md text-sm font-medium border transition-colors ${w===selectedWeight?"bg-brand-900 text-surface-white border-brand-900":"bg-surface-gray-fill text-neutral-400 border-border-toggle-off hover:bg-neutral-250"}`}>{w} г</button>
+                  <button key={w} type="button" onClick={()=>setSelectedWeight(w)} className={`w-20 py-2.5 rounded-radius-md text-sm font-medium border transition-colors disabled:bg-[#f5f5f5] disabled:text-[#737373] disabled:border-[#e5e5e5] ${w===selectedWeight?"bg-brand-900 text-surface-white border-brand-900":"bg-white text-[#262626] border-[#a3a3a3] hover:bg-neutral-250"}`}>{w} г</button>
                 ))}
               </div>
             </div>
-            {isOut && <div className="mt-4 text-sm text-neutral-500">Нет в наличии</div>}
+            {isOut && <div className="mt-4 text-[15px] text-neutral-800">Нет в наличии</div>}
             <button
               type="button"
               disabled={isOut}
@@ -374,27 +376,27 @@ export default function Product() {
               {btnText || 'В корзину'}
             </button>
             {!isOut && (
-              <p className="text-xs text-neutral-500 mt-2">Ближайшая доставка: завтра, {deliveryDate}</p>
+              <p className="text-[15px] text-neutral-800 mt-2">Ближайшая доставка: завтра, {deliveryDate}</p>
             )}
           </div>
         </div>
         <div className="flex items-center divide-x divide-neutral-300 mb-8">{tabBtn('desc','О продукте')}{tabBtn('info','Состав и ценность')}{tabBtn('reviews',`Отзывы (${reviews.length})`)}</div>
         {activeTab==='desc' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 lg:max-w-[1280px] gap-8 font-montserrat text-sm leading-6 text-neutral-black">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:max-w-[1280px] gap-8 font-montserrat text-[15px] leading-6 text-neutral-800">
             <div><h4 className="font-bold mb-2">{product.name}</h4><p className="mb-4">{product.description?.text1}</p><p>{product.description?.text2}</p></div>
             <div><h4 className="font-bold mb-3">Гастрономические сочетания</h4><p className="mb-4">{product.description?.pairing1}</p><p>{product.description?.pairing2}</p></div>
           </div>
         )}
         {activeTab==='info' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 lg:max-w-[1280px] gap-8 font-montserrat text-sm leading-6">
-            <div><h4 className="font-bold mb-2">Состав продукта</h4><p className="text-neutral-black mb-6">{product.ingredients}</p><h4 className="font-bold mb-2">Срок годности и хранение</h4><p className="text-neutral-black">{product.shelfLife}</p></div>
-            <div className="bg-surface-white border border-neutral-300 rounded-radius-xl p-6"><h4 className="font-bold text-neutral-black mb-5">Пищевая ценность (на 100 г)</h4><div className="grid grid-cols-2 gap-x-10 gap-y-6">{[[product.nutrition?.calories,'ккал'],[product.nutrition?.proteins,'г белки'],[product.nutrition?.fats,'г жиры'],[product.nutrition?.carbs,'г углеводы']].map(([val,label])=>(<div key={label}><p className="font-inter text-[28px] font-bold leading-none text-brand-900">{val}</p><p className="font-inter text-xs text-neutral-500 mt-2">{label}</p></div>))}</div></div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:max-w-[1280px] gap-8 font-montserrat text-[15px] leading-6">
+            <div><h4 className="font-bold mb-2">Состав продукта</h4><p className="text-neutral-800 mb-6">{product.ingredients}</p><h4 className="font-bold mb-2">Срок годности и хранение</h4><p className="text-neutral-800">{product.shelfLife}</p></div>
+            <div className="bg-surface-white border border-neutral-300 rounded-radius-xl p-6"><h4 className="font-bold text-neutral-900 mb-5">Пищевая ценность (на 100 г)</h4><div className="grid grid-cols-2 gap-x-10 gap-y-6">{[[product.nutrition?.calories,'ккал'],[product.nutrition?.proteins,'г белки'],[product.nutrition?.fats,'г жиры'],[product.nutrition?.carbs,'г углеводы']].map(([val,label])=>(<div key={label}><p className="font-inter text-[28px] font-bold leading-none text-brand-900">{val}</p><p className="font-inter text-[15px] text-neutral-800 mt-2">{label}</p></div>))}</div></div>
           </div>
         )}
         {activeTab==='reviews' && (
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] lg:max-w-[1100px] gap-8 items-start">
             {reviews.length===0 ? (
-              <div className="bg-surface-cream border border-neutral-250-a80 rounded-radius-lg py-12 text-center text-neutral-500 font-montserrat">отзывов пока нет</div>
+              <div className="bg-surface-cream border border-neutral-250-a80 rounded-radius-lg py-12 text-center text-neutral-800 font-montserrat">отзывов пока нет</div>
             ) : (
               <div className="flex flex-col gap-4">
                 {reviews.map(r=>(
@@ -402,10 +404,10 @@ export default function Product() {
                     <div>
                       <p className="font-bold text-neutral-black">{r.author}</p>
                       <div className="mt-3">{starsRow(r.rating)}</div>
-                      {r.pairing && <p className="text-xs text-neutral-600 mt-3">Пара: {r.pairing}</p>}
+                      {r.pairing && <p className="text-[15px] text-neutral-800 mt-3">Пара: {r.pairing}</p>}
                     </div>
                     <div>
-                      <p className="text-sm text-neutral-black leading-6">{r.text}</p>
+                      <p className="text-[15px] text-neutral-800 leading-6">{r.text}</p>
                     </div>
                   </article>
                 ))}
@@ -413,7 +415,7 @@ export default function Product() {
             )}
             <aside className="font-montserrat">
               <p className="text-4xl font-bold text-neutral-black leading-none">{avgRating}</p>
-              <p className="text-xs text-neutral-500 mt-2">{reviews.length === 0 ? 'На основе 0 отзывов' : `На основе ${reviews.length}-х ${reviewsWord(reviews.length)}`}</p>
+              <p className="text-[15px] text-neutral-800 mt-2">{reviews.length === 0 ? 'На основе 0 отзывов' : `На основе ${reviews.length}-х ${reviewsWord(reviews.length)}`}</p>
               <div className="mt-3">{starsRow(Math.floor(avgRating))}</div>
               <button type="button" onClick={handleOpenReviewModal} className="mt-6 w-full py-3 rounded-radius-md border border-brand-outline text-brand-outline bg-surface-white text-sm font-medium hover:bg-surface-cream transition-colors">Оставить отзыв</button>
             </aside>
@@ -440,7 +442,7 @@ export default function Product() {
               value={reviewText}
               onChange={(e) => setReviewText(e.target.value)}
               placeholder={'Напишите что думаете о данном товаре . . .'.trim()}
-              className="w-full h-[150px] p-5 rounded-radius-lg border border-neutral-300 text-neutral-black placeholder:text-neutral-400 focus:outline-none focus:border-brand-900 resize-none text-[15px] leading-relaxed transition-colors"
+              className="w-full h-[150px] p-5 rounded-radius-lg border border-neutral-300 text-neutral-black placeholder:text-neutral-500 focus:outline-none focus:border-brand-900 resize-none text-[15px] leading-relaxed transition-colors"
             />
 
             <div className="flex gap-4 mt-6 mb-8">
@@ -464,7 +466,7 @@ export default function Product() {
                       strokeWidth="1.6"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="w-8 h-8 text-neutral-350"
+                      className="w-8 h-8 text-neutral-600"
                     >
                       <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
                     </svg>

@@ -46,7 +46,7 @@ export default function Forgot() {
   };
 
   return (
-    <div className="w-full min-h-[calc(100vh-140px)] bg-[#FDFBF7] flex items-center justify-center px-4 py-12 md:py-20 font-montserrat">
+    <div className="w-full min-h-[calc(100vh-140px)] flex items-center justify-center px-4 py-12 md:py-20 font-montserrat">
       <div className="w-full max-w-[480px] bg-white rounded-[20px] shadow-[0_4px_24px_rgba(0,0,0,0.06)] p-8 md:p-10">
         {!isSent ? (
           <div>

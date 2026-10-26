@@ -1,0 +1,24 @@
+/* ==========================================================================
+   Хлебные крошки — общий компонент. Значения перенесены дословно из эталона:
+   Home.css .breadcrumb (семейство, кегль, цвет, margin-bottom) и
+   Catalog.css .catalog-breadcrumb a (цвет ссылки, hover, переход).
+   ========================================================================== */
+.breadcrumb {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  color: #A0A0A0;
+  margin-bottom: 32px; /* Крошка -> контент (32), как в Home.css .breadcrumb */
+}
+
+.breadcrumb__link {
+  color: #404040;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb__link:hover { color: #4F3422; }
+
+/* Разделитель и текущий пункт — как в каталоге: наследуют цвет крошек */
+.breadcrumb__separator { color: #A0A0A0; }
+
+.breadcrumb__current { color: #171717; text-decoration: underline; }

@@ -19,6 +19,7 @@ import Forgot from './pages/Forgot';
 import Reset from './pages/Reset';
 import Favorites from './pages/Favorites';
 import Success from './pages/Success';
+import Support from './pages/Support';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { CartProvider } from './context/CartContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
@@ -48,6 +49,7 @@ function App() {
                 <Route path="/delivery" element={<Delivery />} />
                 <Route path="/payment" element={<Payment />} />
                 <Route path="/terms" element={<Terms />} />
+                <Route path="/cpp" element={<Support />} />
                 <Route path="/product/:id" element={<Product />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
