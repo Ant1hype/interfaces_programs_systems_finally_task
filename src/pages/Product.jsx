@@ -394,13 +394,13 @@ export default function Product() {
           </div>
         )}
         {activeTab==='reviews' && (
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] lg:max-w-[1100px] gap-8 items-start">
+          <div className="w-full grid grid-cols-[minmax(0,1fr)_420px] gap-10 items-start">
             {reviews.length===0 ? (
-              <div className="bg-surface-cream border border-neutral-250-a80 rounded-radius-lg py-12 text-center text-neutral-800 font-montserrat text-[24px]">отзывов пока нет</div>
+              <div className="w-full bg-surface-cream border border-neutral-250-a80 rounded-radius-lg py-12 text-center text-neutral-800 font-montserrat text-[24px]">отзывов пока нет</div>
             ) : (
-              <div className="flex flex-col gap-4">
+              <div className="w-full flex flex-col gap-4">
                 {reviews.map(r=>(
-                  <article key={r.id} className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 bg-surface-white border border-neutral-300 rounded-radius-lg p-6 font-montserrat text-[24px]">
+                  <article key={r.id} className="w-full grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 bg-surface-white border border-neutral-300 rounded-radius-lg p-6 font-montserrat text-[24px]">
                     <div>
                       <p className="font-bold text-neutral-black">{r.author}</p>
                       <div className="mt-3">{starsRow(r.rating)}</div>
@@ -413,7 +413,7 @@ export default function Product() {
                 ))}
               </div>
             )}
-            <aside className="font-montserrat">
+            <aside className="w-full font-montserrat">
               <p className="text-[54px] font-bold text-neutral-black leading-none">{avgRating}</p>
               <p className="text-[23px] text-neutral-800 mt-2">{reviews.length === 0 ? 'На основе 0 отзывов' : `На основе ${reviews.length}-х ${reviewsWord(reviews.length)}`}</p>
               <div className="mt-3">{starsRow(Math.floor(avgRating))}</div>
