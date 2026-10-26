@@ -274,7 +274,7 @@ export default function Product() {
   const starsRow=(rating)=>(<span className="flex gap-1.5" aria-label={`Оценка ${rating} из 5`}>{[1,2,3,4,5].map(d=>(<span key={d} className={`w-3 h-3 rounded-full ${d<=rating?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>);
 
   const tabBtn=(key,label)=>(
-    <button onClick={()=>setActiveTab(key)} className={`py-4 font-montserrat text-[17px] font-semibold px-6 first:pl-0 transition-colors border-b-2 ${activeTab===key?"text-neutral-900 !border-b-brand-900":"text-neutral-600 !border-b-transparent hover:text-neutral-900"}`}>{label}</button>
+    <button onClick={()=>setActiveTab(key)} className={`py-4 font-montserrat text-[26px] font-semibold px-6 first:pl-0 transition-colors border-b-2 ${activeTab===key?"text-neutral-900 !border-b-brand-900":"text-neutral-600 !border-b-transparent hover:text-neutral-900"}`}>{label}</button>
   );
 
   return (
@@ -382,46 +382,46 @@ export default function Product() {
         </div>
         <div className="flex items-center divide-x divide-neutral-300 mb-8">{tabBtn('desc','О продукте')}{tabBtn('info','Состав и ценность')}{tabBtn('reviews',`Отзывы (${reviews.length})`)}</div>
         {activeTab==='desc' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 lg:max-w-[1280px] gap-8 font-montserrat text-[15px] leading-6 text-neutral-800">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:max-w-[1280px] gap-8 font-montserrat text-[23px] leading-6 text-neutral-800">
             <div><h4 className="font-bold mb-2">{product.name}</h4><p className="mb-4">{product.description?.text1}</p><p>{product.description?.text2}</p></div>
             <div><h4 className="font-bold mb-3">Гастрономические сочетания</h4><p className="mb-4">{product.description?.pairing1}</p><p>{product.description?.pairing2}</p></div>
           </div>
         )}
         {activeTab==='info' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 lg:max-w-[1280px] gap-8 font-montserrat text-[15px] leading-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:max-w-[1280px] gap-8 font-montserrat text-[23px] leading-6">
             <div><h4 className="font-bold mb-2">Состав продукта</h4><p className="text-neutral-800 mb-6">{product.ingredients}</p><h4 className="font-bold mb-2">Срок годности и хранение</h4><p className="text-neutral-800">{product.shelfLife}</p></div>
-            <div className="bg-surface-white border border-neutral-300 rounded-radius-xl p-6"><h4 className="font-bold text-neutral-900 mb-5">Пищевая ценность (на 100 г)</h4><div className="grid grid-cols-2 gap-x-10 gap-y-6">{[[product.nutrition?.calories,'ккал'],[product.nutrition?.proteins,'г белки'],[product.nutrition?.fats,'г жиры'],[product.nutrition?.carbs,'г углеводы']].map(([val,label])=>(<div key={label}><p className="font-inter text-[28px] font-bold leading-none text-brand-900">{val}</p><p className="font-inter text-[15px] text-neutral-800 mt-2">{label}</p></div>))}</div></div>
+            <div className="bg-surface-white border border-neutral-300 rounded-radius-xl p-6"><h4 className="font-bold text-neutral-900 mb-5">Пищевая ценность (на 100 г)</h4><div className="grid grid-cols-2 gap-x-10 gap-y-6">{[[product.nutrition?.calories,'ккал'],[product.nutrition?.proteins,'г белки'],[product.nutrition?.fats,'г жиры'],[product.nutrition?.carbs,'г углеводы']].map(([val,label])=>(<div key={label}><p className="font-inter text-[42px] font-bold leading-none text-brand-900">{val}</p><p className="font-inter text-[23px] text-neutral-800 mt-2">{label}</p></div>))}</div></div>
           </div>
         )}
         {activeTab==='reviews' && (
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] lg:max-w-[1100px] gap-8 items-start">
             {reviews.length===0 ? (
-              <div className="bg-surface-cream border border-neutral-250-a80 rounded-radius-lg py-12 text-center text-neutral-800 font-montserrat">отзывов пока нет</div>
+              <div className="bg-surface-cream border border-neutral-250-a80 rounded-radius-lg py-12 text-center text-neutral-800 font-montserrat text-[24px]">отзывов пока нет</div>
             ) : (
               <div className="flex flex-col gap-4">
                 {reviews.map(r=>(
-                  <article key={r.id} className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 bg-surface-white border border-neutral-300 rounded-radius-lg p-6 font-montserrat">
+                  <article key={r.id} className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 bg-surface-white border border-neutral-300 rounded-radius-lg p-6 font-montserrat text-[24px]">
                     <div>
                       <p className="font-bold text-neutral-black">{r.author}</p>
                       <div className="mt-3">{starsRow(r.rating)}</div>
-                      {r.pairing && <p className="text-[15px] text-neutral-800 mt-3">Пара: {r.pairing}</p>}
+                      {r.pairing && <p className="text-[23px] text-neutral-800 mt-3">Пара: {r.pairing}</p>}
                     </div>
                     <div>
-                      <p className="text-[15px] text-neutral-800 leading-6">{r.text}</p>
+                      <p className="text-[23px] text-neutral-800 leading-6">{r.text}</p>
                     </div>
                   </article>
                 ))}
               </div>
             )}
             <aside className="font-montserrat">
-              <p className="text-4xl font-bold text-neutral-black leading-none">{avgRating}</p>
-              <p className="text-[15px] text-neutral-800 mt-2">{reviews.length === 0 ? 'На основе 0 отзывов' : `На основе ${reviews.length}-х ${reviewsWord(reviews.length)}`}</p>
+              <p className="text-[54px] font-bold text-neutral-black leading-none">{avgRating}</p>
+              <p className="text-[23px] text-neutral-800 mt-2">{reviews.length === 0 ? 'На основе 0 отзывов' : `На основе ${reviews.length}-х ${reviewsWord(reviews.length)}`}</p>
               <div className="mt-3">{starsRow(Math.floor(avgRating))}</div>
               <button type="button" onClick={handleOpenReviewModal} className="mt-6 w-full py-3 rounded-radius-md border border-brand-outline text-brand-outline bg-surface-white text-sm font-medium hover:bg-surface-cream transition-colors">Оставить отзыв</button>
             </aside>
           </div>
         )}
-        <div className="mt-12"><h2 className="font-lora text-2xl font-bold text-neutral-900-alt mb-6">С этим сыром покупают</h2><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{related.map(pp=>(<ProductCard key={pp.id} product={pp} />))}</div></div>
+        <div className="also-buy mt-12"><h2 className="font-lora text-[36px] leading-8 font-bold text-neutral-900-alt mb-6">С этим сыром покупают</h2><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{related.map(pp=>(<ProductCard key={pp.id} product={pp} />))}</div></div>
       </div>
 
       {isReviewModalOpen && (

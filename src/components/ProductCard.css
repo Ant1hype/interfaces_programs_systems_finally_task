@@ -106,3 +106,15 @@
   background: #6D4C41;
   opacity: 0.9;
 }
+
+.also-buy .product-card__title {
+  font-size: 30px;
+}
+
+.also-buy .product-card__weight {
+  font-size: 21px;
+}
+
+.also-buy .product-card__price {
+  font-size: 30px;
+}
