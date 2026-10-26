@@ -322,8 +322,8 @@ export default function Product() {
                 </svg>
               </button>
             </div>
-            <p className="font-lora text-2xl lg:text-3xl font-bold text-neutral-black">{currentPrice} ₽ <span className="text-[18px] font-normal text-neutral-700">/ {selectedWeight} г</span></p>
-            <p className="text-[17px] text-neutral-700 mt-1">{isOut?"Нет в наличии":`В наличии ${stock} шт.`}</p>
+            <p className="font-lora text-2xl lg:text-3xl font-bold text-neutral-black">{currentPrice} ₽ <span className="text-[18px] font-normal text-neutral-700" style={{color:'#525252'}}>/ {selectedWeight} г</span></p>
+            <p className="text-[17px] font-medium text-neutral-700 mt-1" style={{color:'#404040'}}>{isOut?"Нет в наличии":`В наличии ${stock} шт.`}</p>
             <div className="border-t border-neutral-250 mt-4 pt-5">
               <h3 className="font-bold text-[22px] text-neutral-900 mb-3">Характеристики</h3>
               <div className="flex flex-col items-start gap-2 mb-3">
@@ -331,11 +331,11 @@ export default function Product() {
                 <span className="flex gap-2">{[1,2,3,4,5].map(d=>(<span key={d} className={`w-6 h-6 rounded-full ${d<=product.taste?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>
               </div>
               <div className="flex flex-col space-y-3 text-[18px]">
-                <p className="text-neutral-700">Тип молока: <b className="text-neutral-900 font-semibold">{product.milk}</b></p>
-                <p className="text-neutral-700">Выдержка: <b className="text-neutral-900 font-semibold">{product.age}</b></p>
-                <p className="text-neutral-700">Добавки: <b className="text-neutral-900 font-semibold">{product.additives}</b></p>
-                <p className="text-neutral-700">Особенности: <b className="text-neutral-900 font-semibold">{product.features}</b></p>
-                <p className="text-neutral-700">Совместимость с вином: <b className="text-neutral-900 font-semibold">{product.wine}</b></p>
+                <p className="text-neutral-700"><span className="font-medium" style={{color:'#404040'}}>Тип молока:</span> <b className="text-neutral-900 font-semibold">{product.milk}</b></p>
+                <p className="text-neutral-700"><span className="font-medium" style={{color:'#404040'}}>Выдержка:</span> <b className="text-neutral-900 font-semibold">{product.age}</b></p>
+                <p className="text-neutral-700"><span className="font-medium" style={{color:'#404040'}}>Добавки:</span> <b className="text-neutral-900 font-semibold">{product.additives}</b></p>
+                <p className="text-neutral-700"><span className="font-medium" style={{color:'#404040'}}>Особенности:</span> <b className="text-neutral-900 font-semibold">{product.features}</b></p>
+                <p className="text-neutral-700"><span className="font-medium" style={{color:'#404040'}}>Совместимость с вином:</span> <b className="text-neutral-900 font-semibold">{product.wine}</b></p>
               </div>
             </div>
             <div className="mt-6">
@@ -376,7 +376,7 @@ export default function Product() {
               {btnText || 'В корзину'}
             </button>
             {!isOut && (
-              <p className="text-[17px] text-neutral-700 mt-2">Ближайшая доставка: завтра, {deliveryDate}</p>
+              <p className="text-[17px] font-medium text-neutral-700 mt-2" style={{color:'#404040'}}>Ближайшая доставка: завтра, {deliveryDate}</p>
             )}
           </div>
         </div>
