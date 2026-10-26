@@ -274,15 +274,13 @@ export default function Product() {
   const starsRow=(rating)=>(<span className="flex gap-1.5" aria-label={`Оценка ${rating} из 5`}>{[1,2,3,4,5].map(d=>(<span key={d} className={`w-3 h-3 rounded-full ${d<=rating?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>);
 
   const tabBtn=(key,label)=>(
-    <button onClick={()=>setActiveTab(key)} className={`py-4 font-montserrat text-[18px] font-semibold px-6 first:pl-0 transition-colors border-b-2 ${activeTab===key?"text-neutral-900 border-brand-900":"text-neutral-600 border-transparent hover:text-neutral-900"}`}>{label}</button>
+    <button onClick={()=>setActiveTab(key)} className={`pb-3 font-montserrat text-base font-semibold px-6 first:pl-0 transition-colors ${activeTab===key?"text-brand-900":"text-neutral-500 hover:text-neutral-900-alt"}`}>{label}</button>
   );
 
   return (
     <div className="min-h-screen pb-[100px]">
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-6">
-        <div className="[&_.breadcrumb]:text-neutral-900 [&_.breadcrumb__link]:text-neutral-900 [&_.breadcrumb__separator]:text-neutral-900 [&_.breadcrumb__current]:text-neutral-900 [&_.breadcrumb__current]:underline">
-          <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/catalog', label: 'Каталог' }]} current={product.name} />
-        </div>
+        <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/catalog', label: 'Каталог' }]} current={product.name} />
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-10 lg:gap-16 mb-14">
           <div>
             <div
