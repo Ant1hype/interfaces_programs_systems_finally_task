@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { getProducts } from '../lib/api.js';
 import Dropdown from '../components/Dropdown.jsx';
 import Breadcrumbs from '../components/Breadcrumbs.jsx';
+import './Checkout.css';
 
 const PROMO_CODE = 'CHEESE10', PROMO_PERCENT = 10;
 const fmt = (v) => `${Math.round(v).toLocaleString('ru-RU')} ₽`;
@@ -318,7 +319,7 @@ export default function Checkout() {
 
   if (items.length === 0) {
     return (
-      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat">
+      <div className="checkout-root w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat">
         <div className="[&_.breadcrumb__link]:text-neutral-700 [&_.breadcrumb__link:hover]:text-brand-900 [&_.breadcrumb__current]:text-neutral-900 [&_.breadcrumb__current]:underline">
           <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/cart', label: 'Корзина' }]} current="Оформление" />
         </div>
@@ -332,7 +333,7 @@ export default function Checkout() {
   }
 
   return (
-    <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat">
+    <div className="checkout-root w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat">
       <div className="[&_.breadcrumb__link]:text-neutral-700 [&_.breadcrumb__link:hover]:text-brand-900 [&_.breadcrumb__current]:text-neutral-900 [&_.breadcrumb__current]:underline">
         <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/cart', label: 'Корзина' }]} current="Оформление" />
       </div>
@@ -557,7 +558,7 @@ export default function Checkout() {
             <div className="mb-4">
               <div className="flex items-center justify-between text-[15px] mb-2">
                 <span className="text-neutral-900">Списать баллы</span>
-                <span className="text-neutral-700">Доступно: {balance}</span>
+                <span data-dd="avail" className="text-neutral-700">Доступно: {balance}</span>
               </div>
               <div className="relative flex items-center">
                 <input
@@ -569,6 +570,7 @@ export default function Checkout() {
                   className="w-full h-[44px] pl-4 pr-16 bg-surface-white border border-neutral-300 rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-700 outline-none focus:border-brand-900"
                 />
                 <button
+                  data-dd="max"
                   type="button"
                   onClick={handlePointsMax}
                   className="absolute right-3 text-[14px] text-neutral-700 hover:text-brand-900 font-normal cursor-pointer bg-transparent border-none p-0"

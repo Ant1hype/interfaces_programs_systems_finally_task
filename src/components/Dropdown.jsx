@@ -61,7 +61,7 @@ export default function Dropdown({
           aria-label={ariaLabel}
           className="w-full h-[52px] px-6 flex items-center justify-between gap-3 text-[16px] text-neutral-900 bg-transparent border-0 cursor-pointer focus:outline-none focus-visible:outline-none"
         >
-          <span className="truncate" style={selectedOption ? undefined : { color: '#404040' }}>{headerLabel}</span>
+          <span data-dd={selectedOption ? undefined : 'ph'} className="truncate" style={selectedOption ? undefined : { color: '#404040' }}>{headerLabel}</span>
           <svg
             width="16"
             height="16"

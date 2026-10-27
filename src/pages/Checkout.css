@@ -1,0 +1,12 @@
+.checkout-root input::placeholder,
+.checkout-root textarea::placeholder {
+  color: #525252 !important;
+  opacity: 1;
+}
+.checkout-root [data-dd="ph"] {
+  color: #404040 !important;
+}
+.checkout-root [data-dd="avail"],
+.checkout-root [data-dd="max"] {
+  color: #404040 !important;
+}
