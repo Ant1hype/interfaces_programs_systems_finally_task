@@ -149,3 +149,8 @@ body.search-open *::-webkit-scrollbar {
   animation: toastEnter 200ms ease-out;
 }
 
+input::placeholder, textarea::placeholder {
+  color: #525252 !important;
+  opacity: 1;
+}
+
