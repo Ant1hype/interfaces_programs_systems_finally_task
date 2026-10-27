@@ -47,10 +47,10 @@ export default function Dropdown({
   }, [isOpen]);
 
   return (
-    <div className="relative w-full font-montserrat" ref={rootRef}>
+    <div className={`relative w-full font-montserrat ${isOpen ? 'z-50' : ''}`} ref={rootRef}>
       <div
-        className={`bg-[#ECEEF0] border border-neutral-900 overflow-hidden ${
-          isOpen ? 'rounded-t-[12px] rounded-b-none' : 'rounded-[12px]'
+        className={`border overflow-hidden ${
+          isOpen ? 'bg-[#ECEEF0] border-neutral-900 rounded-t-[12px] rounded-b-none' : 'bg-surface-white border-neutral-300 rounded-[12px]'
         }`}
       >
         <button
@@ -61,7 +61,7 @@ export default function Dropdown({
           aria-label={ariaLabel}
           className="w-full h-[52px] px-6 flex items-center justify-between gap-3 text-[16px] text-neutral-900 bg-transparent border-0 cursor-pointer focus:outline-none focus-visible:outline-none"
         >
-          <span className="truncate">{headerLabel}</span>
+          <span className={`truncate text-[17px] ${selectedOption ? 'text-[#171717]' : 'text-[#525252]'}`}>{headerLabel}</span>
           <svg
             width="16"
             height="16"

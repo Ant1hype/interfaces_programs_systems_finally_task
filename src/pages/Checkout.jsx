@@ -351,7 +351,7 @@ export default function Checkout() {
           <form onSubmit={handleSubmit} noValidate>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-[15px] text-neutral-800 mb-2">Ваше имя</label>
+                <label className="block text-[17px] text-[#404040] mb-2">Ваше имя</label>
                 <input
                   type="text"
                   value={name}
@@ -360,27 +360,27 @@ export default function Checkout() {
                     if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
                   }}
                   placeholder="Иван"
-                  className={`w-full h-[48px] px-4 bg-surface-white border ${errors.name ? 'border-danger-700' : 'border-neutral-300'} rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900`}
+                  className={`w-full h-[48px] px-4 bg-surface-white border ${errors.name ? 'border-danger-700' : 'border-neutral-300'} rounded-radius-lg text-[17px] text-[#171717] placeholder:text-[#525252] outline-none focus:border-brand-900`}
                 />
                 {errors.name && <p className="text-[15px] text-danger-700 mt-1">{errors.name}</p>}
               </div>
 
               <div>
-                <label className="block text-[15px] text-neutral-800 mb-2">Номер телефона</label>
+                <label className="block text-[17px] text-[#404040] mb-2">Номер телефона</label>
                 <input
                   type="tel"
                   value={phoneDisplay}
                   onChange={handlePhoneChange}
                   onKeyDown={handlePhoneKeyDown}
                   placeholder="+7 (___) ___-__-__"
-                  className={`w-full h-[48px] px-4 bg-surface-white border ${errors.phone ? 'border-danger-700' : 'border-neutral-300'} rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900`}
+                  className={`w-full h-[48px] px-4 bg-surface-white border ${errors.phone ? 'border-danger-700' : 'border-neutral-300'} rounded-radius-lg text-[17px] text-[#171717] placeholder:text-[#525252] outline-none focus:border-brand-900`}
                 />
                 {errors.phone && <p className="text-[15px] text-danger-700 mt-1">{errors.phone}</p>}
               </div>
             </div>
 
             <div className="mb-6">
-              <label className="block text-[15px] text-neutral-800 mb-2">Email</label>
+              <label className="block text-[17px] text-[#404040] mb-2">Email</label>
               <input
                 type="email"
                 value={email}
@@ -389,7 +389,7 @@ export default function Checkout() {
                   if (errors.email) setErrors((prev) => ({ ...prev, email: '' }));
                 }}
                 placeholder="example@mail.ru"
-                className={`w-full h-[48px] px-4 bg-surface-white border ${errors.email ? 'border-danger-700' : 'border-neutral-300'} rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900`}
+                className={`w-full h-[48px] px-4 bg-surface-white border ${errors.email ? 'border-danger-700' : 'border-neutral-300'} rounded-radius-lg text-[17px] text-[#171717] placeholder:text-[#525252] outline-none focus:border-brand-900`}
               />
               {errors.email && <p className="text-[15px] text-danger-700 mt-1">{errors.email}</p>}
             </div>
@@ -429,7 +429,7 @@ export default function Checkout() {
               {delivery === 'Доставка курьером' ? (
                 <>
                   <div className="mb-4">
-                    <label className="block text-[15px] text-neutral-800 mb-2">Адрес доставки</label>
+                    <label className="block text-[17px] text-[#404040] mb-2">Адрес доставки</label>
                     <input
                       type="text"
                       value={address}
@@ -440,14 +440,14 @@ export default function Checkout() {
                       placeholder="г. Томск, ул. Сырная, д. 7, кв. 7"
                       className={`w-full h-[48px] px-4 bg-surface-white border ${
                         errors.address ? 'border-danger-700' : 'border-neutral-300'
-                      } rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900`}
+                      } rounded-radius-lg text-[17px] text-[#171717] placeholder:text-[#525252] outline-none focus:border-brand-900`}
                     />
                     {errors.address && <p className="text-[15px] text-danger-700 mt-1">{errors.address}</p>}
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[15px] text-neutral-800 mb-2">Дата доставки</label>
+                      <label className="block text-[17px] text-[#404040] mb-2">Дата доставки</label>
                       <Dropdown
                         value={deliveryDate}
                         onChange={(nextValue) => {
@@ -464,7 +464,7 @@ export default function Checkout() {
                     </div>
 
                     <div>
-                      <label className="block text-[15px] text-neutral-800 mb-2">Временной интервал</label>
+                      <label className="block text-[17px] text-[#404040] mb-2">Временной интервал</label>
                       <Dropdown
                         value={deliverySlot}
                         onChange={(nextValue) => {
@@ -507,7 +507,7 @@ export default function Checkout() {
                     onChange={(e) => setPayment(e.target.value)}
                     className="sr-only"
                   />
-                  <span className="text-[15px] text-neutral-black">Картой онлайн</span>
+                  <span className="text-[17px] text-[#262626]">Картой онлайн</span>
                 </label>
 
                 <label className="flex items-center gap-3 cursor-pointer select-none">
@@ -526,7 +526,7 @@ export default function Checkout() {
                     onChange={(e) => setPayment(e.target.value)}
                     className="sr-only"
                   />
-                  <span className="text-[15px] text-neutral-black">При получении</span>
+                  <span className="text-[17px] text-[#262626]">При получении</span>
                 </label>
               </div>
             </div>
@@ -534,11 +534,11 @@ export default function Checkout() {
         </div>
 
         <aside className="bg-surface-white border border-neutral-250-a80 rounded-radius-xl p-6 lg:mt-[68px]">
-          <div className="flex items-center justify-between text-[15px] text-neutral-black mb-4">
+          <div className="flex items-center justify-between text-[17px] text-neutral-black mb-4">
             <span>Товары ({totalQty})</span>
             <span className="font-inter font-bold">{fmt(it)}</span>
           </div>
-          <div className="flex items-center justify-between text-[15px] text-neutral-black mb-5">
+          <div className="flex items-center justify-between text-[17px] text-neutral-black mb-5">
             <span>Скидка</span>
             <span className="font-inter font-bold">-{disc} ₽</span>
           </div>
@@ -556,8 +556,8 @@ export default function Checkout() {
           {user && balance > 0 && (
             <div className="mb-4">
               <div className="flex items-center justify-between text-[15px] mb-2">
-                <span className="text-neutral-800">Списать баллы</span>
-                <span className="text-neutral-600">Доступно: {balance}</span>
+                <span className="text-[17px] text-[#404040]">Списать баллы</span>
+                <span className="text-[16px] text-[#404040]">Доступно: {balance}</span>
               </div>
               <div className="relative flex items-center">
                 <input
@@ -566,12 +566,12 @@ export default function Checkout() {
                   value={pointsInput}
                   onChange={handlePointsChange}
                   placeholder="0"
-                  className="w-full h-[44px] pl-4 pr-16 bg-surface-white border border-neutral-300 rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900"
+                  className="w-full h-[44px] pl-4 pr-16 bg-surface-white border border-neutral-300 rounded-radius-lg text-[17px] text-[#171717] placeholder:text-[#525252] outline-none focus:border-brand-900"
                 />
                 <button
                   type="button"
                   onClick={handlePointsMax}
-                  className="absolute right-3 text-[14px] text-neutral-800 hover:text-brand-900 font-normal cursor-pointer bg-transparent border-none p-0"
+                  className="absolute right-3 text-[15px] text-[#404040] hover:text-brand-900 font-normal cursor-pointer bg-transparent border-none p-0"
                 >
                   Макс.
                 </button>
@@ -585,7 +585,7 @@ export default function Checkout() {
               value={promoInput}
               onChange={(e) => setPromoInput(e.target.value)}
               placeholder="Введите промокод..."
-              className="flex-1 min-w-0 h-[44px] px-4 bg-surface-white border border-neutral-300 rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900"
+              className="flex-1 min-w-0 h-[44px] px-4 bg-surface-white border border-neutral-300 rounded-radius-lg text-[17px] text-[#171717] placeholder:text-[#525252] outline-none focus:border-brand-900"
             />
             <button
               type="submit"
