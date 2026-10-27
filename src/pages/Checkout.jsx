@@ -360,7 +360,7 @@ export default function Checkout() {
                     if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
                   }}
                   placeholder="Иван"
-                  className={`w-full h-[48px] px-4 bg-surface-white border ${errors.name ? 'border-danger-700' : 'border-neutral-300'} rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900`}
+                  className={`w-full h-[48px] px-4 bg-surface-white border ${errors.name ? 'border-danger-700' : 'border-neutral-300'} rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-600 outline-none focus:border-brand-900`}
                 />
                 {errors.name && <p className="text-[15px] text-danger-700 mt-1">{errors.name}</p>}
               </div>
@@ -373,7 +373,7 @@ export default function Checkout() {
                   onChange={handlePhoneChange}
                   onKeyDown={handlePhoneKeyDown}
                   placeholder="+7 (___) ___-__-__"
-                  className={`w-full h-[48px] px-4 bg-surface-white border ${errors.phone ? 'border-danger-700' : 'border-neutral-300'} rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900`}
+                  className={`w-full h-[48px] px-4 bg-surface-white border ${errors.phone ? 'border-danger-700' : 'border-neutral-300'} rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-600 outline-none focus:border-brand-900`}
                 />
                 {errors.phone && <p className="text-[15px] text-danger-700 mt-1">{errors.phone}</p>}
               </div>
@@ -389,7 +389,7 @@ export default function Checkout() {
                   if (errors.email) setErrors((prev) => ({ ...prev, email: '' }));
                 }}
                 placeholder="example@mail.ru"
-                className={`w-full h-[48px] px-4 bg-surface-white border ${errors.email ? 'border-danger-700' : 'border-neutral-300'} rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900`}
+                className={`w-full h-[48px] px-4 bg-surface-white border ${errors.email ? 'border-danger-700' : 'border-neutral-300'} rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-600 outline-none focus:border-brand-900`}
               />
               {errors.email && <p className="text-[15px] text-danger-700 mt-1">{errors.email}</p>}
             </div>
@@ -440,7 +440,7 @@ export default function Checkout() {
                       placeholder="г. Томск, ул. Сырная, д. 7, кв. 7"
                       className={`w-full h-[48px] px-4 bg-surface-white border ${
                         errors.address ? 'border-danger-700' : 'border-neutral-300'
-                      } rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900`}
+                      } rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-600 outline-none focus:border-brand-900`}
                     />
                     {errors.address && <p className="text-[15px] text-danger-700 mt-1">{errors.address}</p>}
                   </div>
@@ -566,7 +566,7 @@ export default function Checkout() {
                   value={pointsInput}
                   onChange={handlePointsChange}
                   placeholder="0"
-                  className="w-full h-[44px] pl-4 pr-16 bg-surface-white border border-neutral-300 rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900"
+                  className="w-full h-[44px] pl-4 pr-16 bg-surface-white border border-neutral-300 rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-600 outline-none focus:border-brand-900"
                 />
                 <button
                   type="button"
@@ -585,7 +585,7 @@ export default function Checkout() {
               value={promoInput}
               onChange={(e) => setPromoInput(e.target.value)}
               placeholder="Введите промокод..."
-              className="flex-1 min-w-0 h-[44px] px-4 bg-surface-white border border-neutral-300 rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-500 outline-none focus:border-brand-900"
+              className="flex-1 min-w-0 h-[44px] px-4 bg-surface-white border border-neutral-300 rounded-radius-lg text-[15px] text-neutral-900 placeholder:text-neutral-600 outline-none focus:border-brand-900"
             />
             <button
               type="submit"

@@ -310,7 +310,7 @@ export default function Product() {
                 style={isFav ? { color: 'var(--danger-700, #A61A1A)' } : undefined}
               >
                 <svg
-                  className="w-6 h-6"
+                  className="w-9 h-9"
                   viewBox="0 0 24 24"
                   fill={isFav ? 'currentColor' : 'none'}
                   stroke="currentColor"

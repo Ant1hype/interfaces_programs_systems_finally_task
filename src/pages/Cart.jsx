@@ -45,7 +45,13 @@ export default function Cart() {
 
   if (items.length === 0) return (<div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat"><Breadcrumbs items={[{ to: '/', label: 'Главная' }]} current="Корзина" /><h1 className="font-lora text-[32px] font-bold text-neutral-900-alt mb-10">Корзина</h1><div className="bg-surface-cream border border-neutral-250-a80 rounded-radius-xl py-16 px-6 text-center"><p className="text-[18px] text-neutral-500 mb-6">Ваша корзина пуста</p><Link to="/catalog" className="inline-flex px-8 py-4 rounded-radius-lg bg-brand-900 text-surface-white font-medium no-underline hover:bg-brand-700">В каталог</Link></div></div>);
 
-  return (<div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat"><Breadcrumbs items={[{ to: '/', label: 'Главная' }]} current="Корзина" /><h1 className="font-lora text-[32px] font-bold text-neutral-900-alt mb-10">Корзина</h1><div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-10 xl:gap-16 items-start"><div>{rows.map(r => {
+  return (<div className="cart-readability w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat"><style>{`
+    .cart-readability a[href="/catalog"].inline-block { font-size: 17px; }
+    .cart-readability a[href="/catalog"].inline-block:not(:hover) { color: #404040; }
+    .cart-readability aside > div:nth-child(-n+2) > span:first-child { font-size: 17px; }
+    .cart-readability aside input::placeholder { font-size: 15px; color: #737373; opacity: 1; }
+    .cart-readability aside a[href="/checkout"] + p { font-size: 15px; color: #525252; }
+  `}</style><Breadcrumbs items={[{ to: '/', label: 'Главная' }]} current="Корзина" /><h1 className="font-lora text-[32px] font-bold text-neutral-900-alt mb-10">Корзина</h1><div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-10 xl:gap-16 items-start"><div>{rows.map(r => {
   const p = byId.get(String(r.id));
   const stock = (r.stock !== undefined ? r.stock : p?.stock) !== undefined ? Number(r.stock !== undefined ? r.stock : p?.stock) : undefined;
   const isMax = stock !== undefined && qtyForId(r.id) >= stock;
@@ -58,14 +64,14 @@ export default function Cart() {
       >
         <img src={r.image} alt={r.name} className="w-[80px] h-[80px] rounded-radius-md object-cover shrink-0" />
         <div className="flex-1 min-w-0">
-          <h3 className="font-lora text-[18px] font-semibold text-neutral-900-alt group-hover:text-brand-900 hover:text-brand-900 transition-colors mb-2">{r.name}</h3>
-          <p className="font-inter text-[14px] text-neutral-500">Фасовка: {r.pack} г</p>
+          <h3 className="font-lora text-[20px] font-semibold text-[#171717] group-hover:text-brand-900 hover:text-brand-900 transition-colors mb-2">{r.name}</h3>
+          <p className="font-inter text-[17px] text-[#525252]">Фасовка: {r.pack} г</p>
         </div>
       </Link>
       <div className="flex items-center gap-6 shrink-0">
         <div className="flex items-center gap-8 bg-brand-900 rounded-radius-lg px-6 py-3 text-surface-white">
-          <button type="button" onClick={() => dec(r.id, r.pack)} disabled={r.qty <= 1} className="bg-transparent border-0 p-0 text-surface-white text-[18px] cursor-pointer disabled:opacity-40">−</button>
-          <span className="font-bold text-[16px] min-w-[12px] text-center">{r.qty}</span>
+          <button type="button" onClick={() => dec(r.id, r.pack)} disabled={r.qty <= 1} className="bg-transparent border-0 p-0 text-[#ffffff] text-[18px] cursor-pointer disabled:opacity-40">−</button>
+          <span className="font-bold text-[18px] min-w-[12px] text-center">{r.qty}</span>
           <button
             type="button"
             onClick={() => {
@@ -75,14 +81,14 @@ export default function Cart() {
               }
               inc(r.id, r.pack);
             }}
-            className={`bg-transparent border-0 p-0 text-surface-white text-[18px] ${
+            className={`bg-transparent border-0 p-0 text-[#ffffff] text-[18px] ${
               isMax ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
             }`}
           >
             +
           </button>
         </div>
-        <span className="font-inter text-[16px] font-bold text-neutral-black w-[90px] text-right">{fmt(r.lineTotal)}</span>
+        <span className="font-inter text-[20px] font-bold text-[#171717] w-[90px] text-right">{fmt(r.lineTotal)}</span>
         <button type="button" onClick={() => remove(r.id, r.pack)} className="bg-transparent border-0 p-0 text-neutral-black cursor-pointer hover:text-danger-700">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
             <line x1="18" y1="6" x2="6" y2="18" />
