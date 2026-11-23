@@ -57,7 +57,7 @@ export default function Product() {
   const [product,setProduct]=useState(null);
   const [allProducts,setAllProducts]=useState([]);
   const [activeTab,setActiveTab]=useState('desc');
-  const [mainImg,setMainImg]=useState('');
+  const [activeIndex,setActiveIndex]=useState(0);
   const [selectedWeight,setSelectedWeight]=useState(100);
   const pack = selectedWeight;
   const [brokenImages,setBrokenImages]=useState([]);
@@ -169,12 +169,13 @@ export default function Product() {
   useEffect(()=>{
     let cancelled=false;
     setLoading(true);
+    setBrokenImages([]);
+    setActiveIndex(0);
     Promise.all([getProduct(id),getProducts()])
       .then(([pp,list])=>{
         if(cancelled) return;
         const tp=trimProduct(pp);
         setProduct(tp);
-        setMainImg((tp.images&&tp.images[0])||tp.image||'');
         setAllProducts((list||[]).map(trimProduct));
       })
       .catch(e=>{ if(!cancelled) setError(e.message); })
@@ -187,27 +188,38 @@ export default function Product() {
     return d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
   },[]);
 
+  const CROPS = [
+    { position: '50% 50%', scale: 1 },
+    { position: '25% 35%', scale: 1.7 },
+    { position: '75% 65%', scale: 1.7 },
+    { position: '50% 15%', scale: 2.2 },
+  ];
   const mainImage=product?.image||'';
   const rawImages=(product?.images&&product.images.length)?product.images:[mainImage].filter(Boolean);
   const visibleImages=rawImages.filter(img=>!brokenImages.includes(img));
-  const images=visibleImages.length?visibleImages:[mainImage].filter(Boolean);
-  const lightboxImages=(Array.isArray(product?.images)&&product.images.length>0)?product.images:(images.length?images:[mainImg||mainImage].filter(Boolean));
+  const gallery=visibleImages.map(src=>({ src, position: '50% 50%', scale: 1 }));
+  while(gallery.length<4 && gallery[0]){
+    gallery.push({ src: gallery[0].src, ...CROPS[gallery.length] });
+  }
+  const safeIndex=gallery.length?(activeIndex<gallery.length?activeIndex:0):0;
+  const active=gallery[safeIndex]||null;
 
   const handleOpenLightbox = () => {
-    const currentSrc = mainImg || mainImage;
-    const idx = lightboxImages.indexOf(currentSrc);
-    setLightboxIndex(idx >= 0 ? idx : 0);
+    if (!gallery.length) return;
+    setLightboxIndex(safeIndex);
     setIsLightboxOpen(true);
   };
 
   const handlePrevLightbox = (e) => {
     e?.stopPropagation();
-    setLightboxIndex((prev) => (prev - 1 + lightboxImages.length) % lightboxImages.length);
+    if (!gallery.length) return;
+    setLightboxIndex((prev) => (prev - 1 + gallery.length) % gallery.length);
   };
 
   const handleNextLightbox = (e) => {
     e?.stopPropagation();
-    setLightboxIndex((prev) => (prev + 1) % lightboxImages.length);
+    if (!gallery.length) return;
+    setLightboxIndex((prev) => (prev + 1) % gallery.length);
   };
 
   useEffect(() => {
@@ -225,23 +237,21 @@ export default function Product() {
       if (e.key === 'Escape') {
         setIsLightboxOpen(false);
       } else if (e.key === 'ArrowLeft') {
-        if (lightboxImages.length > 1) {
-          setLightboxIndex((prev) => (prev - 1 + lightboxImages.length) % lightboxImages.length);
+        if (gallery.length > 1) {
+          setLightboxIndex((prev) => (prev - 1 + gallery.length) % gallery.length);
         }
       } else if (e.key === 'ArrowRight') {
-        if (lightboxImages.length > 1) {
-          setLightboxIndex((prev) => (prev + 1) % lightboxImages.length);
+        if (gallery.length > 1) {
+          setLightboxIndex((prev) => (prev + 1) % gallery.length);
         }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isLightboxOpen, lightboxImages.length]);
+  }, [isLightboxOpen, gallery.length]);
 
   const handleImgError=(src)=>{
     setBrokenImages(prev=>prev.includes(src)?prev:[...prev,src]);
-    if(mainImg===src && mainImage && src!==mainImage) setMainImg(mainImage);
-    else if(mainImg===src) setMainImg('');
   };
 
   if(loading) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] pt-[40px] pb-8 font-montserrat">Загрузка...</div>;
@@ -291,16 +301,55 @@ export default function Product() {
         </div>
         <div className="grid grid-cols-12 gap-5 lg:gap-16 mb-14">
           <div className="col-span-12 lg:col-span-7">
-            <div
-              onClick={handleOpenLightbox}
-              className="w-full max-w-[760px] rounded-radius-lg overflow-hidden bg-surface-white border border-neutral-300 cursor-pointer"
-            >
-              <img src={mainImg||mainImage} alt={product.name} onError={()=>handleImgError(mainImg||mainImage)} className="w-full object-cover aspect-[4/3] block" />
-            </div>
-            {images.length>1 && (
+            {active ? (
+              <div
+                onClick={handleOpenLightbox}
+                className="w-full max-w-[760px] aspect-[4/3] rounded-radius-lg overflow-hidden bg-surface-white border border-neutral-300 cursor-pointer"
+              >
+                <img
+                  src={active.src}
+                  alt={product.name}
+                  onError={()=>handleImgError(active.src)}
+                  className="w-full h-full object-cover block"
+                  style={{
+                    objectPosition: active.position,
+                    transform: `scale(${active.scale})`,
+                    transformOrigin: active.position,
+                    transition: 'transform .4s ease',
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="w-full max-w-[760px] aspect-[4/3] rounded-radius-lg overflow-hidden bg-neutral-200 border border-neutral-300 flex items-center justify-center text-neutral-500">
+                <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-label="Изображение отсутствует">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+              </div>
+            )}
+            {gallery.length>1 && (
               <div className="grid grid-cols-4 gap-5 mt-4 max-w-[760px]">
-                {images.map((img,i)=>(
-                  <button key={img+i} onClick={()=>setMainImg(img)} className={`aspect-square w-full rounded-radius-md overflow-hidden border-2 ${(mainImg||mainImage)===img?"border-brand-900":"border-neutral-300"}`}><img src={img} alt="thumb" onError={()=>handleImgError(img)} className="w-full h-full object-cover" /></button>
+                {gallery.map((item,i)=>(
+                  <button
+                    key={item.src+'-'+i}
+                    type="button"
+                    onClick={()=>setActiveIndex(i)}
+                    className={`aspect-square w-full rounded-radius-md overflow-hidden border-2 ${safeIndex===i?"border-brand-900":"border-neutral-300"}`}
+                  >
+                    <img
+                      src={item.src}
+                      alt={`${product.name} ${i+1}`}
+                      onError={()=>handleImgError(item.src)}
+                      className="w-full h-full object-cover block"
+                      style={{
+                        objectPosition: item.position,
+                        transform: `scale(${item.scale})`,
+                        transformOrigin: item.position,
+                        transition: 'transform .4s ease',
+                      }}
+                    />
+                  </button>
                 ))}
               </div>
             )}
@@ -526,60 +575,73 @@ export default function Product() {
         </div>
       )}
 
-      {isLightboxOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-neutral-black/20 backdrop-blur-[20px] flex items-center justify-center p-4 sm:p-8"
-          onClick={() => setIsLightboxOpen(false)}
-        >
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsLightboxOpen(false);
-            }}
-            aria-label="Закрыть"
-            className="absolute top-5 right-5 sm:top-6 sm:right-6 w-10 h-10 rounded-full flex items-center justify-center text-neutral-800 hover:text-black hover:bg-neutral-200/50 transition-colors cursor-pointer border-none bg-transparent z-10"
+      {isLightboxOpen && gallery.length > 0 && (() => {
+        const lbItem = gallery[lightboxIndex] || gallery[0];
+        return (
+          <div
+            className="fixed inset-0 z-50 bg-neutral-black/20 backdrop-blur-[20px] flex items-center justify-center p-4 sm:p-8"
+            onClick={() => setIsLightboxOpen(false)}
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-
-          {lightboxImages.length > 1 && (
             <button
               type="button"
-              onClick={handlePrevLightbox}
-              aria-label="Предыдущее фото"
-              className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 bg-surface-white rounded-radius-md shadow-md flex items-center justify-center text-neutral-800 hover:bg-neutral-50 transition-colors cursor-pointer border-none z-10"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsLightboxOpen(false);
+              }}
+              aria-label="Закрыть"
+              className="absolute top-5 right-5 sm:top-6 sm:right-6 w-10 h-10 rounded-full flex items-center justify-center text-neutral-800 hover:text-black hover:bg-neutral-200/50 transition-colors cursor-pointer border-none bg-transparent z-10"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="15 18 9 12 15 6" />
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
-          )}
 
-          <img
-            src={lightboxImages[lightboxIndex]}
-            alt={product.name}
-            className="max-h-[80vh] max-w-[85vw] object-contain rounded-2xl select-none"
-            onClick={(e) => e.stopPropagation()}
-          />
+            {gallery.length > 1 && (
+              <button
+                type="button"
+                onClick={handlePrevLightbox}
+                aria-label="Предыдущее фото"
+                className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 bg-surface-white rounded-radius-md shadow-md flex items-center justify-center text-neutral-800 hover:bg-neutral-50 transition-colors cursor-pointer border-none z-10"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </button>
+            )}
 
-          {lightboxImages.length > 1 && (
-            <button
-              type="button"
-              onClick={handleNextLightbox}
-              aria-label="Следующее фото"
-              className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 bg-surface-white rounded-radius-md shadow-md flex items-center justify-center text-neutral-800 hover:bg-neutral-50 transition-colors cursor-pointer border-none z-10"
+            <div
+              className="w-[min(85vw,calc(80vh*4/3))] aspect-[4/3] overflow-hidden rounded-2xl select-none bg-surface-white"
+              onClick={(e) => e.stopPropagation()}
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </button>
-          )}
-        </div>
-      )}
+              <img
+                src={lbItem.src}
+                alt={product.name}
+                className="w-full h-full object-cover block"
+                style={{
+                  objectPosition: lbItem.position,
+                  transform: `scale(${lbItem.scale})`,
+                  transformOrigin: lbItem.position,
+                  transition: 'transform .4s ease',
+                }}
+              />
+            </div>
+
+            {gallery.length > 1 && (
+              <button
+                type="button"
+                onClick={handleNextLightbox}
+                aria-label="Следующее фото"
+                className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 bg-surface-white rounded-radius-md shadow-md flex items-center justify-center text-neutral-800 hover:bg-neutral-50 transition-colors cursor-pointer border-none z-10"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </button>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }
