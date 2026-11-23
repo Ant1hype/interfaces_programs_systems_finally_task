@@ -386,11 +386,11 @@ export default function Product() {
                 <span className="flex gap-2">{[1,2,3,4,5].map(d=>(<span key={d} className={`w-6 h-6 rounded-full ${d<=product.taste?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>
               </div>
               <div className="flex flex-col space-y-3 text-[18px]">
-                <p className="text-neutral-700"><span className="font-medium" style={{color:'#404040'}}>Тип молока:</span> <b className="text-neutral-900 font-semibold">{product.milk}</b></p>
-                <p className="text-neutral-700"><span className="font-medium" style={{color:'#404040'}}>Выдержка:</span> <b className="text-neutral-900 font-semibold">{product.age}</b></p>
-                <p className="text-neutral-700"><span className="font-medium" style={{color:'#404040'}}>Добавки:</span> <b className="text-neutral-900 font-semibold">{product.additives}</b></p>
-                <p className="text-neutral-700"><span className="font-medium" style={{color:'#404040'}}>Особенности:</span> <b className="text-neutral-900 font-semibold">{product.features}</b></p>
-                <p className="text-neutral-700"><span className="font-medium" style={{color:'#404040'}}>Совместимость с вином:</span> <b className="text-neutral-900 font-semibold">{product.wine}</b></p>
+                <p className="text-neutral-700"><span className="font-normal" style={{ color: '#000000' }}>Тип молока:</span> <b className="font-bold" style={{ color: '#000000' }}>{product.milk}</b></p>
+                <p className="text-neutral-700"><span className="font-normal" style={{ color: '#000000' }}>Выдержка:</span> <b className="font-bold" style={{ color: '#000000' }}>{product.age}</b></p>
+                <p className="text-neutral-700"><span className="font-normal" style={{ color: '#000000' }}>Добавки:</span> <b className="font-bold" style={{ color: '#000000' }}>{product.additives}</b></p>
+                <p className="text-neutral-700"><span className="font-normal" style={{ color: '#000000' }}>Особенности:</span> <b className="font-bold" style={{ color: '#000000' }}>{product.features}</b></p>
+                <p className="text-neutral-700"><span className="font-normal" style={{ color: '#000000' }}>Совместимость с вином:</span> <b className="font-bold" style={{ color: '#000000' }}>{product.wine}</b></p>
               </div>
             </div>
             <div className="mt-6">
