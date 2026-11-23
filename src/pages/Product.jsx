@@ -289,23 +289,23 @@ export default function Product() {
         <div className="[&_.breadcrumb__link]:text-neutral-700 [&_.breadcrumb__link:hover]:text-brand-900 [&_.breadcrumb__current]:text-neutral-900 [&_.breadcrumb__current]:underline">
           <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/catalog', label: 'Каталог' }]} current={product.name} />
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-10 lg:gap-16 mb-14">
-          <div>
+        <div className="grid grid-cols-12 gap-5 mb-14">
+          <div className="col-span-12 lg:col-span-7">
             <div
               onClick={handleOpenLightbox}
-              className="rounded-radius-lg overflow-hidden bg-surface-white border border-neutral-300 cursor-pointer lg:max-w-[860px]"
+              className="rounded-radius-lg overflow-hidden bg-surface-white border border-neutral-300 cursor-pointer"
             >
               <img src={mainImg||mainImage} alt={product.name} onError={()=>handleImgError(mainImg||mainImage)} className="w-full object-cover aspect-[4/3] block" />
             </div>
             {images.length>1 && (
-              <div className="grid grid-cols-4 gap-4 mt-4">
+              <div className="grid grid-cols-4 gap-5 mt-4">
                 {images.map((img,i)=>(
                   <button key={img+i} onClick={()=>setMainImg(img)} className={`aspect-square w-full rounded-radius-md overflow-hidden border-2 ${(mainImg||mainImage)===img?"border-brand-900":"border-neutral-300"}`}><img src={img} alt="thumb" onError={()=>handleImgError(img)} className="w-full h-full object-cover" /></button>
                 ))}
               </div>
             )}
           </div>
-          <div className="font-montserrat lg:max-w-[640px]">
+          <div className="col-span-12 lg:col-span-5 font-montserrat">
             <div className="flex items-start justify-between gap-4">
               <h1 className="font-lora text-[32px] sm:text-[36px] font-bold text-neutral-900-alt mb-2">{product.name}</h1>
               <button
@@ -394,38 +394,38 @@ export default function Product() {
           {tabBtn('reviews',`Отзывы (${reviews.length})`)}
         </div>
         {activeTab==='desc' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 font-montserrat text-[23px] text-[#262626]" style={{ columnGap: '18%', rowGap: '40px', lineHeight: 1.65 }}>
-            <div><h4 className="font-bold text-[#171717]" style={{ marginBottom: '32px' }}>{product.name}</h4><p style={{ marginBottom: '32px' }}>{product.description?.text1}</p><p>{product.description?.text2}</p></div>
-            <div><h4 className="font-bold text-[#171717]" style={{ marginBottom: '32px' }}>Гастрономические сочетания</h4><p style={{ marginBottom: '32px' }}>{product.description?.pairing1}</p><p>{product.description?.pairing2}</p></div>
+          <div className="grid grid-cols-12 gap-5 font-montserrat text-[23px] text-[#262626]" style={{ lineHeight: 1.65 }}>
+            <div className="col-span-12 lg:col-span-5 lg:col-start-1"><h4 className="font-bold text-[#171717]" style={{ marginBottom: '32px' }}>{product.name}</h4><p style={{ marginBottom: '32px' }}>{product.description?.text1}</p><p>{product.description?.text2}</p></div>
+            <div className="col-span-12 lg:col-span-5 lg:col-start-8"><h4 className="font-bold text-[#171717]" style={{ marginBottom: '32px' }}>Гастрономические сочетания</h4><p style={{ marginBottom: '32px' }}>{product.description?.pairing1}</p><p>{product.description?.pairing2}</p></div>
           </div>
         )}
         {activeTab==='info' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 font-montserrat text-[23px] text-[#262626]" style={{ columnGap: '18%', rowGap: '40px', lineHeight: 1.65 }}>
-            <div><h4 className="font-bold text-[#171717]" style={{ marginBottom: '32px' }}>Состав продукта</h4><p className="text-[#262626]" style={{ marginBottom: '48px' }}>{product.ingredients}</p><h4 className="font-bold text-[#171717]" style={{ marginBottom: '32px' }}>Срок годности и хранение</h4><p className="text-[#262626]">{product.shelfLife}</p></div>
-            <div className="bg-surface-white border border-neutral-300 rounded-radius-xl" style={{ alignSelf: 'start', padding: '32px', lineHeight: 1.4 }}><h4 className="font-bold text-[#171717]" style={{ marginBottom: '24px' }}>Пищевая ценность (на 100 г)</h4><div className="grid grid-cols-2" style={{ columnGap: '48px', rowGap: '32px' }}>{[[product.nutrition?.calories,'ккал'],[product.nutrition?.proteins,'г белки'],[product.nutrition?.fats,'г жиры'],[product.nutrition?.carbs,'г углеводы']].map(([val,label])=>(<div key={label}><p className="font-inter text-[42px] font-bold leading-none text-[#262626]">{val}</p><p className="font-inter text-[23px] text-[#262626] mt-2">{label}</p></div>))}</div></div>
+          <div className="grid grid-cols-12 gap-5 font-montserrat text-[23px] text-[#262626]" style={{ lineHeight: 1.65 }}>
+            <div className="col-span-12 lg:col-span-6 lg:col-start-1"><h4 className="font-bold text-[#171717]" style={{ marginBottom: '32px' }}>Состав продукта</h4><p className="text-[#262626]" style={{ marginBottom: '48px' }}>{product.ingredients}</p><h4 className="font-bold text-[#171717]" style={{ marginBottom: '32px' }}>Срок годности и хранение</h4><p className="text-[#262626]">{product.shelfLife}</p></div>
+            <div className="col-span-12 lg:col-span-5 lg:col-start-8 bg-surface-white border border-neutral-300 rounded-radius-xl" style={{ alignSelf: 'start', padding: '32px', lineHeight: 1.4 }}><h4 className="font-bold text-[#171717]" style={{ marginBottom: '24px' }}>Пищевая ценность (на 100 г)</h4><div className="grid grid-cols-2 gap-5">{[[product.nutrition?.calories,'ккал'],[product.nutrition?.proteins,'г белки'],[product.nutrition?.fats,'г жиры'],[product.nutrition?.carbs,'г углеводы']].map(([val,label])=>(<div key={label}><p className="font-inter text-[42px] font-bold leading-none text-[#262626]">{val}</p><p className="font-inter text-[23px] text-[#262626] mt-2">{label}</p></div>))}</div></div>
           </div>
         )}
         {activeTab==='reviews' && (
-          <div className="w-full grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_420px] gap-10 items-start">
+          <div className="w-full grid grid-cols-12 gap-5 items-start">
             {reviews.length===0 ? (
-              <div className="w-full bg-surface-cream border border-neutral-250-a80 rounded-radius-lg py-12 text-center text-[#262626] font-montserrat text-[24px]">отзывов пока нет</div>
+              <div className="col-span-12 lg:col-span-9 w-full bg-surface-cream border border-neutral-250-a80 rounded-radius-lg py-12 text-center text-[#262626] font-montserrat text-[24px]">отзывов пока нет</div>
             ) : (
-              <div className="w-full flex flex-col gap-4">
+              <div className="col-span-12 lg:col-span-9 w-full flex flex-col gap-5">
                 {reviews.map(r=>(
-                  <article key={r.id} className="grid grid-cols-1 md:grid-cols-[220px_1fr] bg-surface-white border border-neutral-300 rounded-radius-lg" style={{ padding: '32px', columnGap: '32px', rowGap: '24px', lineHeight: 1.65 }}>
-                    <div>
+                  <article key={r.id} className="grid grid-cols-12 gap-5 bg-surface-white border border-neutral-300 rounded-radius-lg" style={{ padding: '32px', lineHeight: 1.65 }}>
+                    <div className="col-span-12 md:col-span-3">
                       <p className="font-bold text-[#262626]">{r.author}<span className="font-normal text-[16px]" style={{ color: '#737373', marginLeft: '8px' }}>{r.date}</span></p>
                       <div className="mt-4">{starsRow(r.rating)}</div>
                       {r.pairing && <p className="text-[23px] text-[#262626] mt-4">Пара: {r.pairing}</p>}
                     </div>
-                    <div>
+                    <div className="col-span-12 md:col-span-9">
                       <p className="text-[23px] text-[#262626]">{r.text}</p>
                     </div>
                   </article>
                 ))}
               </div>
             )}
-            <aside className="w-full font-montserrat">
+            <aside className="col-span-12 lg:col-span-3 w-full font-montserrat">
               <p className="text-[54px] font-bold text-[#262626] leading-none">{avgRating}</p>
               <p className="text-[23px] text-[#262626] mt-3">{reviews.length === 0 ? 'На основе 0 отзывов' : `На основе ${reviews.length}-х ${reviewsWord(reviews.length)}`}</p>
               <div className="mt-3">{starsRow(Math.floor(avgRating))}</div>
@@ -433,7 +433,7 @@ export default function Product() {
             </aside>
           </div>
         )}
-        <div className="also-buy" style={{ marginTop: '64px' }}><h2 className="font-lora text-[36px] leading-8 font-bold text-neutral-900-alt mb-6">С этим сыром покупают</h2><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{related.map(pp=>(<ProductCard key={pp.id} product={pp} />))}</div></div>
+        <div className="also-buy" style={{ marginTop: '64px' }}><h2 className="font-lora text-[36px] leading-8 font-bold text-neutral-900-alt mb-6">С этим сыром покупают</h2><div className="grid grid-cols-12 gap-5">{related.map(pp=>(<div key={pp.id} className="col-span-12 sm:col-span-6 lg:col-span-3"><ProductCard product={pp} /></div>))}</div></div>
       </div>
 
       {isReviewModalOpen && (
