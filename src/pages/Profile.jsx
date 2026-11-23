@@ -812,13 +812,51 @@ export default function Profile() {
                     </button>
                   </div>
                 </form>
+              </div>
+              </div>
+
+              {/* Правая колонка: программа лояльности и адреса */}
+              <div className="w-full sm:w-[400px] shrink-0">
+                <h2 className="text-[22px] font-bold text-neutral-900-alt mb-6 font-montserrat">
+                  Программа лояльности
+                </h2>
+                <div
+                  className="relative rounded-2xl overflow-hidden p-6 text-white shadow-md flex flex-col justify-between w-full sm:w-[360px] min-h-[160px]"
+                  style={{
+                    backgroundColor: '#1E1B18',
+                    backgroundImage: "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)), url('/images/balance.jpg')",
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                  }}
+                >
+                  <div>
+                    <div className="text-[13px] text-white/80 mb-1">
+                      Ваш баланс
+                    </div>
+                    <div className="text-[28px] sm:text-[32px] font-bold tracking-tight text-white">
+                      {balance} баллов
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[13px] pt-4 mt-2">
+                    <span className="text-white/80">1 балл = 1 ₽</span>
+                    <button
+                      type="button"
+                      onClick={() => notify('1 балл за каждый 1 ₽ заказа')}
+                      className="text-white underline hover:text-white/80 transition-colors bg-transparent border-none p-0 cursor-pointer text-[13px]"
+                    >
+                      Как копить?
+                    </button>
+                  </div>
+                </div>
 
                 {/* Блок Мои адреса */}
-                <div className="mt-10 sm:mt-12">
+                <div className="mt-10">
                   <h2 className="text-[22px] font-bold text-neutral-900-alt mb-6 font-montserrat">
                     Мои адреса
                   </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     {userAddresses.map((item, idx) => {
                       const label = typeof item === 'string' ? item : item.label || item.title || 'Дом';
                       const addr = typeof item === 'string' ? item : item.address || item.text || '';
@@ -972,41 +1010,6 @@ export default function Profile() {
                         </button>
                       )
                     )}
-                  </div>
-                </div>
-              </div>
-              </div>
-
-              {/* Правая колонка: Карта баланса */}
-              <div className="w-full sm:w-[400px] shrink-0 mt-6 xl:mt-0">
-                <div
-                  className="relative rounded-2xl overflow-hidden p-6 text-white shadow-md flex flex-col justify-between w-full sm:w-[360px] min-h-[160px]"
-                  style={{
-                    backgroundColor: '#1E1B18',
-                    backgroundImage: "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)), url('/images/balance.jpg')",
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                  }}
-                >
-                  <div>
-                    <div className="text-[13px] text-white/80 mb-1">
-                      Ваш баланс
-                    </div>
-                    <div className="text-[28px] sm:text-[32px] font-bold tracking-tight text-white">
-                      {balance} баллов
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between text-[13px] pt-4 mt-2">
-                    <span className="text-white/80">1 балл = 1 ₽</span>
-                    <button
-                      type="button"
-                      onClick={() => notify('1 балл за каждый 1 ₽ заказа')}
-                      className="text-white underline hover:text-white/80 transition-colors bg-transparent border-none p-0 cursor-pointer text-[13px]"
-                    >
-                      Как копить?
-                    </button>
                   </div>
                 </div>
               </div>
