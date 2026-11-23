@@ -828,7 +828,7 @@ export default function Profile() {
                           <form
                             key={item?.id ?? idx}
                             onSubmit={handleSaveEdit}
-                            className="border border-neutral-300 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between w-full min-h-[210px] bg-white shadow-sm gap-2"
+                            className="border border-neutral-300 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between w-full min-h-[150px] bg-white shadow-sm gap-2"
                           >
                             <input
                               type="text"
@@ -868,7 +868,7 @@ export default function Profile() {
                       return (
                         <div
                           key={item?.id ?? idx}
-                          className="relative rounded-2xl overflow-hidden p-5 sm:p-6 text-white flex flex-col justify-between w-full h-[210px] shadow-sm"
+                          className="relative rounded-2xl overflow-hidden p-5 sm:p-6 text-white flex flex-col justify-between w-full h-[150px] shadow-sm"
                           style={{
                             backgroundColor: '#26211E',
                             backgroundImage: "linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.75)), url('/images/address.jpg'), linear-gradient(135deg, #3A2E2B 0%, #1E1B18 100%)",
@@ -917,7 +917,7 @@ export default function Profile() {
                       showAddAddress ? (
                         <form
                           onSubmit={handleAddAddress}
-                          className="border border-neutral-300 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between w-full min-h-[210px] bg-white shadow-sm gap-2"
+                          className="border border-neutral-300 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between w-full min-h-[150px] bg-white shadow-sm gap-2"
                         >
                           <input
                             type="text"
@@ -965,7 +965,7 @@ export default function Profile() {
                             setAddressLabel('');
                             setAddressValue('');
                           }}
-                          className="border border-neutral-300 hover:border-neutral-400 transition-colors rounded-2xl p-4 sm:p-5 flex flex-col justify-between w-full h-[210px] text-left bg-white cursor-pointer group"
+                          className="border border-neutral-300 hover:border-neutral-400 transition-colors rounded-2xl p-4 sm:p-5 flex flex-col justify-between w-full h-[150px] text-left bg-white cursor-pointer group"
                         >
                           <span className="text-[28px] font-bold text-neutral-900-alt leading-none">+</span>
                           <span className="font-lora text-[17px] font-semibold text-neutral-900-alt">Добавить адрес</span>
