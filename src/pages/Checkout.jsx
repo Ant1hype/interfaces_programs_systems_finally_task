@@ -319,11 +319,11 @@ export default function Checkout() {
 
   if (items.length === 0) {
     return (
-      <div className="checkout-root w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat">
+      <div className="checkout-root w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto pt-[40px] pb-10 font-montserrat">
         <div className="[&_.breadcrumb__link]:text-neutral-700 [&_.breadcrumb__link:hover]:text-brand-900 [&_.breadcrumb__current]:text-neutral-900 [&_.breadcrumb__current]:underline">
           <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/cart', label: 'Корзина' }]} current="Оформление" />
         </div>
-        <h1 className="font-lora text-[32px] font-bold text-neutral-900-alt mb-10">Оформление заказа</h1>
+        <h1 className="font-lora text-[32px] sm:text-[36px] font-bold text-neutral-900-alt mb-10">Оформление заказа</h1>
         <div className="bg-surface-cream border border-neutral-250-a80 rounded-radius-xl py-16 px-6 text-center">
           <p className="text-[18px] text-neutral-800 mb-6">Ваша корзина пуста</p>
           <Link to="/catalog" className="inline-flex px-8 py-4 rounded-radius-lg bg-brand-900 text-surface-white font-medium no-underline hover:bg-brand-700">В каталог</Link>
@@ -333,15 +333,15 @@ export default function Checkout() {
   }
 
   return (
-    <div className="checkout-root w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-10 font-montserrat">
+    <div className="checkout-root w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] max-w-[1920px] mx-auto pt-[40px] pb-10 font-montserrat">
       <div className="[&_.breadcrumb__link]:text-neutral-700 [&_.breadcrumb__link:hover]:text-brand-900 [&_.breadcrumb__current]:text-neutral-900 [&_.breadcrumb__current]:underline">
         <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/cart', label: 'Корзина' }]} current="Оформление" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_360px] gap-10 xl:gap-16 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_420px] gap-10 xl:gap-16 items-start">
         <div>
           <div className="flex flex-wrap items-baseline justify-between gap-4 mb-6">
-            <h1 className="font-lora text-[32px] font-bold text-neutral-900-alt">Оформление заказа</h1>
+            <h1 className="font-lora text-[32px] sm:text-[36px] font-bold text-neutral-900-alt">Оформление заказа</h1>
             {!user && (
               <span className="text-[15px] text-neutral-black">
                 Уже есть аккаунт? <Link to="/auth" className="font-bold underline text-neutral-black hover:text-brand-900">Войти</Link>
@@ -534,7 +534,7 @@ export default function Checkout() {
           </form>
         </div>
 
-        <aside className="bg-surface-white border border-neutral-250-a80 rounded-radius-xl p-6 lg:mt-[68px]">
+        <aside className="bg-surface-white border border-neutral-250-a80 rounded-radius-xl p-6 lg:sticky lg:top-24 lg:self-start">
           <div className="flex items-center justify-between text-[15px] text-neutral-black mb-4">
             <span>Товары ({totalQty})</span>
             <span className="font-inter font-bold">{fmt(it)}</span>

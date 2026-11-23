@@ -244,9 +244,9 @@ export default function Product() {
     else if(mainImg===src) setMainImg('');
   };
 
-  if(loading) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-8 font-montserrat">Загрузка...</div>;
-  if(error) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-8">Ошибка: {error}</div>;
-  if(!product) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-8">Сыр не найден</div>;
+  if(loading) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] pt-[40px] pb-8 font-montserrat">Загрузка...</div>;
+  if(error) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] pt-[40px] pb-8">Ошибка: {error}</div>;
+  if(!product) return <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] pt-[40px] pb-8">Сыр не найден</div>;
 
   const isFav = isFavorite ? isFavorite(product.id) : false;
 
@@ -279,7 +279,7 @@ export default function Product() {
 
   return (
     <div className="min-h-screen pb-[100px]">
-      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] pt-[40px] pb-6">
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] 2xl:px-[120px] pt-[40px] pb-6">
         <div className="[&_.breadcrumb__link]:text-neutral-700 [&_.breadcrumb__link:hover]:text-brand-900 [&_.breadcrumb__current]:text-neutral-900 [&_.breadcrumb__current]:underline">
           <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/catalog', label: 'Каталог' }]} current={product.name} />
         </div>
@@ -301,7 +301,7 @@ export default function Product() {
           </div>
           <div className="font-montserrat lg:max-w-[640px]">
             <div className="flex items-start justify-between gap-4">
-              <h1 className="font-lora text-2xl lg:text-3xl font-bold text-neutral-900-alt mb-2">{product.name}</h1>
+              <h1 className="font-lora text-[32px] sm:text-[36px] font-bold text-neutral-900-alt mb-2">{product.name}</h1>
               <button
                 type="button"
                 onClick={handleFavClick}
@@ -394,7 +394,7 @@ export default function Product() {
           </div>
         )}
         {activeTab==='reviews' && (
-          <div className="w-full grid grid-cols-[minmax(0,1fr)_420px] gap-10 items-start">
+          <div className="w-full grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_420px] gap-10 items-start">
             {reviews.length===0 ? (
               <div className="w-full bg-surface-cream border border-neutral-250-a80 rounded-radius-lg py-12 text-center text-[#262626] font-montserrat text-[24px]">отзывов пока нет</div>
             ) : (
