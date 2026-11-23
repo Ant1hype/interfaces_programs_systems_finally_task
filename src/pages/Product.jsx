@@ -289,16 +289,16 @@ export default function Product() {
         <div className="[&_.breadcrumb__link]:text-neutral-700 [&_.breadcrumb__link:hover]:text-brand-900 [&_.breadcrumb__current]:text-neutral-900 [&_.breadcrumb__current]:underline">
           <Breadcrumbs items={[{ to: '/', label: 'Главная' }, { to: '/catalog', label: 'Каталог' }]} current={product.name} />
         </div>
-        <div className="grid grid-cols-12 gap-5 mb-14">
+        <div className="grid grid-cols-12 gap-5 lg:gap-16 mb-14">
           <div className="col-span-12 lg:col-span-7">
             <div
               onClick={handleOpenLightbox}
-              className="rounded-radius-lg overflow-hidden bg-surface-white border border-neutral-300 cursor-pointer"
+              className="w-full max-w-[760px] rounded-radius-lg overflow-hidden bg-surface-white border border-neutral-300 cursor-pointer"
             >
               <img src={mainImg||mainImage} alt={product.name} onError={()=>handleImgError(mainImg||mainImage)} className="w-full object-cover aspect-[4/3] block" />
             </div>
             {images.length>1 && (
-              <div className="grid grid-cols-4 gap-5 mt-4">
+              <div className="grid grid-cols-4 gap-5 mt-4 max-w-[760px]">
                 {images.map((img,i)=>(
                   <button key={img+i} onClick={()=>setMainImg(img)} className={`aspect-square w-full rounded-radius-md overflow-hidden border-2 ${(mainImg||mainImage)===img?"border-brand-900":"border-neutral-300"}`}><img src={img} alt="thumb" onError={()=>handleImgError(img)} className="w-full h-full object-cover" /></button>
                 ))}
