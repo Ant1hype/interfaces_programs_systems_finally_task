@@ -685,11 +685,11 @@ export default function Profile() {
               </form>
             </div>
           ) : (
-            <div className="flex-1 w-full flex flex-col xl:flex-row gap-10 xl:gap-16 items-start">
+            <div className="flex-1 w-full grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_420px] gap-10 xl:gap-16">
               {/* Блок Личные данные */}
               <div className="flex-1 min-w-0 flex justify-center">
               <div className="w-full max-w-[640px]">
-                <h2 className="text-[31px] font-bold text-neutral-900-alt mb-6 font-montserrat">
+                <h2 className="text-[26px] font-bold text-neutral-900-alt mb-6 font-montserrat">
                   Личные данные
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -816,12 +816,12 @@ export default function Profile() {
               </div>
 
               {/* Правая колонка: программа лояльности и адреса */}
-              <div className="w-full sm:w-[400px] shrink-0">
-                <h2 className="text-[22px] font-bold text-neutral-900-alt mb-6 font-montserrat">
+              <div className="w-full">
+                <h2 className="text-[26px] font-bold text-neutral-900-alt mb-6 font-montserrat">
                   Программа лояльности
                 </h2>
                 <div
-                  className="relative rounded-2xl overflow-hidden p-6 text-white shadow-md flex flex-col justify-between w-full sm:w-[360px] min-h-[160px]"
+                  className="relative rounded-2xl overflow-hidden p-6 text-white shadow-md flex flex-col justify-between w-full h-[150px]"
                   style={{
                     backgroundColor: '#1E1B18',
                     backgroundImage: "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)), url('/images/balance.jpg')",
@@ -831,20 +831,20 @@ export default function Profile() {
                   }}
                 >
                   <div>
-                    <div className="text-[13px] text-white/80 mb-1">
+                    <div className="font-lora text-[17px] text-white/80 mb-1">
                       Ваш баланс
                     </div>
-                    <div className="text-[28px] sm:text-[32px] font-bold tracking-tight text-white">
+                    <div className="font-lora font-bold text-[26px] tracking-tight text-white">
                       {balance} баллов
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-[13px] pt-4 mt-2">
+                  <div className="flex items-center justify-between font-lora text-[15px] pt-4 mt-2">
                     <span className="text-white/80">1 балл = 1 ₽</span>
                     <button
                       type="button"
                       onClick={() => notify('1 балл за каждый 1 ₽ заказа')}
-                      className="text-white underline hover:text-white/80 transition-colors bg-transparent border-none p-0 cursor-pointer text-[13px]"
+                      className="font-lora text-white underline hover:text-white/80 transition-colors bg-transparent border-none p-0 cursor-pointer text-[15px]"
                     >
                       Как копить?
                     </button>
@@ -853,10 +853,10 @@ export default function Profile() {
 
                 {/* Блок Мои адреса */}
                 <div className="mt-10">
-                  <h2 className="text-[22px] font-bold text-neutral-900-alt mb-6 font-montserrat">
+                  <h2 className="text-[26px] font-bold text-neutral-900-alt mb-6 font-montserrat">
                     Мои адреса
                   </h2>
-                  <div className="grid grid-cols-1 gap-4">
+                  <div className="space-y-4">
                     {userAddresses.map((item, idx) => {
                       const label = typeof item === 'string' ? item : item.label || item.title || 'Дом';
                       const addr = typeof item === 'string' ? item : item.address || item.text || '';
@@ -866,7 +866,7 @@ export default function Profile() {
                           <form
                             key={item?.id ?? idx}
                             onSubmit={handleSaveEdit}
-                            className="border border-neutral-300 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between w-full min-h-[150px] bg-white shadow-sm gap-2"
+                            className="border border-neutral-300 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between w-full h-[150px] bg-white shadow-sm gap-2"
                           >
                             <input
                               type="text"
@@ -955,7 +955,7 @@ export default function Profile() {
                       showAddAddress ? (
                         <form
                           onSubmit={handleAddAddress}
-                          className="border border-neutral-300 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between w-full min-h-[150px] bg-white shadow-sm gap-2"
+                          className="border border-neutral-300 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between w-full h-[150px] bg-white shadow-sm gap-2"
                         >
                           <input
                             type="text"
@@ -1005,7 +1005,7 @@ export default function Profile() {
                           }}
                           className="border border-neutral-300 hover:border-neutral-400 transition-colors rounded-2xl p-4 sm:p-5 flex flex-col justify-between w-full h-[150px] text-left bg-white cursor-pointer group"
                         >
-                          <span className="text-[28px] font-bold text-neutral-900-alt leading-none">+</span>
+                          <span className="text-[22px] font-bold text-neutral-900-alt leading-none">+</span>
                           <span className="font-lora text-[17px] font-semibold text-neutral-900-alt">Добавить адрес</span>
                         </button>
                       )
