@@ -7,6 +7,7 @@ import ProductCard from '../components/ProductCard.jsx';
 import Breadcrumbs from '../components/Breadcrumbs.jsx';
 
 const PROMO_CODE = 'CHEESE10', PROMO_PERCENT = 10;
+const FREE_SHIPPING_THRESHOLD = 3000;
 const fmt = (v) => `${Math.round(v).toLocaleString('ru-RU')} ₽`;
 
 function useProducts() {
@@ -31,6 +32,9 @@ export default function Cart() {
   const rows = useMemo(() => items.map(it => { const p = byId.get(String(it.id)); const bp = Number(p?.price) || 0; const lp = (bp * it.pack) / 100; return { key: itemKey(it.id, it.pack), id: it.id, pack: it.pack, qty: it.qty, name: p?.name || '...', image: p?.image || '', stock: p?.stock, lineTotal: lp * it.qty }; }), [items, byId]);
   const it = useMemo(() => rows.reduce((s, r) => s + r.lineTotal, 0), [rows]);
   const disc = appliedPromo === PROMO_CODE ? Math.round((it * PROMO_PERCENT) / 100) : 0;
+  const shippingRemaining = Math.max(0, FREE_SHIPPING_THRESHOLD - it);
+  const shippingProgress = Math.min(100, (it / FREE_SHIPPING_THRESHOLD) * 100);
+  const shippingReached = it >= FREE_SHIPPING_THRESHOLD;
   const gt = Math.max(0, it - disc);
   const pair = useMemo(() => { const ic = new Set(items.map(x => String(x.id))); return products.filter(x => x.inStock).filter(x => !ic.has(String(x.id))).sort((a, b) => (Number(b.taste) || 0) - (Number(a.taste) || 0)).slice(0, 4); }, [products, items]);
   const ap = (e) => {
@@ -98,5 +102,27 @@ export default function Cart() {
       </div>
     </div>
   );
-})}<Link to="/catalog" className="inline-block mt-6 text-[14px] text-neutral-700 no-underline hover:text-brand-900">← Продолжить покупки</Link></div><aside className="bg-surface-white border border-neutral-250-a80 rounded-radius-xl p-6 lg:sticky lg:top-24 lg:self-start"><div className="flex items-center justify-between text-[15px] text-neutral-black mb-4"><span>Товары ({totalQty})</span><span className="font-inter font-bold">{fmt(it)}</span></div><div className="flex items-center justify-between text-[15px] text-neutral-black mb-5"><span>Скидка</span><span className="font-inter font-bold">-{disc} ₽</span></div><div className="border-t border-neutral-250 pt-5 mb-5 flex items-center justify-between"><span className="text-[24px] font-bold text-neutral-black">Итого</span><span className="text-[24px] font-bold text-neutral-black">{fmt(gt)}</span></div><form onSubmit={ap} className="flex items-center gap-3 mb-4"><input type="text" value={pi} onChange={e => setPi(e.target.value)} placeholder="Введите промокод..." className="flex-1 min-w-0 h-[44px] px-4 bg-surface-white border border-neutral-250-a80 rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900" /><button type="submit" className="w-[44px] h-[44px] shrink-0 rounded-radius-md bg-brand-900 text-surface-white cursor-pointer hover:bg-brand-700"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 mx-auto"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg></button></form>{pe && <p className="text-[13px] text-danger-700 mb-4">{pe}</p>}{appliedPromo && !pe && <p className="text-[13px] text-brand-700 mb-4">Промокод {appliedPromo} применён</p>}<Link to="/checkout" className="flex items-center justify-center w-full h-[52px] rounded-radius-md bg-brand-900 text-surface-white text-[16px] font-medium no-underline hover:bg-brand-700">Перейти к оформлению</Link><p className="mt-4 text-[11px] leading-4 text-overlay-dark-40">Нажимая на кнопку, вы соглашаетесь с условиями возврата</p></aside></div>{pair.length > 0 && (<section className="mt-16"><h2 className="font-lora text-[26px] font-bold text-neutral-900-alt mb-8">Идеальная пара</h2><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{pair.map(p => (<ProductCard key={p.id} product={p} />))}</div></section>)}</div>);
+})}<Link to="/catalog" className="inline-block mt-6 text-[14px] text-neutral-700 no-underline hover:text-brand-900">← Продолжить покупки</Link></div><aside className="bg-surface-white border border-neutral-250-a80 rounded-radius-xl p-6 lg:sticky lg:top-24 lg:self-start"><div className="flex items-center justify-between text-[15px] text-neutral-black mb-4"><span>Товары ({totalQty})</span><span className="font-inter font-bold">{fmt(it)}</span></div><div className="flex items-center justify-between text-[15px] text-neutral-black mb-5"><span>Скидка</span><span className="font-inter font-bold">-{disc} ₽</span></div>{it > 0 && (
+  <div className="mb-5">
+    <div className="flex items-center justify-between text-[14px] mb-2">
+      {shippingReached ? (
+        <span className="font-semibold text-brand-900 flex items-center gap-1.5">
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          Бесплатная доставка достигнута!
+        </span>
+      ) : (
+        <span className="text-neutral-700">
+          До бесплатной доставки{' '}
+          <span className="font-semibold text-neutral-900">{Math.round(shippingRemaining).toLocaleString('ru-RU')} ₽</span>
+        </span>
+      )}
+      <span className="text-neutral-500 tabular-nums">{Math.round(shippingProgress)}%</span>
+    </div>
+    <div className="w-full h-2 bg-neutral-200 rounded-full overflow-hidden">
+      <div className={`h-full rounded-full transition-[width] duration-500 ${shippingReached ? 'bg-brand-700' : 'bg-brand-900'}`} style={{ width: `${shippingProgress}%` }} />
+    </div>
+  </div>
+)}<div className="border-t border-neutral-250 pt-5 mb-5 flex items-center justify-between"><span className="text-[24px] font-bold text-neutral-black">Итого</span><span className="text-[24px] font-bold text-neutral-black">{fmt(gt)}</span></div><form onSubmit={ap} className="flex items-center gap-3 mb-4"><input type="text" value={pi} onChange={e => setPi(e.target.value)} placeholder="Введите промокод..." className="flex-1 min-w-0 h-[44px] px-4 bg-surface-white border border-neutral-250-a80 rounded-radius-md text-[14px] text-neutral-black placeholder:text-neutral-400 outline-none focus:border-brand-900" /><button type="submit" className="w-[44px] h-[44px] shrink-0 rounded-radius-md bg-brand-900 text-surface-white cursor-pointer hover:bg-brand-700"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 mx-auto"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg></button></form>{pe && <p className="text-[13px] text-danger-700 mb-4">{pe}</p>}{appliedPromo && !pe && <p className="text-[13px] text-brand-700 mb-4">Промокод {appliedPromo} применён</p>}<Link to="/checkout" className="flex items-center justify-center w-full h-[52px] rounded-radius-md bg-brand-900 text-surface-white text-[16px] font-medium no-underline hover:bg-brand-700">Перейти к оформлению</Link><p className="mt-4 text-[11px] leading-4 text-overlay-dark-40">Нажимая на кнопку, вы соглашаетесь с условиями возврата</p></aside></div>{pair.length > 0 && (<section className="mt-16"><h2 className="font-lora text-[26px] font-bold text-neutral-900-alt mb-8">Идеальная пара</h2><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{pair.map(p => (<ProductCard key={p.id} product={p} />))}</div></section>)}</div>);
 }
