@@ -8,6 +8,8 @@ import Breadcrumbs from '../components/Breadcrumbs.jsx';
 import './Checkout.css';
 
 const PROMO_CODE = 'CHEESE10', PROMO_PERCENT = 10;
+const FREE_SHIPPING_THRESHOLD = 3000;
+const DEFAULT_SHIPPING_COST = 300;
 const fmt = (v) => `${Math.round(v).toLocaleString('ru-RU')} ₽`;
 
 const DELIVERY_SLOTS = [
@@ -165,6 +167,10 @@ export default function Checkout() {
 
   const it = useMemo(() => rows.reduce((s, r) => s + r.lineTotal, 0), [rows]);
   const disc = appliedPromo === PROMO_CODE ? Math.round((it * PROMO_PERCENT) / 100) : 0;
+  const shippingBase = delivery === 'Самовывоз' ? 0 : (it >= FREE_SHIPPING_THRESHOLD ? 0 : DEFAULT_SHIPPING_COST);
+  const shippingReached = it >= FREE_SHIPPING_THRESHOLD;
+  const shippingRemaining = Math.max(0, FREE_SHIPPING_THRESHOLD - it);
+  const shippingProgress = Math.min(100, (it / FREE_SHIPPING_THRESHOLD) * 100);
   const afterPromo = Math.max(0, it - disc);
   const cap = Math.max(0, Math.min(balance, afterPromo));
 
@@ -173,7 +179,7 @@ export default function Checkout() {
     ? Math.min(pointsNum, cap)
     : 0;
 
-  const gt = Math.max(0, afterPromo - pointsToSpend);
+  const gt = Math.max(0, it + shippingBase - disc - pointsToSpend);
 
   const handlePointsChange = (e) => {
     const rawVal = e.target.value.trim();
@@ -294,6 +300,7 @@ export default function Checkout() {
       userId: user?.id,
       userEmail: user?.email,
       delivery,
+      shipping: shippingBase,
       deliveryDate:
         delivery === 'Самовывоз'
           ? tomorrow.toISOString()
@@ -539,6 +546,42 @@ export default function Checkout() {
             <span>Товары ({totalQty})</span>
             <span className="font-inter font-bold">{fmt(it)}</span>
           </div>
+          <div className="flex items-center justify-between text-[15px] text-neutral-black mb-4">
+            <span>Доставка</span>
+            {delivery === 'Доставка курьером' && shippingReached ? (
+              <span className="font-inter flex items-center gap-1.5">
+                <span className="line-through text-neutral-400">{fmt(DEFAULT_SHIPPING_COST)}</span>
+                <span className="font-bold text-brand-900">{fmt(0)}</span>
+              </span>
+            ) : (
+              <span className="font-inter font-bold">{fmt(shippingBase)}</span>
+            )}
+          </div>
+          {delivery === 'Самовывоз' ? (
+            <p className="text-[14px] text-neutral-600 mb-5">Самовывоз — бесплатно</p>
+          ) : delivery === 'Доставка курьером' && it > 0 && (
+            <div className="mb-5">
+              <div className="flex items-center justify-between text-[14px] mb-2">
+                {shippingReached ? (
+                  <span className="font-semibold text-brand-900 flex items-center gap-1.5">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    Бесплатная доставка достигнута!
+                  </span>
+                ) : (
+                  <span className="text-neutral-700">
+                    До бесплатной доставки{' '}
+                    <span className="font-semibold text-neutral-900">{Math.round(shippingRemaining).toLocaleString('ru-RU')} ₽</span>
+                  </span>
+                )}
+                <span className="text-neutral-500 tabular-nums">{Math.round(shippingProgress)}%</span>
+              </div>
+              <div className="w-full h-2 bg-neutral-200 rounded-full overflow-hidden">
+                <div className={`h-full rounded-full transition-[width] duration-500 ${shippingReached ? 'bg-brand-700' : 'bg-brand-900'}`} style={{ width: `${shippingProgress}%` }} />
+              </div>
+            </div>
+          )}
           <div className="flex items-center justify-between text-[15px] text-neutral-black mb-5">
             <span>Скидка</span>
             <span className="font-inter font-bold">-{disc} ₽</span>

@@ -1089,6 +1089,12 @@ export default function Profile() {
                       {totalQty} шт.
                     </div>
                   </div>
+                  <div>
+                    <div className="text-[13px] text-neutral-500 mb-1">Доставка</div>
+                    <div className="text-[15px] font-semibold text-neutral-900-alt">
+                      {selectedOrder.shipping ?? (selectedOrder.delivery === 'Самовывоз' ? 0 : 300)} ₽
+                    </div>
+                  </div>
                 </div>
               );
             })()}
