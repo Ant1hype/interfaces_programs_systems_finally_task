@@ -782,7 +782,7 @@ export default function Profile() {
                     <button
                       type="submit"
                       disabled={saving}
-                      className="bg-brand-900 text-white hover:bg-brand-700 transition-colors font-medium text-[15px] px-8 py-3.5 rounded-lg disabled:opacity-60 cursor-pointer"
+                      className="bg-brand-900 text-white hover:bg-brand-700 transition-colors font-medium w-full h-[52px] flex items-center justify-center text-[16px] rounded-lg disabled:opacity-60 cursor-pointer"
                     >
                       {saving ? 'Сохранение...' : savedRecently ? 'Изменения сохранены' : 'Сохранить изменения'}
                     </button>
