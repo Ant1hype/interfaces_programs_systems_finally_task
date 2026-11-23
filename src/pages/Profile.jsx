@@ -689,24 +689,24 @@ export default function Profile() {
               {/* Блок Личные данные */}
               <div className="flex-1 min-w-0 flex justify-center">
               <div className="w-full max-w-[640px]">
-                <h2 className="text-[22px] font-bold text-neutral-900-alt mb-6 font-montserrat">
+                <h2 className="text-[31px] font-bold text-neutral-900-alt mb-6 font-montserrat">
                   Личные данные
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-[13px] text-neutral-500 mb-1">
+                    <label className="block text-[18px] text-neutral-700 mb-1">
                       Имя
                     </label>
                     <input
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full h-[46px] px-4 rounded-lg border border-neutral-300 focus:outline-none focus:border-brand-900 text-neutral-900-alt text-[14px] transition-colors"
+                      className="w-full h-[46px] px-4 rounded-lg border border-neutral-300 focus:outline-none focus:border-brand-900 text-neutral-900-alt text-[20px] placeholder:text-neutral-600 transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[13px] text-neutral-500 mb-1">
+                    <label className="block text-[18px] text-neutral-700 mb-1">
                       Номер телефона
                     </label>
                     <input
@@ -714,12 +714,12 @@ export default function Profile() {
                       value={phone}
                       onChange={(e) => setPhone(formatPhone(e.target.value))}
                       placeholder="+7 (___) ___-__-__"
-                      className="w-full h-[46px] px-4 rounded-lg border border-neutral-300 focus:outline-none focus:border-brand-900 text-neutral-900-alt text-[14px] transition-colors"
+                      className="w-full h-[46px] px-4 rounded-lg border border-neutral-300 focus:outline-none focus:border-brand-900 text-neutral-900-alt text-[20px] placeholder:text-neutral-600 transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[13px] text-neutral-500 mb-1">
+                    <label className="block text-[18px] text-neutral-700 mb-1">
                       E-mail
                     </label>
                     <input
@@ -729,12 +729,12 @@ export default function Profile() {
                         setEmail(e.target.value);
                         setEmailError('');
                       }}
-                      className={`w-full h-[46px] px-4 rounded-lg border focus:outline-none focus:border-brand-900 text-neutral-900-alt text-[14px] transition-colors ${
+                      className={`w-full h-[46px] px-4 rounded-lg border focus:outline-none focus:border-brand-900 text-neutral-900-alt text-[20px] placeholder:text-neutral-600 transition-colors ${
                         emailError ? 'border-danger-700' : 'border-neutral-300'
                       }`}
                     />
                     {emailError && (
-                      <p className="text-danger-700 text-[13px] mt-1.5 font-montserrat">
+                      <p className="text-danger-700 text-[18px] mt-1.5 font-montserrat">
                         {emailError}
                       </p>
                     )}
@@ -743,7 +743,7 @@ export default function Profile() {
                   <div className="pt-1">
                     <Link
                       to="/profile?tab=security"
-                      className="text-[14px] text-neutral-700 hover:text-neutral-900 transition-colors inline-flex items-center gap-1.5 font-normal no-underline"
+                      className="text-[20px] text-neutral-800 hover:text-neutral-900 transition-colors inline-flex items-center gap-1.5 font-normal no-underline"
                     >
                       <span>&rarr;</span>
                       <span>Изменить пароль</span>
@@ -771,7 +771,7 @@ export default function Profile() {
                         checked={subscribeEmail}
                         onChange={(e) => setSubscribeEmail(e.target.checked)}
                       />
-                      <span className="text-[14px] text-neutral-800">
+                      <span className="text-[20px] text-neutral-900">
                         Получать акции и скидки на почту
                       </span>
                     </label>
@@ -796,7 +796,7 @@ export default function Profile() {
                         checked={subscribeSms}
                         onChange={(e) => setSubscribeSms(e.target.checked)}
                       />
-                      <span className="text-[14px] text-neutral-800">
+                      <span className="text-[20px] text-neutral-900">
                         SMS-уведомления о заказах
                       </span>
                     </label>
@@ -806,7 +806,7 @@ export default function Profile() {
                     <button
                       type="submit"
                       disabled={saving}
-                      className="bg-brand-900 text-white hover:bg-brand-700 transition-colors font-medium w-full h-[52px] flex items-center justify-center text-[16px] rounded-lg disabled:opacity-60 cursor-pointer"
+                      className="bg-brand-900 text-white hover:bg-brand-700 transition-colors font-medium w-full h-[52px] flex items-center justify-center text-[21px] rounded-lg disabled:opacity-60 cursor-pointer"
                     >
                       {saving ? 'Сохранение...' : savedRecently ? 'Изменения сохранены' : 'Сохранить изменения'}
                     </button>
