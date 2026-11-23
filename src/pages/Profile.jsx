@@ -67,12 +67,13 @@ export default function Profile() {
   const moveLine = (i) => {
     const el = refs[i].current;
     if (el) {
-      setLine({ left: el.offsetLeft, top: el.offsetTop + el.offsetHeight - 2, width: el.offsetWidth, opacity: 1 });
+      setLine({ left: el.offsetLeft, top: el.offsetTop + el.offsetHeight + 2, width: el.offsetWidth, opacity: 1 });
     }
   };
 
   useEffect(() => {
-    moveLine(activeIndex);
+    const frame = requestAnimationFrame(() => moveLine(activeIndex));
+    return () => cancelAnimationFrame(frame);
   }, [tab]);
 
   const [products, setProducts] = useState([]);
@@ -461,12 +462,12 @@ export default function Profile() {
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-start">
           {/* Сайдбар слева */}
           <aside className="w-full lg:w-48 shrink-0 flex flex-col">
-            <div className="relative flex lg:flex-col gap-6 lg:gap-4" onMouseLeave={() => moveLine(activeIndex)}>
+            <div className="relative flex lg:flex-col items-start gap-6 lg:gap-4" onMouseLeave={() => moveLine(activeIndex)}>
               <Link
                 to="/profile"
                 ref={refs[0]}
                 onMouseEnter={() => moveLine(0)}
-                className={`text-[18px] transition-colors ${
+                className={`w-fit text-[18px] transition-colors ${
                   activeIndex === 0
                     ? 'font-bold text-neutral-900-alt'
                     : 'text-neutral-800 hover:text-neutral-900-alt'
@@ -478,7 +479,7 @@ export default function Profile() {
                 to="/profile?tab=orders"
                 ref={refs[1]}
                 onMouseEnter={() => moveLine(1)}
-                className={`text-[18px] transition-colors ${
+                className={`w-fit text-[18px] transition-colors ${
                   activeIndex === 1
                     ? 'font-bold text-neutral-900-alt'
                     : 'text-neutral-800 hover:text-neutral-900-alt'
@@ -494,7 +495,7 @@ export default function Profile() {
                   logout();
                   navigate('/');
                 }}
-                className="mt-8 lg:mt-12 inline-flex items-center gap-2 text-[18px] text-neutral-700 hover:text-neutral-900 transition-colors cursor-pointer bg-transparent border-none p-0 text-left"
+                className="mt-8 lg:mt-12 w-fit inline-flex items-center gap-2 text-[18px] text-neutral-700 hover:text-neutral-900 transition-colors cursor-pointer bg-transparent border-none p-0 text-left"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -502,9 +503,8 @@ export default function Profile() {
                 </svg>
                 Выйти
               </button>
-              <span aria-hidden className="absolute h-[2px] bg-brand-900 pointer-events-none"
-                style={{ top: line.top, left: line.left, width: line.width, opacity: line.opacity,
-                  transition: 'top .3s cubic-bezier(.25,.8,.25,1), left .3s cubic-bezier(.25,.8,.25,1), width .3s cubic-bezier(.25,.8,.25,1), opacity .3s' }} />
+              <span aria-hidden className="absolute h-[2px] bg-brand-900 pointer-events-none transition-[top,left,width,opacity] duration-300 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
+                style={{ ...line }} />
             </div>
           </aside>
 
