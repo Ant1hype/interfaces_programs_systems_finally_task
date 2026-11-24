@@ -463,7 +463,13 @@ export default function Product() {
         {activeTab==='desc' && (
           <div className="grid grid-cols-12 gap-5 font-montserrat text-[23px] text-[#262626]" style={{ lineHeight: 1.65 }}>
             <div className="col-span-12 lg:col-span-5 lg:col-start-1"><h4 className="font-bold text-[#171717]" style={{ marginBottom: '32px' }}>{product.name}</h4><p style={{ marginBottom: '32px' }}>{product.description?.text1}</p><p>{product.description?.text2}</p></div>
-            <div className="col-span-12 lg:col-span-5 lg:col-start-8"><h4 className="font-bold text-[#171717]" style={{ marginBottom: '32px' }}>Гастрономические сочетания</h4><p style={{ marginBottom: '32px' }}>{product.description?.pairing1}</p><p>{product.description?.pairing2}</p></div>
+            <div className="col-span-12 lg:col-span-5 lg:col-start-8">
+              <div className="bg-surface-white border border-neutral-300 rounded-radius-xl" style={{ padding: '32px', lineHeight: 1.65 }}>
+                <h4 className="font-bold mb-4 text-[#171717]">Гастрономические сочетания</h4>
+                <p className="text-[#262626]" style={{ marginBottom: '24px' }}>{product.description?.pairing1}</p>
+                <p className="text-[#262626]">{product.description?.pairing2}</p>
+              </div>
+            </div>
           </div>
         )}
         {activeTab==='info' && (
