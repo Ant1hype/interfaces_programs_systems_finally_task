@@ -7,6 +7,26 @@ import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 
+function formatReviewDate(raw) {
+  if (typeof raw !== 'string' || !/^\d{4}-\d{2}-\d{2}(?:T|$)/.test(raw)) return raw;
+  const date = new Date(raw);
+  return Number.isNaN(date.getTime())
+    ? raw
+    : date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function Rating({ value, size }) {
+  return (
+    <span className="flex gap-1.5" aria-label={`Оценка ${value} из 5`}>
+      {[1, 2, 3, 4, 5].map((i) => {
+        const fill = Math.max(0, Math.min(1, value - (i - 1)));
+        const background = fill >= 1 ? '#4F3422' : fill <= 0 ? '#E5E5E5' : 'linear-gradient(90deg, #4F3422 50%, #E5E5E5 50%)';
+        return <span key={i} style={{ background, borderRadius: '50%', width: size, height: size, display: 'inline-block' }} />;
+      })}
+    </span>
+  );
+}
+
 function hasUserPurchasedProduct(user, productId) {
   if (!user) return false;
   const pIdStr = String(productId).trim();
@@ -280,8 +300,6 @@ export default function Product() {
   const related=allProducts.filter(pp=>pp.category===product.category && String(pp.id)!==String(product.id)).slice(0,4);
   const reviews=product.reviews||[];
   const avgRating=reviews.length?Math.round(reviews.reduce((s,r)=>s+(Number(r.rating)||0),0)/reviews.length*10)/10:0;
-  const reviewsWord=(n=>{const a=n%100;if(a>=11&&a<=14)return 'отзывов';const b=n%10;if(b===1)return 'отзыв';if(b>=2&&b<=4)return 'отзыва';return 'отзывов';});
-  const starsRow=(rating)=>(<span className="flex gap-1.5" aria-label={`Оценка ${rating} из 5`}>{[1,2,3,4,5].map(d=>(<span key={d} className={`w-3 h-3 rounded-full ${d<=rating?"bg-brand-900":"bg-surface-gray-fill border border-neutral-300"}`} />))}</span>);
 
   const tabBtn=(key,label)=>(
     <button
@@ -462,13 +480,18 @@ export default function Product() {
               <div className="col-span-12 lg:col-span-9 w-full flex flex-col gap-5">
                 {reviews.map(r=>(
                   <article key={r.id} className="grid grid-cols-12 gap-5 bg-surface-white border border-neutral-300 rounded-radius-lg" style={{ padding: '32px', lineHeight: 1.65 }}>
-                    <div className="col-span-12 md:col-span-3">
-                      <p className="font-bold text-[#262626]">{r.author}<span className="font-normal text-[16px]" style={{ color: '#737373', marginLeft: '8px' }}>{r.date}</span></p>
-                      <div className="mt-4">{starsRow(r.rating)}</div>
+                    <div className="col-span-12 md:col-span-4">
+                      <p className="font-bold text-[#262626]">{r.author}<span className="font-normal text-[16px]" style={{ color: '#737373', marginLeft: '8px' }}>{formatReviewDate(r.date)}</span></p>
+                      <div className="mt-4"><Rating value={r.rating} size={12} /></div>
                       {r.pairing && <p className="text-[23px] text-[#262626] mt-4">Пара: {r.pairing}</p>}
                     </div>
-                    <div className="col-span-12 md:col-span-9">
+                    <div className="col-span-12 md:col-span-8">
                       <p className="text-[23px] text-[#262626]">{r.text}</p>
+                      {Array.isArray(r.photos) && r.photos.length > 0 && (
+                        <div className="flex gap-3 mt-4">
+                          {r.photos.map((photo, i) => <img key={i} src={photo} alt={`Фото отзыва ${i + 1}`} className="w-[72px] h-[72px] rounded-radius-md object-cover" />)}
+                        </div>
+                      )}
                     </div>
                   </article>
                 ))}
@@ -476,8 +499,8 @@ export default function Product() {
             )}
             <aside className="col-span-12 lg:col-span-3 w-full font-montserrat">
               <p className="text-[54px] font-bold text-[#262626] leading-none">{avgRating}</p>
-              <p className="text-[23px] text-[#262626] mt-3">{reviews.length === 0 ? 'На основе 0 отзывов' : `На основе ${reviews.length}-х ${reviewsWord(reviews.length)}`}</p>
-              <div className="mt-3">{starsRow(Math.floor(avgRating))}</div>
+              <p className="text-[23px] text-[#262626] mt-3">{reviews.length === 1 ? 'На основе 1 отзыва' : `На основе ${reviews.length}-х отзывов`}</p>
+              <div className="mt-3"><Rating value={avgRating} size={16} /></div>
               <button type="button" onClick={handleOpenReviewModal} className="w-full py-3 rounded-radius-md border border-brand-outline text-brand-outline bg-surface-white text-sm font-medium hover:bg-surface-cream transition-colors" style={{ marginTop: '32px' }}>Оставить отзыв</button>
             </aside>
           </div>
