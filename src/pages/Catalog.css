@@ -427,30 +427,3 @@ body.search-locked::-webkit-scrollbar {
 @media (max-width: 640px) {
   .catalog-grid { grid-template-columns: 1fr; }
 }
-
-/* Внутренние отступы карточек каталога */
-.catalog-grid .product-card {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.catalog-grid .product-card__image-wrap {
-  margin-bottom: 20px;
-}
-
-.catalog-grid .product-card__title {
-  margin: 0 0 8px;
-}
-
-.catalog-grid .product-card__weight {
-  margin: 0 0 12px;
-}
-
-.catalog-grid .product-card__price {
-  margin: 0 0 24px;
-}
-
-.catalog-grid .product-card__btn {
-  margin-top: auto;
-}
