@@ -47,19 +47,23 @@
 
 .product-row {
   display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 26px;
   margin-bottom: 26px;
 }
 
-.product-row .product-card__link {
-  flex: 1 1 0;
-  min-width: 0;
-  width: auto;
+.product-row > * {
+  flex-shrink: 0;
 }
 
-.product-row .product-card {
-  width: 100%;
-  max-width: none;
+@media (max-width: 1300px) {
+  .product-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 26px;
+    justify-content: initial;
+  }
 }
 
 /* У последнего ряда отступ до кнопки больше */
