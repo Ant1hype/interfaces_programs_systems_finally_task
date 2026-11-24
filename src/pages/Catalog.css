@@ -15,10 +15,7 @@
 
 /* --- ВЕРХНЯЯ ЧАСТЬ (Крошки, Заголовок, Выпадашка) --- */
 .catalog-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 20px;
+  position: relative;
   margin-bottom: 21px; /* Заголовок - Блок с фильтрами (21) */
 }
 
@@ -29,11 +26,13 @@
   color: #1A1A1A;
 }
 
-/* --- ВЫПАДАЮЩИЙ СПИСОК --- */
-.catalog-sort {
-  display: flex;
-  flex-direction: column;
-  width: 263.33px;
+/* --- ВЫПАДАЮЩИЙ СПИСОК (Жесткие размеры 240х48) --- */
+.catalog-sort-wrapper {
+  position: absolute;
+  right: 0;
+  bottom: -4px; /* Выравниваем по базовой линии заголовка */
+  width: 240px;
+  z-index: 10;
 }
 
 .custom-dropdown {
@@ -97,20 +96,19 @@
 
 /* --- ОСНОВНОЙ КОНТЕНТ (Сайдбар + Матрица товаров) --- */
 .catalog-content {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 20px; /* Ровный отступ между сайдбаром фильтров и плиткой */
-  align-items: start;
+  display: flex;
+  gap: 24px; /* Ровный отступ между сайдбаром фильтров и плиткой */
+  align-items: flex-start;
 }
 
 /* --- САЙДБАР ФИЛЬТРОВ --- */
 .catalog-sidebar {
-  grid-column: span 3;
-  width: auto;
+  width: 320px;
   background: #FFFFFF;
   border-radius: 16px;
   padding: 24px 20px;
   box-sizing: border-box;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
 }
@@ -211,12 +209,12 @@
 
 /* --- МАТРИЦА ТОВАРОВ --- */
 .catalog-grid-wrapper {
-  grid-column: span 9;
+  flex: 1 1 auto; /* Занимает всю оставшуюся ширину рядом с сайдбаром */
   min-width: 0;
   display: flex;
   flex-direction: column;
   /* Обёртка сетки не добавляет собственных отступов:
-     зазор между сайдбаром и плиткой задаёт только gap у .catalog-content (20px) */
+     зазор между сайдбаром и плиткой задаёт только gap у .catalog-content (24px) */
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -224,8 +222,8 @@
 
 .catalog-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px; /* Единственный источник зазоров между карточками — ровно 20px */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px; /* Единственный источник зазоров между карточками */
   width: 100%;
   /* Никаких внешних отступов у самой сетки, иначе зазор удваивается */
   margin: 0;
@@ -233,24 +231,24 @@
   box-sizing: border-box;
 }
 
+.catalog-grid > *,
+.catalog-grid .product-card,
 .catalog-grid .product-card__link {
-  display: block;
   width: 100%;
   max-width: none;
   margin: 0;
+  box-sizing: border-box;
 }
 
-.catalog-grid .product-card {
-  width: 100%;
-  max-width: none;
-  margin: 0;
+.catalog-grid .product-card__link {
+  display: block;
 }
 
 /* Кнопка Показать еще */
 .catalog-show-more {
   margin-top: 40px;
   align-self: center;
-  width: 263.33px;
+  width: 280px;
   height: 50px;
   background: transparent;
   border: 1px solid #1A1A1A;
@@ -370,7 +368,7 @@
 }
 
 .catalog-empty__reset {
-  width: 263.33px;
+  width: 280px;
   height: 50px;
   background: transparent;
   border: 1px solid #1A1A1A;
@@ -420,8 +418,12 @@ body.search-locked::-webkit-scrollbar {
 /* --- АДАПТИВНОСТЬ ПРИ СЖАТИИ ОКНА --- */
 @media (max-width: 1300px) {
   .catalog-container { padding: 40px 40px 60px 40px; }
-  .catalog-content { grid-template-columns: 1fr; }
-  .catalog-sidebar, .catalog-grid-wrapper { grid-column: 1 / -1; }
-  .catalog-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
-  .catalog-sidebar { max-width: none; }
+  .catalog-content { flex-direction: column; align-items: center; }
+  .catalog-grid-wrapper { width: 100%; }
+  .catalog-sidebar { width: 100%; max-width: none; }
+  .catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .catalog-grid { grid-template-columns: 1fr; }
 }

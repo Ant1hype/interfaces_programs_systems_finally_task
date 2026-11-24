@@ -113,7 +113,7 @@ export default function Catalog() {
 
   // Состояния для выпадашки и пагинации (пагинация считается целыми рядами)
   const gridWrapperRef = useRef(null);
-  const [cols, setCols] = useState(3);
+  const [cols, setCols] = useState(4);
   const [rows, setRows] = useState(3);
   const [selectedSort, setSelectedSort] = useState(sortOptions[0].value);
 
@@ -196,12 +196,16 @@ export default function Catalog() {
     return 0; // "recommended" оставляем исходный порядок БД
   });
 
-  // Считаем реальные колонки сетки при её появлении и изменении размера окна
+  // Пересчитываем колонки при изменении размера окна и появлении сетки
   const hasProducts = sortedProducts.length > 0;
   useEffect(() => {
     const measureCols = () => {
-      const g = gridWrapperRef.current?.querySelector('.catalog-grid');
-      if (g) setCols(getComputedStyle(g).gridTemplateColumns.split(' ').length);
+      if (window.innerWidth > 1300) {
+        setCols(4);
+      } else {
+        const grid = gridWrapperRef.current?.querySelector('.catalog-grid');
+        if (grid) setCols(getComputedStyle(grid).gridTemplateColumns.split(' ').length);
+      }
     };
     measureCols();
     window.addEventListener('resize', measureCols);
@@ -232,26 +236,27 @@ export default function Catalog() {
       <div className="catalog-container">
         
         <div className="catalog-header">
-          <div>
-            <Breadcrumbs items={[{ to: '/', label: 'Главная' }]} current={pageTitle} />
-            <h1 className="catalog-title">{pageTitle}</h1>
-          </div>
-          <div className="catalog-sort">
-            <span className="filter-title">Сортировка</span>
-            <Dropdown
-              value={selectedSort}
-              onChange={setSelectedSort}
-              options={sortOptions}
-              placeholder="По популярности"
-              ariaLabel="Сортировка товаров"
-            />
-          </div>
+          <Breadcrumbs items={[{ to: '/', label: 'Главная' }]} current={pageTitle} />
+
+          <h1 className="catalog-title">{pageTitle}</h1>
         </div>
 
         <div className="catalog-content">
           
           {/* САЙДБАР С ФИЛЬТРАМИ */}
           <aside className="catalog-sidebar">
+
+            {/* СОРТИРОВКА (Dropdown) */}
+            <div className="filter-group" style={{ marginBottom: 32 }}>
+              <span className="filter-title">Сортировка</span>
+              <Dropdown
+                value={selectedSort}
+                onChange={setSelectedSort}
+                options={sortOptions}
+                placeholder="По популярности"
+                ariaLabel="Сортировка товаров"
+              />
+            </div>
 
             {/* Тумблер */}
             <div className="filter-group filter-group--inline toggle-box">
