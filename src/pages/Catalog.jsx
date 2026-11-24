@@ -24,10 +24,6 @@ const sortOptions = [
   { value: "new", label: "Новинки" }
 ];
 
-// Метрики плитки: минимальная ширина 250px и зазор 20px (совпадают с CSS .catalog-grid)
-const GRID_COL_MIN = 250;
-const GRID_GAP = 20;
-
 const categoryMap = {
   'lactose-free': 'Без лактозы',
   'wine': 'К красному сухому вину',
@@ -126,17 +122,6 @@ export default function Catalog() {
     setRows(3);
   }, [filterParam, searchParam]);
 
-  // Считаем число колонок плитки по реальной ширине обёртки сетки и пересчитываем при resize окна
-  useEffect(() => {
-    const measureCols = () => {
-      const w = gridWrapperRef.current ? gridWrapperRef.current.clientWidth : 0;
-      setCols(Math.max(1, Math.floor((w + GRID_GAP) / (GRID_COL_MIN + GRID_GAP))));
-    };
-    measureCols();
-    window.addEventListener('resize', measureCols);
-    return () => window.removeEventListener('resize', measureCols);
-  }, []);
-
   // Функция переключения чекбоксов
   const handleCheckboxChange = (key, option) => {
     setSelectedFilters(prev => {
@@ -211,6 +196,18 @@ export default function Catalog() {
     return 0; // "recommended" оставляем исходный порядок БД
   });
 
+  // Считаем реальные колонки сетки при её появлении и изменении размера окна
+  const hasProducts = sortedProducts.length > 0;
+  useEffect(() => {
+    const measureCols = () => {
+      const g = gridWrapperRef.current?.querySelector('.catalog-grid');
+      if (g) setCols(getComputedStyle(g).gridTemplateColumns.split(' ').length);
+    };
+    measureCols();
+    window.addEventListener('resize', measureCols);
+    return () => window.removeEventListener('resize', measureCols);
+  }, [hasProducts]);
+
   // Срез для пагинации кнопки "Показать еще": показываем целые ряды (rows × cols карточек)
   const visibleCount = rows * cols;
   const displayProducts = sortedProducts.slice(0, visibleCount);
@@ -235,28 +232,26 @@ export default function Catalog() {
       <div className="catalog-container">
         
         <div className="catalog-header">
-          <Breadcrumbs items={[{ to: '/', label: 'Главная' }]} current={pageTitle} />
-          
-          <h1 className="catalog-title">{pageTitle}</h1>
+          <div>
+            <Breadcrumbs items={[{ to: '/', label: 'Главная' }]} current={pageTitle} />
+            <h1 className="catalog-title">{pageTitle}</h1>
+          </div>
+          <div className="catalog-sort">
+            <span className="filter-title">Сортировка</span>
+            <Dropdown
+              value={selectedSort}
+              onChange={setSelectedSort}
+              options={sortOptions}
+              placeholder="По популярности"
+              ariaLabel="Сортировка товаров"
+            />
+          </div>
         </div>
 
         <div className="catalog-content">
           
           {/* САЙДБАР С ФИЛЬТРАМИ */}
           <aside className="catalog-sidebar">
-
-            {/* СОРТИРОВКА (Dropdown) — переехал из шапки в панель фильтров:
-                стоит слева и наследует внутреннюю ширину сайдбара (263.33px - 2*20px) */}
-            <div className="filter-group" style={{ marginBottom: 32 }}>
-              <span className="filter-title">Сортировка</span>
-              <Dropdown
-                value={selectedSort}
-                onChange={setSelectedSort}
-                options={sortOptions}
-                placeholder="По популярности"
-                ariaLabel="Сортировка товаров"
-              />
-            </div>
 
             {/* Тумблер */}
             <div className="filter-group filter-group--inline toggle-box">
