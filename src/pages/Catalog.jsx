@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import Dropdown from '../components/Dropdown';
@@ -196,25 +196,21 @@ export default function Catalog() {
     return 0; // "recommended" оставляем исходный порядок БД
   });
 
-  // Пересчитываем колонки при изменении размера окна и появлении сетки
-  const hasProducts = sortedProducts.length > 0;
-  useEffect(() => {
+  // Срез для пагинации кнопки "Показать еще": показываем целые ряды (rows × cols карточек)
+  const visibleCount = rows * cols;
+  const displayProducts = sortedProducts.slice(0, visibleCount);
+
+  // Считаем карточки в первом ряду после обновления списка и при изменении размера окна
+  useLayoutEffect(() => {
     const measureCols = () => {
-      if (window.innerWidth > 1300) {
-        setCols(4);
-      } else {
-        const grid = gridWrapperRef.current?.querySelector('.catalog-grid');
-        if (grid) setCols(getComputedStyle(grid).gridTemplateColumns.split(' ').length);
-      }
+      const cards = gridWrapperRef.current.querySelectorAll('.catalog-grid > *');
+      const top = cards[0]?.offsetTop;
+      setCols([...cards].filter(c => c.offsetTop === top).length || 1);
     };
     measureCols();
     window.addEventListener('resize', measureCols);
     return () => window.removeEventListener('resize', measureCols);
-  }, [hasProducts]);
-
-  // Срез для пагинации кнопки "Показать еще": показываем целые ряды (rows × cols карточек)
-  const visibleCount = rows * cols;
-  const displayProducts = sortedProducts.slice(0, visibleCount);
+  }, [displayProducts]);
 
   // Активен ли поисковый запрос или глобальная подборка (для счётчика и пустого состояния)
   const hasActiveQuery = Boolean(searchTerm || currentCategory);

@@ -221,27 +221,14 @@
 }
 
 .catalog-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 24px; /* Единственный источник зазоров между карточками */
   width: 100%;
   /* Никаких внешних отступов у самой сетки, иначе зазор удваивается */
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-.catalog-grid > *,
-.catalog-grid .product-card,
-.catalog-grid .product-card__link {
-  width: 100%;
-  max-width: none;
-  margin: 0;
-  box-sizing: border-box;
-}
-
-.catalog-grid .product-card__link {
-  display: block;
 }
 
 /* Кнопка Показать еще */
@@ -421,9 +408,4 @@ body.search-locked::-webkit-scrollbar {
   .catalog-content { flex-direction: column; align-items: center; }
   .catalog-grid-wrapper { width: 100%; }
   .catalog-sidebar { width: 100%; max-width: none; }
-  .catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-@media (max-width: 640px) {
-  .catalog-grid { grid-template-columns: 1fr; }
 }
