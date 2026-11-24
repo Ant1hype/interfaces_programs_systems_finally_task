@@ -199,7 +199,7 @@ export default function Header() {
       >
         <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[120px] max-w-[1920px] mx-auto py-6 md:py-8">
           <form onSubmit={handleSearchSubmit} className="flex items-center gap-4" role="search">
-            <div className="flex items-center flex-1 min-w-0 h-[52px] px-4 bg-white border border-[#E5E2DB] rounded-[12px] shadow-[0_2px_8px_rgba(0,0,0,0.06)] focus-within:border-brand-900 transition-colors duration-200">
+            <div className="flex items-center gap-3 flex-1 min-w-0 h-[52px] px-4 bg-white border border-[#E5E2DB] rounded-[12px] shadow-[0_2px_8px_rgba(0,0,0,0.06)] focus-within:border-brand-900 transition-colors duration-200">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 text-neutral-500 shrink-0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Поиск по каталогу..." className="flex-1 min-w-0 bg-transparent border-0 outline-none text-[16px] font-montserrat placeholder:text-neutral-500" />
             </div>
