@@ -114,12 +114,12 @@ export default function Catalog() {
   // Состояния для выпадашки и пагинации (пагинация считается целыми рядами)
   const gridWrapperRef = useRef(null);
   const [cols, setCols] = useState(4);
-  const [rows, setRows] = useState(3);
+  const [rows, setRows] = useState(4);
   const [selectedSort, setSelectedSort] = useState(sortOptions[0].value);
 
   // Сбрасываем количество рядов при переходе между подборками и новом поиске
   useEffect(() => {
-    setRows(3);
+    setRows(4);
   }, [filterParam, searchParam]);
 
   // Функция переключения чекбоксов
@@ -131,7 +131,7 @@ export default function Catalog() {
         : [...currentValues, option];                // ставим галочку
       return { ...prev, [key]: updatedValues };
     });
-    setRows(3); // Сбрасываем пагинацию (ряды) при изменении фильтров
+    setRows(4); // Сбрасываем пагинацию (ряды) при изменении фильтров
   };
 
   // --- ПОИСКОВЫЙ КОНТЕКСТ ЗАПРОСА ---
@@ -221,7 +221,7 @@ export default function Catalog() {
     setInStockOnly(false);
     setPrice([0, 5000]);
     setTaste([1, 5]);
-    setRows(3);
+    setRows(4);
     navigate('/catalog');
   };
 
@@ -261,7 +261,7 @@ export default function Catalog() {
                 <input 
                   type="checkbox" 
                   checked={inStockOnly} 
-                  onChange={(e) => { setInStockOnly(e.target.checked); setRows(3); }} 
+                  onChange={(e) => { setInStockOnly(e.target.checked); setRows(4); }} 
                 />
                 <span className="toggle-slider"></span>
               </label>
@@ -271,8 +271,8 @@ export default function Catalog() {
             <div className="filter-group slider-box">
               <span className="filter-title">Цена, ₽</span>
               <div className="dual-slider">
-                <input type="range" min="0" max="5000" value={price[0]} onChange={e => { setPrice([parseInt(e.target.value), price[1]]); setRows(3); }} />
-                <input type="range" min="0" max="5000" value={price[1]} onChange={e => { setPrice([price[0], parseInt(e.target.value)]); setRows(3); }} />
+                <input type="range" min="0" max="5000" value={price[0]} onChange={e => { setPrice([parseInt(e.target.value), price[1]]); setRows(4); }} />
+                <input type="range" min="0" max="5000" value={price[1]} onChange={e => { setPrice([price[0], parseInt(e.target.value)]); setRows(4); }} />
                 <div className="slider-track" style={{ left: `${(price[0]/5000)*100}%`, right: `${100 - (price[1]/5000)*100}%` }}></div>
               </div>
               <div className="range-labels">
@@ -285,8 +285,8 @@ export default function Catalog() {
             <div className="filter-group slider-box">
               <span className="filter-title">Интенсивность вкуса</span>
               <div className="dual-slider">
-                <input type="range" min="1" max="5" value={taste[0]} onChange={e => { setTaste([parseInt(e.target.value), taste[1]]); setRows(3); }} />
-                <input type="range" min="1" max="5" value={taste[1]} onChange={e => { setTaste([taste[0], parseInt(e.target.value)]); setRows(3); }} />
+                <input type="range" min="1" max="5" value={taste[0]} onChange={e => { setTaste([parseInt(e.target.value), taste[1]]); setRows(4); }} />
+                <input type="range" min="1" max="5" value={taste[1]} onChange={e => { setTaste([taste[0], parseInt(e.target.value)]); setRows(4); }} />
                 <div className="slider-track" style={{ left: `${((taste[0]-1)/4)*100}%`, right: `${100 - ((taste[1]-1)/4)*100}%` }}></div>
               </div>
               <div className="range-labels">
