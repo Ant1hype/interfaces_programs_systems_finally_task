@@ -475,7 +475,7 @@ export default function Product() {
         {activeTab==='reviews' && (
           <div className="w-full grid grid-cols-12 gap-5 items-start">
             {reviews.length===0 ? (
-              <div className="col-span-12 lg:col-span-9 w-full bg-surface-cream border border-neutral-250-a80 rounded-radius-lg py-12 text-center text-[#262626] font-montserrat text-[24px]">отзывов пока нет</div>
+              <div className="col-span-12 lg:col-span-9 w-full bg-surface-cream border border-neutral-250-a80 rounded-radius-lg py-12 text-center text-[#262626] font-montserrat text-[24px] self-stretch flex items-center justify-center">отзывов пока нет</div>
             ) : (
               <div className="col-span-12 lg:col-span-9 w-full flex flex-col gap-5">
                 {reviews.map(r=>(
