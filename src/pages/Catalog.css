@@ -97,13 +97,13 @@
 /* --- ОСНОВНОЙ КОНТЕНТ (Сайдбар + Матрица товаров) --- */
 .catalog-content {
   display: flex;
-  gap: 26px; /* Ровный отступ между сайдбаром фильтров и плиткой */
+  gap: 20px; /* Ровный отступ между сайдбаром фильтров и плиткой */
   align-items: flex-start;
 }
 
 /* --- САЙДБАР ФИЛЬТРОВ --- */
 .catalog-sidebar {
-  width: 280px;
+  width: 263.33px; /* 2 колонки сетки */
   background: #FFFFFF;
   border-radius: 16px;
   padding: 24px 20px;
@@ -214,7 +214,7 @@
   display: flex;
   flex-direction: column;
   /* Обёртка сетки не добавляет собственных отступов:
-     зазор между сайдбаром и плиткой задаёт только gap у .catalog-content (26px) */
+     зазор между сайдбаром и плиткой задаёт только gap у .catalog-content (20px) */
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -223,7 +223,7 @@
 .catalog-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Динамическая плитка */
-  gap: 26px; /* Единственный источник зазоров между карточками — ровно 26px */
+  gap: 20px; /* Единственный источник зазоров между карточками — ровно 20px */
   width: 100%;
   /* Никаких внешних отступов у самой сетки, иначе зазор удваивается */
   margin: 0;
@@ -240,7 +240,7 @@
   max-width: 100% !important;
   min-width: 0;
   box-sizing: border-box;
-  /* Внешние отступы ячеек сетки обнуляем ПОЛНОСТЬЮ: зазор даёт только gap (26px),
+  /* Внешние отступы ячеек сетки обнуляем ПОЛНОСТЬЮ: зазор даёт только gap (20px),
      иначе получаются двойные промежутки между карточками */
   margin: 0 !important;
 }
@@ -270,7 +270,7 @@
 .catalog-show-more {
   margin-top: 40px;
   align-self: center;
-  width: 280px;
+  width: 263.33px;
   height: 50px;
   background: transparent;
   border: 1px solid #1A1A1A;
@@ -390,7 +390,7 @@
 }
 
 .catalog-empty__reset {
-  width: 280px;
+  width: 263.33px;
   height: 50px;
   background: transparent;
   border: 1px solid #1A1A1A;

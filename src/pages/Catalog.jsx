@@ -24,9 +24,9 @@ const sortOptions = [
   { value: "new", label: "Новинки" }
 ];
 
-// Метрики плитки: минимальная ширина колонки и зазор (совпадают с CSS .catalog-grid)
+// Метрики плитки: минимальная ширина 250px и зазор 20px (совпадают с CSS .catalog-grid)
 const GRID_COL_MIN = 250;
-const GRID_GAP = 26;
+const GRID_GAP = 20;
 
 const categoryMap = {
   'lactose-free': 'Без лактозы',
@@ -246,7 +246,7 @@ export default function Catalog() {
           <aside className="catalog-sidebar">
 
             {/* СОРТИРОВКА (Dropdown) — переехал из шапки в панель фильтров:
-                стоит слева и наследует ширину сайдбара (280px - 2*20px = 240px) */}
+                стоит слева и наследует внутреннюю ширину сайдбара (263.33px - 2*20px) */}
             <div className="filter-group" style={{ marginBottom: 32 }}>
               <span className="filter-title">Сортировка</span>
               <Dropdown
